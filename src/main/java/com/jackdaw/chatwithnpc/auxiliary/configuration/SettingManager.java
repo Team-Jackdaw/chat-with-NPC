@@ -1,13 +1,12 @@
 package com.jackdaw.chatwithnpc.auxiliary.configuration;
 
+import com.google.gson.Gson;
 import com.jackdaw.chatwithnpc.ChatWithNPCMod;
-import com.jackdaw.chatwithnpc.auxiliary.yaml.YamlUtils;
 import org.slf4j.Logger;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.HashMap;
+import java.nio.file.Files;
 
 /**
  * Manages the config files for the modules provided by this plugin.
@@ -20,48 +19,75 @@ import java.util.HashMap;
  */
 public class SettingManager {
     private static final Logger logger = ChatWithNPCMod.LOGGER;
-    private static final File configFile = ChatWithNPCMod.workingDirectory.resolve("config.yml").toFile();
+    private static final File configFile = ChatWithNPCMod.workingDirectory.resolve("config.json").toFile();
 
     // use for confirming the setting version is the same with the plugin
-    private static final String lastVersion = "v1.0";
+    private static final String lastVersion = "v2.0";
 
     public static boolean enabled = true;
 
     public static String language = "Chinese";
     public static String apiKey = "";
-    public static String model = "text-davinci-003";
+    public static String model = "gpt-3.5-turbo";
     public static float temperature = 0.6f;
+
+    private static final class Config {
+        private final String lastVersion = "v2.0";
+        private boolean enabled = true;
+        private String language = "Chinese";
+        private String apiKey = "";
+        private String model = "gpt-3.5-turbo";
+        private float temperature = 0.6f;
+
+        private static String toJson() {
+            Config config = new Config();
+            config.enabled = SettingManager.enabled;
+            config.language = SettingManager.language;
+            config.apiKey = SettingManager.apiKey;
+            config.model = SettingManager.model;
+            config.temperature = SettingManager.temperature;
+            Gson gson = new Gson();
+            return gson.toJson(config);
+        }
+
+        private void set() {
+            if (!SettingManager.lastVersion.equals(lastVersion)) {
+                logger.warn("[chat-with-npc] The config file is not the same version with the plugin.");
+                save();
+                return;
+            }
+            SettingManager.enabled = enabled;
+            SettingManager.language = language;
+            SettingManager.apiKey = apiKey;
+            SettingManager.model = model;
+            SettingManager.temperature = temperature;
+        }
+
+    }
 
 
     /**
      * Load the setting from the config file.
      */
-    public static void loadConfig(){
+    public static void sync(){
         if (configFile.exists()) {
             try {
-                HashMap data = YamlUtils.readFile(configFile);
-                String version = (String) data.get("version");
-                if (!lastVersion.equals(version)) {
-                    logger.warn("[chat-with-npc] The config file is not the same version with the plugin.");
-                    saveConfig();
-                }
-                SettingManager.enabled = (boolean) data.get("enabled");
-                SettingManager.language = (String) data.get("language");
-                SettingManager.apiKey = (String) data.get("apiKey");
-                SettingManager.model = (String) data.get("model");
-                SettingManager.temperature = Float.parseFloat(data.get("temperature").toString() + "f");
-            } catch (FileNotFoundException e) {
+                String json = new String(Files.readAllBytes(configFile.toPath()));
+                Gson gson = new Gson();
+                Config config = gson.fromJson(json, Config.class);
+                config.set();
+            } catch (IOException e) {
                 logger.error("[chat-with-npc] Can't open the config file.");
             }
         } else {
-            saveConfig();
+            save();
         }
     }
 
     /**
      * Write the setting to the config file.
      */
-    public static void saveConfig() {
+    public static void save() {
         try {
             if (!configFile.exists()) {
                 if (!configFile.createNewFile()) {
@@ -69,14 +95,7 @@ public class SettingManager {
                     return;
                 }
             }
-            HashMap<String, Object> data = new HashMap<>();
-            data.put("version", lastVersion);
-            data.put("enabled", SettingManager.enabled);
-            data.put("language", SettingManager.language);
-            data.put("apiKey", SettingManager.apiKey);
-            data.put("model", SettingManager.model);
-            data.put("temperature", SettingManager.temperature);
-            YamlUtils.writeFile(configFile, data);
+            Files.write(configFile.toPath(), Config.toJson().getBytes());
         } catch (IOException e) {
             logger.error("[chat-with-npc] Can't write the config file.");
         }

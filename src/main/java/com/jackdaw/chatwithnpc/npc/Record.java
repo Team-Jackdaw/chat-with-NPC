@@ -7,16 +7,16 @@ public class Record {
         PLAYER, NPC
     }
     public static final class Message {
-        public final Role role;
+        private final Role role;
         private final String message;
 
-        private Message(Role role, String message) {
+        public Message(Role role, String message) {
             this.role = role;
             this.message = message;
         }
 
-        public String getRole() {
-            return role.toString();
+        public Role getRole() {
+            return role;
         }
 
         public String getMessage() {

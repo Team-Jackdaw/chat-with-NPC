@@ -11,11 +11,11 @@ import net.minecraft.text.Text;
 
 public class ConversationHandler {
 
-    NPCEntity npc;
+    final NPCEntity npc;
 
-    PlayerEntity player;
+    final PlayerEntity player;
 
-    long updateTime;
+    long updateTime = 0L;
 
     public ConversationHandler(NPCEntity npc, PlayerEntity player) {
         this.npc = npc;
@@ -28,6 +28,7 @@ public class ConversationHandler {
     }
 
     public void getResponse(PlayerEntity player, String message) {
+        ChatWithNPCMod.LOGGER.info("[chat-with-npc] Draft message: " + message);
         // 1.5 second cooldown between requests
         if (npc.getLastMessageTime() + 1500L > System.currentTimeMillis()) return;
         if (SettingManager.apiKey.isEmpty()) {
@@ -38,7 +39,7 @@ public class ConversationHandler {
         Thread t = new Thread(() -> {
             try {
                 OpenAIHandler.updateSetting();
-                String response = OpenAIHandler.sendRequest(message);
+                String response = OpenAIHandler.sendRequest(message, npc.getMessageRecord());
                 player.sendMessage(Text.of("<" + npc.getName() + "> " + response));
                 npc.addMessageRecord(npc.getLastMessageTime(), Record.Role.NPC, response);
             } catch (Exception e) {
@@ -52,7 +53,7 @@ public class ConversationHandler {
     private void startConversation() {
         sendWaitMessage();
         getResponse(player, Prompt.builder()
-                .setNpc(npc.getName())
+                .setNpc(npc)
                 .build()
                 .getInitialPrompt() + "Start with you: ");
         updateTime = System.currentTimeMillis();
@@ -62,7 +63,7 @@ public class ConversationHandler {
         sendWaitMessage();
         npc.addMessageRecord(System.currentTimeMillis(), Record.Role.PLAYER, message);
         Prompt prompt = Prompt.builder()
-                .setNpc(npc.getName())
+                .setNpc(npc)
                 .build();
         getResponse(player, prompt.getInitialPrompt() + prompt.getHistoryMessage() + "Now you response: ");
         updateTime = System.currentTimeMillis();

@@ -39,7 +39,7 @@ public class CommandSet {
     }
     public static int setEnabled(CommandContext<ServerCommandSource> context, boolean enabled) {
         SettingManager.enabled = enabled;
-        SettingManager.saveConfig();
+        SettingManager.save();
         context.getSource().sendFeedback(Text.of("[chat-with-npc] ChatWithNPC " + (enabled ? "enabled" : "disabled")), true);
         return 1;
     }
@@ -78,7 +78,7 @@ public class CommandSet {
         String apiKey = context.getArgument("key", String.class);
         if (!apiKey.isEmpty()) {
             SettingManager.apiKey = apiKey;
-            SettingManager.saveConfig();
+            SettingManager.save();
             context.getSource().sendFeedback(Text.of("[chat-with-npc] API key set"), true);
             return 1;
         }
@@ -88,7 +88,7 @@ public class CommandSet {
         String model = context.getArgument("model", String.class);
         if (!model.isEmpty()) {
             SettingManager.model = model;
-            SettingManager.saveConfig();
+            SettingManager.save();
             context.getSource().sendFeedback(Text.of("[chat-with-npc] Model set"), true);
             return 1;
         }
@@ -96,7 +96,7 @@ public class CommandSet {
     }
     public static int setTemp(CommandContext<ServerCommandSource> context) {
         SettingManager.temperature = context.getArgument("temperature", float.class);
-        SettingManager.saveConfig();
+        SettingManager.save();
         context.getSource().sendFeedback(Text.of("[chat-with-npc] Temperature set"), true);
         return 1;
     }

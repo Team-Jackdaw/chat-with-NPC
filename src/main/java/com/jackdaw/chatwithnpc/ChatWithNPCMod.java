@@ -46,7 +46,7 @@ public class ChatWithNPCMod implements ModInitializer {
             }
         }
         // Load the configuration
-        SettingManager.loadConfig();
+        SettingManager.sync();
         // Register the command
         CommandRegistrationCallback.EVENT.register(CommandSet::setupCommand);
         // Register the conversation

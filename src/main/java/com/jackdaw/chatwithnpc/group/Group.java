@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.TreeSet;
 
 public class Group {
@@ -13,7 +14,7 @@ public class Group {
 
     private final ArrayList<String> permanentPrompt = new ArrayList<>(Arrays.asList("good weather", "very save"));
 
-    private final TreeSet<GroupEvent> tempEvent = new TreeSet<>();
+    private final ArrayList<Map<Long, String>> tempEvent = new ArrayList<>();
 
     private long lastLoadTime = System.currentTimeMillis();
 
@@ -43,19 +44,14 @@ public class Group {
     public void updateLastLoadTime(long time) {
         lastLoadTime = time;
     }
-
-    public void setTempEvent(TreeSet<GroupEvent> tempEvent) {
-        this.tempEvent.clear();
-        this.tempEvent.addAll(tempEvent);
-    }
     
     public void addTempEvent(String event, long time) {
         long now = System.currentTimeMillis();
-        tempEvent.add(new GroupEvent(event, now, now + time));
+        tempEvent.add(Map.of(now + time, event));
     }
 
-    public TreeSet<GroupEvent> getTempEvent() {
-        return new TreeSet<>(tempEvent);
+    public ArrayList<Map<Long, String>> getTempEvent() {
+        return new ArrayList<>(tempEvent);
     }
 
     public void addPermanentPrompt(String prompt) {
@@ -73,5 +69,10 @@ public class Group {
     
     public GroupDataManager getDataManager() {
         return new GroupDataManager(this);
+    }
+
+    public void setTempEvent(ArrayList<Map<Long, String>> tempEvent) {
+        this.tempEvent.clear();
+        this.tempEvent.addAll(tempEvent);
     }
 }

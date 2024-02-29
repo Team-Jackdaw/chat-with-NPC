@@ -1,16 +1,15 @@
 package com.jackdaw.chatwithnpc.group;
 
+import com.google.gson.Gson;
 import com.jackdaw.chatwithnpc.ChatWithNPCMod;
-import com.jackdaw.chatwithnpc.auxiliary.yaml.YamlUtils;
 import org.slf4j.Logger;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A serializer used to read or write the data from the files.
@@ -21,6 +20,29 @@ import java.util.HashMap;
  */
 public class GroupDataManager{
 
+    private static final class GroupData {
+        private final String name;
+
+        private final String parentGroup;
+
+        private final ArrayList<String> permanentPrompt;
+
+        private final ArrayList<Map<Long, String>> tempEvent;
+
+        private GroupData(Group group) {
+            this.name = group.getName();
+            this.parentGroup = group.getParentGroup();
+            permanentPrompt = new ArrayList<>(group.getPermanentPrompt());
+            tempEvent = new ArrayList<>(group.getTempEvent());
+        }
+
+        private void set(Group group) {
+            group.setParentGroup(parentGroup);
+            group.setPermanentPrompt(permanentPrompt);
+            group.setTempEvent(tempEvent);
+        }
+    }
+
     private static final Logger logger = ChatWithNPCMod.LOGGER;
     private final File theFile;
 
@@ -29,7 +51,7 @@ public class GroupDataManager{
     public GroupDataManager(Group group) {
         this.group = group;
         mkdir();
-        this.theFile = new File(ChatWithNPCMod.workingDirectory.toFile(), "group/" + group.getName() + ".yml");
+        this.theFile = new File(ChatWithNPCMod.workingDirectory.toFile(), "group/" + group.getName() + ".json");
     }
 
     public boolean isExist() {
@@ -42,18 +64,13 @@ public class GroupDataManager{
             return;
         }
         try {
-            HashMap data = YamlUtils.readFile(theFile);
-            ArrayList<String> permanentPrompt = new ArrayList<>();
-            for (Object s : (Iterable) data.get("permanentPrompt")) {
-                permanentPrompt.add((String) s);
-            }
-            group.setPermanentPrompt(permanentPrompt);
-            HashMap tempEnvironmentPrompt = (HashMap) data.get("tempEvent");
-            for (Object key : tempEnvironmentPrompt.keySet()) {
-                group.addTempEvent((String) tempEnvironmentPrompt.get(key), (long) key);
-            }
-        } catch (FileNotFoundException e) {
+            Gson gson = new Gson();
+            String json = new String(Files.readAllBytes(theFile.toPath()));
+            GroupData data = gson.fromJson(json, GroupData.class);
+            data.set(group);
+        } catch (IOException e) {
             logger.error("[chat-with-npc] Can't open the data file.");
+            throw new RuntimeException(e);
         }
     }
 
@@ -65,17 +82,10 @@ public class GroupDataManager{
                     return;
                 }
             }
-            HashMap<String, Object> data = new HashMap<>();
-            ArrayList<String> permanentPrompt = new ArrayList<>(group.getPermanentPrompt());
-            data.put("permanentPrompt", permanentPrompt);
-            HashMap<Long, String> tempEvent = new HashMap<>();
-            for (GroupEvent record : group.getTempEvent()) {
-                // combine the end time and event
-                String event = record.getEndTime() + ": " + record.getEvent();
-                tempEvent.put(record.getStartTime(), event);
-            }
-            data.put("tempEvent", tempEvent);
-            YamlUtils.writeFile(theFile, data);
+            Gson gson = new Gson();
+            GroupData data = new GroupData(group);
+            String json = gson.toJson(data);
+            Files.write(theFile.toPath(), json.getBytes());
         } catch (IOException e) {
             logger.error("[chat-with-npc] Can't write the data file.");
         }
@@ -94,7 +104,7 @@ public class GroupDataManager{
     /**
      * Create the directory.
      */
-    static void mkdir() {
+    private static void mkdir() {
         Path workingDirectory = ChatWithNPCMod.workingDirectory.resolve("group");
         if (!Files.exists(workingDirectory)) {
             try {
