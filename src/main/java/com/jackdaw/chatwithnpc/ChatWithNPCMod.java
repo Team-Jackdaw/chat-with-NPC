@@ -3,8 +3,6 @@ package com.jackdaw.chatwithnpc;
 import com.jackdaw.chatwithnpc.auxiliary.command.CommandSet;
 import com.jackdaw.chatwithnpc.auxiliary.configuration.SettingManager;
 import com.jackdaw.chatwithnpc.conversation.ConversationManager;
-import com.jackdaw.chatwithnpc.data.DataManager;
-import com.jackdaw.chatwithnpc.group.GroupManager;
 import com.jackdaw.chatwithnpc.event.PlayerSendMessageCallback;
 import com.jackdaw.chatwithnpc.npc.NPCEntityManager;
 import net.fabricmc.api.ModInitializer;

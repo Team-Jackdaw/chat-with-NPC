@@ -1,97 +1,77 @@
 package com.jackdaw.chatwithnpc.group;
 
-import com.jackdaw.chatwithnpc.data.GroupDataManager;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.TreeSet;
 
+public class Group {
+    private final String name;
 
-/**
- * This is an interface used to define the group.
- * The class should record the basic information of the group, such as name, weather, environmentPrompt and tempEnvironmentPrompt.
- * The class should provide methods to get the name, event, weather, environmentPrompt and tempEnvironmentPrompt of the group.
- * <p>
- * <b>Please note: This class should be set a life cycle to reduce repeated reading and memory usage<b/>
- *
- * @version 1.0
- */
-public interface Group {
-    /**
-     * Get the name of the group.
-     * @return the name of the group.
-     */
-    String getName();
+    private String parentGroup = "Global";
 
-    /**
-     * Get the parent group of the group.
-     * @param parentGroup the parent group of the group.
-     */
-    void setParentGroup(String parentGroup);
+    private final ArrayList<String> permanentPrompt = new ArrayList<>(Arrays.asList("good weather", "very save"));
 
-    /**
-     * Get the parent group of the group.
-     * @return the parent group of the group.
-     */
-    Group getParentGroup();
+    private final TreeSet<GroupEvent> tempEvent = new TreeSet<>();
 
-    /**
-     * Get the parent groups of the group. Include the group itself.
-     * @return  subGroup the parent groups of the group.
-     */
-    ArrayList<Group> getParentGroups();
+    private long lastLoadTime = System.currentTimeMillis();
 
-    /**
-     * Get the last load time of the group.
-     * @return the last load time of the group.
-     */
-    long getLastLoadTime();
+    Group(@NotNull String name) {
+        this.name = name;
+        if (name.equals("Global")) {
+            parentGroup = null;
+        }
+    }
 
-    /**
-     * Set the last load time of the group.
-     * @param time the last load time of the group.
-     */
-    void updateLastLoadTime(long time);
+    public String getName() {
+        return name;
+    }
 
-    /**
-     * Set the temporary group event.
-     * @param tempEvent the temporary group event.
-     */
-    void setTempEvent(TreeSet<GroupEvent> tempEvent);
+    public void setParentGroup(String parentGroup) {
+        this.parentGroup = parentGroup;
+    }
 
-    /**
-     * Add a temporary group event.
-     * @param event the event to be added.
-     * @param period the period of the event.
-     */
-    void addTempEvent(String event, long period);
+    public String getParentGroup() {
+        return parentGroup;
+    }
 
-    /**
-     * Get all the temporary group event.
-     * @return all the temporary group event.
-     */
-    TreeSet<GroupEvent> getTempEvent();
+    public long getLastLoadTime() {
+        return lastLoadTime;
+    }
 
-    /**
-     * Set the event of the group.
-     * @param permanentPrompt the event of the group.
-     */
-    void setPermanentPrompt(ArrayList<String> permanentPrompt);
+    public void updateLastLoadTime(long time) {
+        lastLoadTime = time;
+    }
 
-    /**
-     * Add a group event.
-     * @param prompt the event to be added.
-     */
-    void addPermanentPrompt(String prompt);
+    public void setTempEvent(TreeSet<GroupEvent> tempEvent) {
+        this.tempEvent.clear();
+        this.tempEvent.addAll(tempEvent);
+    }
+    
+    public void addTempEvent(String event, long time) {
+        long now = System.currentTimeMillis();
+        tempEvent.add(new GroupEvent(event, now, now + time));
+    }
 
-    /**
-     * Get all the group event.
-     * @return all the group event.
-     */
-    TreeSet<String> getPermanentPrompt();
+    public TreeSet<GroupEvent> getTempEvent() {
+        return new TreeSet<>(tempEvent);
+    }
 
-    /**
-     * Get the data manager of the group.
-     * @return the data manager of the group.
-     */
-    GroupDataManager getDataManager();
+    public void addPermanentPrompt(String prompt) {
+        permanentPrompt.add(prompt);
+    }
+
+    public TreeSet<String> getPermanentPrompt() {
+        return new TreeSet<>(permanentPrompt);
+    }
+
+    public void setPermanentPrompt(ArrayList<String> permanentPrompt) {
+        this.permanentPrompt.clear();
+        this.permanentPrompt.addAll(permanentPrompt);
+    }
+    
+    public GroupDataManager getDataManager() {
+        return new GroupDataManager(this);
+    }
 }

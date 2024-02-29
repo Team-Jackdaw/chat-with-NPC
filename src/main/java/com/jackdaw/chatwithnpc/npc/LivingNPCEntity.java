@@ -1,7 +1,5 @@
 package com.jackdaw.chatwithnpc.npc;
 
-import com.jackdaw.chatwithnpc.prompt.Builder;
-import com.jackdaw.chatwithnpc.prompt.Prompt;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;

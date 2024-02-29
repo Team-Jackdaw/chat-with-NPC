@@ -1,14 +1,14 @@
-package com.jackdaw.chatwithnpc.data;
+package com.jackdaw.chatwithnpc.npc;
 
 import com.jackdaw.chatwithnpc.ChatWithNPCMod;
 import com.jackdaw.chatwithnpc.auxiliary.yaml.YamlUtils;
-import com.jackdaw.chatwithnpc.npc.NPCEntity;
-import com.jackdaw.chatwithnpc.npc.Record;
 import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 
 /**
@@ -18,7 +18,7 @@ import java.util.HashMap;
  *
  * <p>Read or Write the data file with some information, each file just record one relative information.</p>
  */
-public class NPCDataManager implements DataManager {
+public class NPCDataManager{
 
     private static final Logger logger = ChatWithNPCMod.LOGGER;
     private final File theFile;
@@ -27,16 +27,14 @@ public class NPCDataManager implements DataManager {
 
     public NPCDataManager(NPCEntity npc) {
         this.npc = npc;
-        DataManager.mkdir("npc");
+        mkdir();
         this.theFile = new File(ChatWithNPCMod.workingDirectory.toFile(), "npc/" + npc.getName() + ".yml");
     }
 
-    @Override
     public boolean isExist() {
         return theFile.exists();
     }
 
-    @Override
     public void sync() {
         if (!isExist()) {
             save();
@@ -66,7 +64,6 @@ public class NPCDataManager implements DataManager {
         }
     }
 
-    @Override
     public void save() {
         try {
             if (!isExist()) {
@@ -79,7 +76,7 @@ public class NPCDataManager implements DataManager {
             // 将npc的数据写入data中
             data.put("name", npc.getName());
             data.put("careers", npc.getCareer());
-            data.put("localGroup", npc.getGroup().getName());
+            data.put("localGroup", npc.getGroup());
             data.put("basicPrompt", npc.getBasicPrompt());
             // 将npc的消息记录写入data中
             HashMap<Long, String> messageRecord = new HashMap<>();
@@ -96,7 +93,6 @@ public class NPCDataManager implements DataManager {
         }
     }
 
-    @Override
     public void delete() {
         if (!isExist()) {
             logger.warn("[chat-with-npc] The data file doesn't exist.");
@@ -104,6 +100,22 @@ public class NPCDataManager implements DataManager {
         }
         if (!theFile.delete()) {
             logger.error("[chat-with-npc] Can't delete the data file.");
+        }
+    }
+
+    /**
+     * Create the directory.
+     */
+    static void mkdir() {
+        Path workingDirectory = ChatWithNPCMod.workingDirectory.resolve("npc");
+        if (!Files.exists(workingDirectory)) {
+            try {
+                Files.createDirectories(workingDirectory);
+            } catch (IOException e) {
+                ChatWithNPCMod.LOGGER.error("[chat-with-npc] Failed to create the npc directory");
+                ChatWithNPCMod.LOGGER.error(e.getMessage());
+                throw new RuntimeException(e);
+            }
         }
     }
 }

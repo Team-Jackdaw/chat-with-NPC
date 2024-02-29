@@ -52,7 +52,7 @@ public class ConversationHandler {
     private void startConversation() {
         sendWaitMessage();
         getResponse(player, Prompt.builder()
-                .setNpc(npc)
+                .setNpc(npc.getName())
                 .build()
                 .getInitialPrompt() + "Start with you: ");
         updateTime = System.currentTimeMillis();
@@ -62,7 +62,7 @@ public class ConversationHandler {
         sendWaitMessage();
         npc.addMessageRecord(System.currentTimeMillis(), Record.Role.PLAYER, message);
         Prompt prompt = Prompt.builder()
-                .setNpc(npc)
+                .setNpc(npc.getName())
                 .build();
         getResponse(player, prompt.getInitialPrompt() + prompt.getHistoryMessage() + "Now you response: ");
         updateTime = System.currentTimeMillis();

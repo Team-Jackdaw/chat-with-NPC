@@ -1,8 +1,8 @@
 package com.jackdaw.chatwithnpc.group;
 
 import com.jackdaw.chatwithnpc.ChatWithNPCMod;
-import com.jackdaw.chatwithnpc.data.DataManager;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -26,13 +26,8 @@ public class GroupManager {
         if (isLoaded(name)) {
             return;
         }
-        Group group;
-        if (name.equals("Global")) {
-            group = new GlobalGroup();
-        } else {
-            group = new LocalGroup(name);
-        }
-        DataManager groupDataManager = group.getDataManager();
+        Group group = new Group(name);
+        GroupDataManager groupDataManager = group.getDataManager();
         groupDataManager.sync();
         GroupMap.put(name, group);
     }
@@ -65,5 +60,22 @@ public class GroupManager {
         GroupMap.forEach((name, environment) -> {
             removeEnvironment(name);
         });
+    }
+
+    /**
+     * Get the parent groups of the group. Include the group itself.
+     *
+     * @param currentGroup the parent group of the group.
+     * @return parentGroups the parent groups of the group.
+     */
+    public static ArrayList<Group> getParentGroups(String currentGroup) {
+        Group current = GroupManager.getGroup(currentGroup);
+        ArrayList<Group> parentGroups = new ArrayList<>();
+        parentGroups.add(current);
+        String parentGroup = current.getParentGroup();
+        if (parentGroup != null) {
+            parentGroups.addAll(GroupManager.getParentGroups(parentGroup));
+        }
+        return parentGroups;
     }
 }

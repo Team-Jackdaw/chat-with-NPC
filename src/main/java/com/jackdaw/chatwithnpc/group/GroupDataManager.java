@@ -1,15 +1,14 @@
-package com.jackdaw.chatwithnpc.data;
+package com.jackdaw.chatwithnpc.group;
 
 import com.jackdaw.chatwithnpc.ChatWithNPCMod;
 import com.jackdaw.chatwithnpc.auxiliary.yaml.YamlUtils;
-import com.jackdaw.chatwithnpc.group.Group;
-import com.jackdaw.chatwithnpc.group.GroupEvent;
-import com.jackdaw.chatwithnpc.npc.Record;
 import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -20,7 +19,7 @@ import java.util.HashMap;
  *
  * <p>Read or Write the data file with some information, each file just record one relative information.</p>
  */
-public class GroupDataManager implements DataManager {
+public class GroupDataManager{
 
     private static final Logger logger = ChatWithNPCMod.LOGGER;
     private final File theFile;
@@ -29,16 +28,14 @@ public class GroupDataManager implements DataManager {
 
     public GroupDataManager(Group group) {
         this.group = group;
-        DataManager.mkdir("group");
+        mkdir();
         this.theFile = new File(ChatWithNPCMod.workingDirectory.toFile(), "group/" + group.getName() + ".yml");
     }
 
-    @Override
     public boolean isExist() {
         return theFile.exists();
     }
 
-    @Override
     public void sync() {
         if (!isExist()) {
             save();
@@ -60,7 +57,6 @@ public class GroupDataManager implements DataManager {
         }
     }
 
-    @Override
     public void save() {
         try {
             if (!isExist()) {
@@ -85,7 +81,6 @@ public class GroupDataManager implements DataManager {
         }
     }
 
-    @Override
     public void delete() {
         if (!isExist()) {
             logger.warn("[chat-with-npc] The data file doesn't exist.");
@@ -93,6 +88,22 @@ public class GroupDataManager implements DataManager {
         }
         if (!theFile.delete()) {
             logger.error("[chat-with-npc] Can't delete the data file.");
+        }
+    }
+
+    /**
+     * Create the directory.
+     */
+    static void mkdir() {
+        Path workingDirectory = ChatWithNPCMod.workingDirectory.resolve("group");
+        if (!Files.exists(workingDirectory)) {
+            try {
+                Files.createDirectories(workingDirectory);
+            } catch (IOException e) {
+                ChatWithNPCMod.LOGGER.error("[chat-with-npc] Failed to create the npc directory");
+                ChatWithNPCMod.LOGGER.error(e.getMessage());
+                throw new RuntimeException(e);
+            }
         }
     }
 }

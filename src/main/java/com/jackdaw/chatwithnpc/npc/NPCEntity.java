@@ -1,9 +1,7 @@
 package com.jackdaw.chatwithnpc.npc;
 
-import com.jackdaw.chatwithnpc.data.NPCDataManager;
-import com.jackdaw.chatwithnpc.group.Group;
-import com.jackdaw.chatwithnpc.group.GroupManager;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -16,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @version 1.0
  */
-public abstract class NPCEntity implements NPCHandler {
+public abstract class NPCEntity {
 
     protected final Entity entity;
     protected final String name;
@@ -75,8 +73,8 @@ public abstract class NPCEntity implements NPCHandler {
      * 获取NPC的本地群组，该群组应该作为该NPC的特征之一，即该NPC的所在位置相关信息。
      * @return NPC的本地群组
      */
-    public Group getGroup() {
-        return GroupManager.getGroup(this.group);
+    public String getGroup() {
+        return group;
     }
 
     /**
@@ -146,20 +144,24 @@ public abstract class NPCEntity implements NPCHandler {
     }
 
     /**
-     * 读取所有消息记录。
-     * @return 消息记录
-     */
-    @Override
-    public Record readMessageRecord() {
-        return this.messageRecord;
-    }
-
-    /**
      * 获取NPC的数据管理器，该管理器应该用于管理NPC的数据。
      * @return NPC的数据管理器
      */
-    @Override
     public NPCDataManager getDataManager() {
         return new NPCDataManager(this);
     }
+
+    /**
+     * 接收玩家的消息，该消息应该是NPC对玩家的交互。
+     * @param message NPC的信息
+     * @param player 玩家的实体
+     */
+    public abstract void replyMessage(String message, PlayerEntity player);
+
+    /**
+     * 执行动作，该动作应该是NPC对玩家的交互。
+     * @param action 动作
+     * @param player 玩家的实体
+     */
+    public abstract void doAction(Actions action, PlayerEntity player);
 }
