@@ -21,7 +21,7 @@ public class OpenAIHandler {
     private static String apiKey = "";
     private static String model = "gpt-3.5-turbo";
 
-    private static final String maxTokens = "4096";
+    private static final String maxTokens = "512";
 
     public static void updateSetting() {
         apiKey = SettingManager.apiKey;
@@ -48,7 +48,7 @@ public class OpenAIHandler {
      * @throws Exception If the request fails
      */
     public static String sendRequest(String prompt) throws Exception {
-        if (prompt.length() > 8192) prompt = prompt.substring(prompt.length() - 8192);
+        if (prompt.length() > 4096) prompt = prompt.substring(prompt.length() - 4096);
         try (CloseableHttpClient client = HttpClients.createDefault()) {
             HttpPost request = new HttpPost(url);
 

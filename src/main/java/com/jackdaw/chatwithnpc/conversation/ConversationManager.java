@@ -23,13 +23,12 @@ public class ConversationManager {
      * @param player The player to start a conversation with
      */
     public static void startConversation(NPCEntity npc, PlayerEntity player) {
+        if (npc == null || player == null) return;
         if (isConversing(player) && getConversation(player).npc.equals(npc)) {
             return;
         }
-        if (npc == null || player == null) return;
         findAndEndConversation(player);
         ConversationHandler conversationHandler = new ConversationHandler(npc, player);
-        conversationHandler.startConversation();
         conversationMap.put(player, conversationHandler);
     }
 

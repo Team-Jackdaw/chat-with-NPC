@@ -1,6 +1,5 @@
 package com.jackdaw.chatwithnpc.mixin;
 
-import com.jackdaw.chatwithnpc.ChatWithNPCMod;
 import com.jackdaw.chatwithnpc.event.PlayerSendMessageCallback;
 import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
@@ -16,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class PlayerSendMessageMixin {
 	@Shadow public abstract ServerPlayerEntity getPlayer();
 
-	@Inject(at = @At("HEAD"), method = "onChatMessage", cancellable = true)
+	@Inject(at = @At("TAIL"), method = "onChatMessage", cancellable = true)
 	private void onSend(ChatMessageC2SPacket packet, CallbackInfo ci) {
 		ActionResult result = PlayerSendMessageCallback.EVENT.invoker().interact(this.getPlayer(), packet.chatMessage());
 

@@ -2,7 +2,9 @@ package com.jackdaw.chatwithnpc.data;
 
 import com.jackdaw.chatwithnpc.ChatWithNPCMod;
 import com.jackdaw.chatwithnpc.auxiliary.yaml.YamlUtils;
-import com.jackdaw.chatwithnpc.environment.Environment;
+import com.jackdaw.chatwithnpc.group.Group;
+import com.jackdaw.chatwithnpc.group.GroupEvent;
+import com.jackdaw.chatwithnpc.npc.Record;
 import org.slf4j.Logger;
 
 import java.io.File;
@@ -14,20 +16,21 @@ import java.util.HashMap;
 /**
  * A serializer used to read or write the data from the files.
  * <p>
- * This data is related to the Environment's content.
+ * This data is related to the Group's content.
  *
  * <p>Read or Write the data file with some information, each file just record one relative information.</p>
  */
-public class EnvironmentDataManager implements DataManager {
+public class GroupDataManager implements DataManager {
 
     private static final Logger logger = ChatWithNPCMod.LOGGER;
     private final File theFile;
 
-    private final Environment environment;
+    private final Group group;
 
-    public EnvironmentDataManager(Environment environment) {
-        this.environment = environment;
-        this.theFile = new File(ChatWithNPCMod.workingDirectory.toFile(), "environment/" + environment.getName() + ".yml");
+    public GroupDataManager(Group group) {
+        this.group = group;
+        DataManager.mkdir("group");
+        this.theFile = new File(ChatWithNPCMod.workingDirectory.toFile(), "group/" + group.getName() + ".yml");
     }
 
     @Override
@@ -38,22 +41,19 @@ public class EnvironmentDataManager implements DataManager {
     @Override
     public void sync() {
         if (!isExist()) {
+            save();
             return;
         }
         try {
             HashMap data = YamlUtils.readFile(theFile);
-            // 读取储存在文件中的数据，然后将其赋值给environment
-            environment.setWeather((String) data.get("weather"));
-            // 在data中读取存在environmentPrompt中的数据
-            ArrayList<String> environmentPrompt = new ArrayList<>();
-            for (Object s : (Iterable) data.get("environmentPrompt")) {
-                environmentPrompt.add((String) s);
+            ArrayList<String> permanentPrompt = new ArrayList<>();
+            for (Object s : (Iterable) data.get("permanentPrompt")) {
+                permanentPrompt.add((String) s);
             }
-            environment.setEnvironmentPrompt(environmentPrompt);
-            // 在data中读取存在tempEnvironmentPrompt中的数据
-            HashMap tempEnvironmentPrompt = (HashMap) data.get("tempEnvironmentPrompt");
+            group.setPermanentPrompt(permanentPrompt);
+            HashMap tempEnvironmentPrompt = (HashMap) data.get("tempEvent");
             for (Object key : tempEnvironmentPrompt.keySet()) {
-                environment.addTempEnvironmentPrompt((String) tempEnvironmentPrompt.get(key), (long) key);
+                group.addTempEvent((String) tempEnvironmentPrompt.get(key), (long) key);
             }
         } catch (FileNotFoundException e) {
             logger.error("[chat-with-npc] Can't open the data file.");
@@ -70,14 +70,15 @@ public class EnvironmentDataManager implements DataManager {
                 }
             }
             HashMap<String, Object> data = new HashMap<>();
-            data.put("weather", environment.getWeather());
-            ArrayList<String> environmentPrompt = new ArrayList<>(environment.getEnvironmentPrompt());
-            data.put("environmentPrompt", environmentPrompt);
-            HashMap<Long, String> tempEnvironmentPrompt = new HashMap<>();
-            for (long time : environment.getTempEnvironmentPrompt().keySet()) {
-                tempEnvironmentPrompt.put(time, environment.getTempEnvironmentPrompt().get(time));
+            ArrayList<String> permanentPrompt = new ArrayList<>(group.getPermanentPrompt());
+            data.put("permanentPrompt", permanentPrompt);
+            HashMap<Long, String> tempEvent = new HashMap<>();
+            for (GroupEvent record : group.getTempEvent()) {
+                // combine the end time and event
+                String event = record.getEndTime() + ": " + record.getEvent();
+                tempEvent.put(record.getStartTime(), event);
             }
-            data.put("tempEnvironmentPrompt", tempEnvironmentPrompt);
+            data.put("tempEvent", tempEvent);
             YamlUtils.writeFile(theFile, data);
         } catch (IOException e) {
             logger.error("[chat-with-npc] Can't write the data file.");

@@ -3,6 +3,7 @@ package com.jackdaw.chatwithnpc.data;
 import com.jackdaw.chatwithnpc.ChatWithNPCMod;
 import com.jackdaw.chatwithnpc.auxiliary.yaml.YamlUtils;
 import com.jackdaw.chatwithnpc.npc.NPCEntity;
+import com.jackdaw.chatwithnpc.npc.Record;
 import org.slf4j.Logger;
 
 import java.io.File;
@@ -26,6 +27,7 @@ public class NPCDataManager implements DataManager {
 
     public NPCDataManager(NPCEntity npc) {
         this.npc = npc;
+        DataManager.mkdir("npc");
         this.theFile = new File(ChatWithNPCMod.workingDirectory.toFile(), "npc/" + npc.getName() + ".yml");
     }
 
@@ -37,20 +39,27 @@ public class NPCDataManager implements DataManager {
     @Override
     public void sync() {
         if (!isExist()) {
-            logger.error("[chat-with-npc] The data file doesn't exist.");
+            save();
             return;
         }
         try {
             HashMap data = YamlUtils.readFile(theFile);
             // 读取储存在文件中的数据，然后将其赋值给npc
             npc.setCareer((String) data.get("careers"));
-            npc.setLocalGroup((String) data.get("localGroup"));
+            npc.setGroup((String) data.get("localGroup"));
             npc.setBasicPrompt((String) data.get("basicPrompt"));
-            npc.updateLastMessageTime(Long.parseLong(data.get("lastMessageTime").toString()));
             // 在data中读取存在history中的数据，其中key为时间，value为消息
-            HashMap messageRecord = (HashMap) data.get("history");
+            HashMap messageRecord = (HashMap) data.get("messageRecord");
             for (Object key : messageRecord.keySet()) {
-                npc.addMessageRecord((long) key, (String) messageRecord.get(key));
+                String message = (String) messageRecord.get(key);
+                // message的格式为"role:content"，所以需要分割
+                String[] record = message.split(":");
+                npc.addMessageRecord((long) key, Record.Role.valueOf(record[0]), record[1]);
+            }
+            if (!npc.getMessageRecord().isEmpty()) {
+                npc.updateLastMessageTime(npc.getMessageRecord().lastMessageTime());
+            } else {
+                npc.updateLastMessageTime(System.currentTimeMillis());
             }
         } catch (FileNotFoundException e) {
             logger.error("[chat-with-npc] Can't open the data file.");
@@ -69,17 +78,18 @@ public class NPCDataManager implements DataManager {
             HashMap<String, Object> data = new HashMap<>();
             // 将npc的数据写入data中
             data.put("name", npc.getName());
-            data.put("uuid", npc.getUuid().toString());
             data.put("careers", npc.getCareer());
-            data.put("localGroup", npc.getLocalGroup());
+            data.put("localGroup", npc.getGroup().getName());
             data.put("basicPrompt", npc.getBasicPrompt());
-            data.put("lastMessageTime", npc.getLastMessageTime());
             // 将npc的消息记录写入data中
             HashMap<Long, String> messageRecord = new HashMap<>();
-            for (long key : npc.getMessageRecord().keySet()) {
-                messageRecord.put(key, npc.getMessageRecord().get(key));
+            for (long key : npc.getMessageRecord().getTreeMap().keySet()) {
+                // message的格式为"role:content"，所以需要拼接
+                messageRecord.put(key,
+                        npc.getMessageRecord().getTreeMap().get(key).getRole() + ":"
+                                + npc.getMessageRecord().getTreeMap().get(key).getMessage());
             }
-            data.put("history", messageRecord);
+            data.put("messageRecord", messageRecord);
             YamlUtils.writeFile(theFile, data);
         } catch (IOException e) {
             logger.error("[chat-with-npc] Can't write the data file.");

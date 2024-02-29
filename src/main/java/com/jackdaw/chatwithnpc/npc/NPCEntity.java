@@ -1,15 +1,14 @@
 package com.jackdaw.chatwithnpc.npc;
 
 import com.jackdaw.chatwithnpc.data.NPCDataManager;
+import com.jackdaw.chatwithnpc.group.Group;
+import com.jackdaw.chatwithnpc.group.GroupManager;
 import net.minecraft.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.TreeMap;
-import java.util.UUID;
-
 /**
  * 这是一个用于定义与 NPC 交互的类。
- * 该类应记录 NPC 的基本信息，如名称、UUID、职业、basicPrompt 和 localGroup 等，这些都是 NPC 的特征。
+ * 该类应记录 NPC 的基本信息，如名称、职业、basicPrompt 和 localGroup 等，这些都是 NPC 的特征。
  * 同时该类应记录 NPC 的对话状态，如最后一次消息时间、消息记录和是否正在与玩家对话等。
  * 该类应提供接收玩家信息、回复玩家信息和执行动作等方法。
  * <p>
@@ -21,17 +20,11 @@ public abstract class NPCEntity implements NPCHandler {
 
     protected final Entity entity;
     protected final String name;
-
-    protected final String type;
-
-    protected final UUID uuid;
     protected String career = "unemployed";
-    protected String basicPrompt = "Hello, I'm a NPC.";
-    protected String localGroup = "Minecraft";
-
+    protected String basicPrompt = "I'm an NPC.";
+    protected String group = "Global";
+    protected final Record messageRecord = new Record();
     protected long lastMessageTime;
-
-    protected final TreeMap<Long, String> messageRecord = new TreeMap<>();
 
     /**
      * This is a constructor used to initialize the NPC with the entity.
@@ -42,8 +35,6 @@ public abstract class NPCEntity implements NPCHandler {
             throw new IllegalArgumentException("[chat-with-npc] The entity must have a custom name.");
         }
         this.name = entity.getCustomName().getString();
-        this.type = entity.getType().toString();
-        this.uuid = entity.getUuid();
         this.entity = entity;
         this.lastMessageTime = System.currentTimeMillis();
     }
@@ -61,15 +52,7 @@ public abstract class NPCEntity implements NPCHandler {
      * @return NPC的类型
      */
     public String getType() {
-        return this.type;
-    }
-
-    /**
-     * 获取NPC的UUID，该UUID应该作为该NPC在Minecraft中的唯一标识。
-     * @return NPC的UUID
-     */
-    public UUID getUuid() {
-        return this.uuid;
+        return this.entity.getType().toString();
     }
 
     /**
@@ -92,8 +75,16 @@ public abstract class NPCEntity implements NPCHandler {
      * 获取NPC的本地群组，该群组应该作为该NPC的特征之一，即该NPC的所在位置相关信息。
      * @return NPC的本地群组
      */
-    public String getLocalGroup() {
-        return this.localGroup;
+    public Group getGroup() {
+        return GroupManager.getGroup(this.group);
+    }
+
+    /**
+     * 设置NPC的本地群组，该群组应该作为该NPC的特征之一，即该NPC的所在位置相关信息。
+     * @param group NPC的本地群组
+     */
+    public void setGroup(String group) {
+        this.group = group;
     }
 
     /**
@@ -108,7 +99,7 @@ public abstract class NPCEntity implements NPCHandler {
      * 获取NPC的消息记录，该记录应该包括了NPC的所有消息。
      * @return NPC的消息记录
      */
-    public TreeMap<Long, String> getMessageRecord() {
+    public Record getMessageRecord() {
         return this.messageRecord;
     }
 
@@ -129,14 +120,6 @@ public abstract class NPCEntity implements NPCHandler {
     }
 
     /**
-     * 设置NPC的本地群组，该群组应该作为该NPC的特征之一，即该NPC的所在位置相关信息。
-     * @param localGroup NPC的本地群组
-     */
-    public void setLocalGroup(String localGroup) {
-        this.localGroup = localGroup;
-    }
-
-    /**
      * 设置NPC的最后一次消息时间，随着时间的退役该NPC会逐渐遗忘他讲过的内容。
      * @param lastMessageTime NPC的最后一次消息时间
      */
@@ -147,28 +130,19 @@ public abstract class NPCEntity implements NPCHandler {
     /**
      * 添加NPC的消息记录，该记录应该包括了NPC的最近一条消息。
      * @param time NPC的消息时间
-     * @param message NPC的消息内容
-     * @param speaker NPC的消息发出者
+     * @param role 消息发出者的身份
+     * @param message 消息内容
      */
-    public void addMessageRecord(long time, String message, String speaker) {
-        this.messageRecord.put(time, speaker+ "says: " + message);
-    }
-
-    /**
-     * 添加NPC的消息记录，该记录应该包括了NPC的最近一条消息。
-     * @param time NPC的消息时间
-     * @param message NPC的消息内容
-     */
-    public void addMessageRecord(long time, String message) {
-        this.messageRecord.put(time, message);
+    public void addMessageRecord(long time, Record.Role role, String message) {
+        this.messageRecord.addMessage(time, role, message);
     }
 
     /**
      * 删除NPC的消息记录，删除该时间以前的所有记录。
      * @param time 保存的截止时间
      */
-    public void deleteMessageRecord(long time) {
-        this.messageRecord.headMap(time).clear();
+    public void deleteMessageBefore(long time) {
+        this.messageRecord.deleteMessageBefore(time);
     }
 
     /**
@@ -176,13 +150,8 @@ public abstract class NPCEntity implements NPCHandler {
      * @return 消息记录
      */
     @Override
-    public String readMessageRecord() {
-        // 一行一行地读取消息记录，并将时间和内容都其拼接成一个字符串。
-        StringBuilder messageRecord = new StringBuilder();
-        for (Long time : this.messageRecord.keySet()) {
-            messageRecord.append(time).append(": ").append(this.messageRecord.get(time)).append(";");
-        }
-        return messageRecord.toString();
+    public Record readMessageRecord() {
+        return this.messageRecord;
     }
 
     /**

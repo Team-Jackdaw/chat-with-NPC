@@ -9,8 +9,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public final class YamlUtils {
-    public YamlUtils() {
-    }
 
     public static HashMap readFile(File file) throws FileNotFoundException {
         Yaml yaml = new Yaml();

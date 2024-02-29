@@ -3,7 +3,8 @@ package com.jackdaw.chatwithnpc.conversation;
 import com.jackdaw.chatwithnpc.ChatWithNPCMod;
 import com.jackdaw.chatwithnpc.api.OpenAIHandler;
 import com.jackdaw.chatwithnpc.auxiliary.configuration.SettingManager;
-import com.jackdaw.chatwithnpc.auxiliary.prompt.Prompt;
+import com.jackdaw.chatwithnpc.npc.Record;
+import com.jackdaw.chatwithnpc.prompt.Prompt;
 import com.jackdaw.chatwithnpc.npc.NPCEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
@@ -14,21 +15,19 @@ public class ConversationHandler {
 
     PlayerEntity player;
 
-    Prompt prompt;
-
     long updateTime;
 
     public ConversationHandler(NPCEntity npc, PlayerEntity player) {
         this.npc = npc;
         this.player = player;
-        this.prompt = npc.getPrompt();
+        startConversation();
     }
 
     private void sendWaitMessage() {
         player.sendMessage(Text.of("<" + npc.getName() + "> ..."));
     }
 
-    public void getResponse(PlayerEntity player) {
+    public void getResponse(PlayerEntity player, String message) {
         // 1.5 second cooldown between requests
         if (npc.getLastMessageTime() + 1500L > System.currentTimeMillis()) return;
         if (SettingManager.apiKey.isEmpty()) {
@@ -39,10 +38,9 @@ public class ConversationHandler {
         Thread t = new Thread(() -> {
             try {
                 OpenAIHandler.updateSetting();
-                String response = OpenAIHandler.sendRequest(prompt.getPrompt() + "What is your response: \n");
+                String response = OpenAIHandler.sendRequest(message);
                 player.sendMessage(Text.of("<" + npc.getName() + "> " + response));
-                npc.addMessageRecord(npc.getLastMessageTime(), response, npc.getName());
-                prompt.addNpcMessage(response);
+                npc.addMessageRecord(npc.getLastMessageTime(), Record.Role.NPC, response);
             } catch (Exception e) {
                 player.sendMessage(Text.of("[chat-with-npc] Error getting response"));
                 ChatWithNPCMod.LOGGER.error(e.getMessage());
@@ -51,18 +49,22 @@ public class ConversationHandler {
         t.start();
     }
 
-    public void startConversation() {
+    private void startConversation() {
         sendWaitMessage();
-        prompt.setInitialPrompt();
-        getResponse(player);
+        getResponse(player, Prompt.builder()
+                .setNpc(npc)
+                .build()
+                .getInitialPrompt() + "Start with you: ");
         updateTime = System.currentTimeMillis();
     }
 
     public void replyToEntity(String message) {
         sendWaitMessage();
-        npc.addMessageRecord(System.currentTimeMillis(), message, player.getName().getString());
-        prompt.addPlayerMessage(message);
-        getResponse(player);
+        npc.addMessageRecord(System.currentTimeMillis(), Record.Role.PLAYER, message);
+        Prompt prompt = Prompt.builder()
+                .setNpc(npc)
+                .build();
+        getResponse(player, prompt.getInitialPrompt() + prompt.getHistoryMessage() + "Now you response: ");
         updateTime = System.currentTimeMillis();
     }
 

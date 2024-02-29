@@ -1,7 +1,7 @@
 package com.jackdaw.chatwithnpc.npc;
 
-import com.jackdaw.chatwithnpc.auxiliary.prompt.Builder;
-import com.jackdaw.chatwithnpc.auxiliary.prompt.Prompt;
+import com.jackdaw.chatwithnpc.prompt.Builder;
+import com.jackdaw.chatwithnpc.prompt.Prompt;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
@@ -27,8 +27,4 @@ public class LivingNPCEntity extends NPCEntity{
         // TODO: 不在这一版本的考虑范围中
     }
 
-    @Override
-    public Prompt getPrompt() {
-        return new Builder().setFromEntity(this).build();
-    }
 }

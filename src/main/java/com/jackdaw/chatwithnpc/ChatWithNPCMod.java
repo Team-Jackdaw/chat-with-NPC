@@ -4,7 +4,7 @@ import com.jackdaw.chatwithnpc.auxiliary.command.CommandSet;
 import com.jackdaw.chatwithnpc.auxiliary.configuration.SettingManager;
 import com.jackdaw.chatwithnpc.conversation.ConversationManager;
 import com.jackdaw.chatwithnpc.data.DataManager;
-import com.jackdaw.chatwithnpc.environment.EnvironmentManager;
+import com.jackdaw.chatwithnpc.group.GroupManager;
 import com.jackdaw.chatwithnpc.event.PlayerSendMessageCallback;
 import com.jackdaw.chatwithnpc.npc.NPCEntityManager;
 import net.fabricmc.api.ModInitializer;
@@ -49,10 +49,6 @@ public class ChatWithNPCMod implements ModInitializer {
         }
         // Load the configuration
         SettingManager.loadConfig();
-        DataManager.mkdir("npc");
-        DataManager.mkdir("environment");
-        // Load the global environment, and it will not be removed until the game is closed
-        EnvironmentManager.loadEnvironment("Global");
         // Register the command
         CommandRegistrationCallback.EVENT.register(CommandSet::setupCommand);
         // Register the conversation

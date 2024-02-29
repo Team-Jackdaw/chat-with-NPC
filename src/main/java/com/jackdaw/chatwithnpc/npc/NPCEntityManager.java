@@ -41,11 +41,7 @@ public class NPCEntityManager {
             return;
         }
         NPCDataManager npcDataManager = npcEntity.getDataManager();
-        if (npcDataManager.isExist()) {
-            npcDataManager.sync();
-        } else {
-            npcDataManager.save();
-        }
+        npcDataManager.sync();
         npcMap.put(name, npcEntity);
     }
 

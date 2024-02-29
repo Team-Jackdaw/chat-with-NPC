@@ -14,28 +14,17 @@ AIMobs is a mod that lets you chat with Minecraft mobs and other entities by cre
 - Fabric API
 
 ## Usage
-After installing the mod, grab your OpenAI API key from [here](https://beta.openai.com/account/api-keys), and set it with the `/chat-with-npc setkey <key>` command.
+After installing the mod, grab your OpenAI API key from [here](https://beta.openai.com/account/api-keys), and set it with the `/npchat setkey <key>` command.
 
 You should now be able to **talk to mobs by shift+clicking** on them!
 
 ## Commands
-- `/chat-with-npc` - View configuration status
-- `/chat-with-npc help` - View commands help
-- `/chat-with-npc enable/disable` - Enable/disable the mod
-- `/chat-with-npc setkey <key>` - Set OpenAI API key
-- `/chat-with-npc setmodel <model>` - Set AI model
-- `/chat-with-npc settemp <temperature>` - Set model temperature
-
-## Notes
-This project was initially made in 1.12 as a client Forge mod, then ported to 1.19 PaperMC as a server plugin, then ported to Fabric 1.19. Because of this, the code can be a little messy and weird. A couple hardcoded limits are 512 as the max token length and 4096 as the max prompt length (longer prompts will get the beginning cut off), these could be made configurable in the future.
-
-Some plans for the future:  
-- Support for the Forge modloader.
-- Support for other AI APIs.
-
-An unofficial community-made fork is available with support for Ukranian and Español at [Eianex/aimobs](https://github.com/Eianex/aimobs/releases).
-
-The icon used is the **🧠** emoji from [Twemoji](https://twemoji.twitter.com/) (CC BY 4.0)
+- `/npchat` - View configuration status
+- `/npchat help` - View commands help
+- `/npchat enable/disable` - Enable/disable the mod
+- `/npchat setkey <key>` - Set OpenAI API key
+- `/npchat setmodel <model>` - Set AI model
+- `/npchat settemp <temperature>` - Set model temperature
 
 ## 开发结构（临时章节）
 
@@ -57,7 +46,7 @@ The icon used is the **🧠** emoji from [Twemoji](https://twemoji.twitter.com/)
 4. event
     - 用于管理通话事件和处理程序。
     - 类：`ConversationManager`, `ConversationHandler`
-5. environment
+5. group
     - 管理全局和本地环境设置。
     - 类：`EnvironmentManager`, `GlobalEnvironment`, `LocalEnvironment`
     - 接口：`Environment`
@@ -87,8 +76,30 @@ The icon used is the **🧠** emoji from [Twemoji](https://twemoji.twitter.com/)
 - NPCEntity
     - 为NPC提供一个共同的基类，定义了一些通用的属性和方法。
 
-### 注意事项
-- 模块化：确保每个类都有明确的职责，避免过大的类和过多的职责。
-- 接口与实现分离：使用接口定义行为，然后提供具体的实现类。
-- 扩展性：设计时考虑未来可能的扩展，使得添加新功能或修改现有功能更容易。
-- 测试：为关键的功能编写单元测试，确保代码的可靠性。
+### 数据结构
+
+- NPC管理
+  - NPC实例 - （标识（key），组，职业，描述，聊天记录）
+  - NPC文件管理 - （标识，组，职业，描述，聊天记录）
+- 环境管理
+  - 环境实例 - （标识（key），父组，描述）
+  - 环境文件管理 - （标识，父组，描述）
+- 会话管理
+  - 会话实例 - （玩家（key），NPC）
+
+### 运行流程
+
+玩家与NPC对话：
+
+1. 激活会话->加载（注册）NPC->启动会话->递归加载（注册）环境->生成prompt->OpenAI API->记录聊天信息，回应玩家
+
+2. 玩家发送信息->（如果存在会话）加载会话->记录聊天信息，生成新prompt->OpenAI API->记录聊天信息，回应玩家
+
+### 实例生命周期，卸载时更新文件：
+
+1. 会话超5分钟无新内容，自动卸载。
+2. 玩家与新的NPC对话，旧对话卸载。
+3. NPC超5分钟无新对话内容，实例自动卸载。
+4. 环境实例超5分钟未被读取，实例自动卸载。
+5. 服务器关闭，会话，NPC实例，环境实例均自动卸载。
+
