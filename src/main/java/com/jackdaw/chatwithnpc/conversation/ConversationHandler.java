@@ -28,9 +28,8 @@ public class ConversationHandler {
     }
 
     public void getResponse(PlayerEntity player, String message) {
-        ChatWithNPCMod.LOGGER.info("[chat-with-npc] Draft message: " + message);
         // 1.5 second cooldown between requests
-        if (npc.getLastMessageTime() + 1500L > System.currentTimeMillis()) return;
+//        if (npc.getLastMessageTime() + 1500L > System.currentTimeMillis()) return;
         if (SettingManager.apiKey.isEmpty()) {
             player.sendMessage(Text.of("[chat-with-npc] You have not set an API key! Get one from https://beta.openai.com/account/api-keys and set it with /chat-with-npc setkey"));
             return;
@@ -41,7 +40,7 @@ public class ConversationHandler {
                 OpenAIHandler.updateSetting();
                 String response = OpenAIHandler.sendRequest(message, npc.getMessageRecord());
                 player.sendMessage(Text.of("<" + npc.getName() + "> " + response));
-                npc.addMessageRecord(npc.getLastMessageTime(), Record.Role.NPC, response);
+                npc.addMessageRecord(System.currentTimeMillis(), Record.Role.NPC, response);
             } catch (Exception e) {
                 player.sendMessage(Text.of("[chat-with-npc] Error getting response"));
                 ChatWithNPCMod.LOGGER.error(e.getMessage());
@@ -55,17 +54,17 @@ public class ConversationHandler {
         getResponse(player, Prompt.builder()
                 .setNpc(npc)
                 .build()
-                .getInitialPrompt() + "Start with you: ");
+                .getInitialPrompt());
         updateTime = System.currentTimeMillis();
     }
 
     public void replyToEntity(String message) {
         sendWaitMessage();
         npc.addMessageRecord(System.currentTimeMillis(), Record.Role.PLAYER, message);
-        Prompt prompt = Prompt.builder()
+        getResponse(player, Prompt.builder()
                 .setNpc(npc)
-                .build();
-        getResponse(player, prompt.getInitialPrompt() + prompt.getHistoryMessage() + "Now you response: ");
+                .build()
+                .getInitialPrompt());
         updateTime = System.currentTimeMillis();
     }
 

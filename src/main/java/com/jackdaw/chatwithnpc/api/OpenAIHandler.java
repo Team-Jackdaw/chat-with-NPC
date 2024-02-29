@@ -14,8 +14,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -24,20 +22,26 @@ public class OpenAIHandler {
     private static final class RequestJson {
         private final String model;
         private final ArrayList<Map<String, String>> messages = new ArrayList<>();
-        private final String maxTokens;
+        private final int max_tokens;
 
-        public RequestJson(String model, String initialPrompt, Record messages, String maxTokens) {
+        private static String role2String(Record.Role role) {
+            if (role == Record.Role.NPC) return "assistant";
+            if (role == Record.Role.PLAYER) return "user";
+            return "system";
+        }
+
+        private RequestJson(String model, String initialPrompt, Record messages, int max_tokens) {
             this.model = model;
-            this.maxTokens = maxTokens;
+            this.max_tokens = max_tokens;
             this.messages.add(Map.of("role", "system", "content", initialPrompt));
             for (Record.Message message : messages.getTreeMap().values()) {
-                this.messages.add(Map.of("role", message.getRole().toString().toLowerCase(), "content", encodeString(message.getMessage())));
+                this.messages.add(Map.of("role", role2String(message.getRole()), "content", message.getMessage()));
             }
         }
 
         public String toJson() {
             Gson gson = new Gson();
-            ChatWithNPCMod.LOGGER.info("[chat-with-npc] Draft Request: \n" + gson.toJson(this));
+            ChatWithNPCMod.LOGGER.debug("[chat-with-npc] Draft Request: \n" + gson.toJson(this));
             return gson.toJson(this);
         }
     }
@@ -45,15 +49,11 @@ public class OpenAIHandler {
     private static final String url = "https://api.openai.com/v1/chat/completions";
     private static String apiKey = "";
     private static String model = "gpt-3.5-turbo";
-    private static final String maxTokens = "512";
+    private static final int maxTokens = 512;
 
     public static void updateSetting() {
         apiKey = SettingManager.apiKey;
         model = SettingManager.model;
-    }
-
-    public static String encodeString(String value) {
-        return URLEncoder.encode(value, StandardCharsets.UTF_8);
     }
 
     /**
@@ -73,11 +73,11 @@ public class OpenAIHandler {
 
             // 构建请求体
             RequestJson requestJson = new RequestJson(model, initialPrompt, messageRecord, maxTokens);
-            request.setEntity(new StringEntity(requestJson.toJson()));
+            request.setEntity(new StringEntity(requestJson.toJson(), "UTF-8"));
 
             try (CloseableHttpResponse response = client.execute(request)) {
                 String res =  EntityUtils.toString(response.getEntity());
-                ChatWithNPCMod.LOGGER.info("[chat-with-npc] Draft Response: \n" + res);
+                ChatWithNPCMod.LOGGER.debug("[chat-with-npc] Draft Response: \n" + res);
                 JsonObject jsonObject = JsonParser.parseString(res).getAsJsonObject();
                 return jsonObject.getAsJsonArray("choices")
                         .get(0).getAsJsonObject()

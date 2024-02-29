@@ -54,8 +54,7 @@ public class NPCDataManager{
             npc.setGroup(localGroup);
             npc.setBasicPrompt(basicPrompt);
             for (Map<String, String> message : messageRecord) {
-                Object time = message.get("time");
-                npc.addMessageRecord((long) time , Record.Role.valueOf(message.get("role")), message.get("content"));
+                npc.addMessageRecord(Long.parseLong(message.get("time")) , Record.Role.valueOf(message.get("role")), message.get("content"));
             }
         }
     }

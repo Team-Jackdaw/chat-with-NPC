@@ -3,9 +3,8 @@ package com.jackdaw.chatwithnpc.prompt;
 import com.jackdaw.chatwithnpc.auxiliary.configuration.SettingManager;
 import com.jackdaw.chatwithnpc.group.Group;
 import com.jackdaw.chatwithnpc.group.GroupManager;
-import com.jackdaw.chatwithnpc.npc.NPCEntityManager;
 import com.jackdaw.chatwithnpc.npc.NPCEntity;
-import com.jackdaw.chatwithnpc.npc.Record;
+import com.jackdaw.chatwithnpc.npc.NPCEntityManager;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -50,8 +49,7 @@ public class Builder {
 
     public Prompt build() {
         String systemMessage = buildSystemMessage();
-        String historyMessage = buildHistoryMessage();
-        return new Prompt(systemMessage, historyMessage);
+        return new Prompt(systemMessage);
     }
 
     String buildSystemMessage() {
@@ -82,18 +80,5 @@ public class Builder {
         }
         String languagePrompt = "Please use `" + SettingManager.language + "` language to continue the conversation. ";
         return npcbasicPrompt + npcCareerPrompt + String.join("", groupPrompt) + languagePrompt;
-    }
-
-    String buildHistoryMessage() {
-        StringBuilder messageBuilder = new StringBuilder();
-        messageBuilder.append("This is the history of our conversation: ");
-        for (Record.Message message : NPCEntityManager.getNPCEntity(npcName).getMessageRecord().getTreeMap().values()) {
-            if (message.getRole() == Record.Role.NPC) {
-                messageBuilder.append("You said: " + message.getMessage() + ". ");
-            } else {
-                messageBuilder.append("You heard: " + message.getMessage() + ". ");
-            }
-        }
-        return messageBuilder.toString();
     }
 }
