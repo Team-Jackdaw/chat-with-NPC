@@ -2,6 +2,7 @@ package com.jackdaw.chatwithnpc.group;
 
 import com.jackdaw.chatwithnpc.ChatWithNPCMod;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -77,5 +78,18 @@ public class GroupManager {
             parentGroups.addAll(GroupManager.getParentGroups(parentGroup));
         }
         return parentGroups;
+    }
+
+    public static ArrayList<String> getGroupList() {
+        File workingDirectory = ChatWithNPCMod.workingDirectory.resolve("group").toFile();
+        File[] files = workingDirectory.listFiles();
+        ArrayList<String> groupList = new ArrayList<>();
+        if (files != null) {
+            for (File file : files) {
+                String name = file.getName();
+                groupList.add(name.substring(0, name.length() - 5));
+            }
+        }
+        return groupList;
     }
 }

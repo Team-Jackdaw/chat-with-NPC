@@ -1,4 +1,4 @@
-package com.jackdaw.chatwithnpc.event;
+package com.jackdaw.chatwithnpc.listener;
 
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;

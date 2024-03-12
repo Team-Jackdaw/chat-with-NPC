@@ -1,6 +1,6 @@
 package com.jackdaw.chatwithnpc.mixin;
 
-import com.jackdaw.chatwithnpc.event.PlayerSendMessageCallback;
+import com.jackdaw.chatwithnpc.listener.PlayerSendMessageCallback;
 import net.minecraft.network.message.MessageType;
 import net.minecraft.network.message.SignedMessage;
 import net.minecraft.server.PlayerManager;

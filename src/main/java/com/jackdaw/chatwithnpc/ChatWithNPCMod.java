@@ -3,7 +3,7 @@ package com.jackdaw.chatwithnpc;
 import com.jackdaw.chatwithnpc.auxiliary.command.CommandSet;
 import com.jackdaw.chatwithnpc.auxiliary.configuration.SettingManager;
 import com.jackdaw.chatwithnpc.conversation.ConversationManager;
-import com.jackdaw.chatwithnpc.event.PlayerSendMessageCallback;
+import com.jackdaw.chatwithnpc.listener.PlayerSendMessageCallback;
 import com.jackdaw.chatwithnpc.npc.NPCEntityManager;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -63,7 +63,7 @@ public class ChatWithNPCMod implements ModInitializer {
             ConversationManager.startConversation(NPCEntityManager.getNPCEntity(name), player);
             return ActionResult.FAIL;
         });
-        // Register the player chat event
+        // Register the player chat listener
         PlayerSendMessageCallback.EVENT.register((player, message) -> {
             // The mod must be enabled
             if (!SettingManager.enabled) return ActionResult.PASS;

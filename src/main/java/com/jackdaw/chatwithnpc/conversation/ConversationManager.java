@@ -32,7 +32,7 @@ public class ConversationManager {
         conversationMap.put(player, conversationHandler);
     }
 
-    private static void endConversation(PlayerEntity player) {;
+    public static void endConversation(PlayerEntity player) {
         conversationMap.remove(player);
     }
 
@@ -45,7 +45,7 @@ public class ConversationManager {
         return conversationMap.containsKey(player);
     }
 
-    private static void findAndEndConversation(PlayerEntity player) {
+    public static void findAndEndConversation(PlayerEntity player) {
         if (isConversing(player)) {
             endConversation(player);
         }

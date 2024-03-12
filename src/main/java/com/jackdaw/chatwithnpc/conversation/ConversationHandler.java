@@ -7,6 +7,7 @@ import com.jackdaw.chatwithnpc.npc.Record;
 import com.jackdaw.chatwithnpc.prompt.Prompt;
 import com.jackdaw.chatwithnpc.npc.NPCEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 
 public class ConversationHandler {
@@ -25,6 +26,14 @@ public class ConversationHandler {
 
     private void sendWaitMessage() {
         player.sendMessage(Text.of("<" + npc.getName() + "> ..."));
+    }
+
+    public ServerPlayerEntity getPlayer() {
+        return (ServerPlayerEntity) player;
+    }
+
+    public NPCEntity getNpc() {
+        return npc;
     }
 
     public void getResponse(PlayerEntity player, String message) {

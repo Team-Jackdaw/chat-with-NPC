@@ -21,6 +21,7 @@ public abstract class NPCEntity {
     protected String career = "unemployed";
     protected String basicPrompt = "I'm an NPC.";
     protected String group = "Global";
+    protected String longTermMemory = "None";
     protected final Record messageRecord = new Record();
     protected long lastMessageTime;
 
