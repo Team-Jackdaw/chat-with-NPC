@@ -10,6 +10,7 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
+import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,6 +71,10 @@ public class ChatWithNPCMod implements ModInitializer {
             // The player must be in a conversation
             ConversationHandler conversationHandler = ConversationManager.getConversation(player);
             if (conversationHandler == null) return ActionResult.PASS;
+            if (conversationHandler.isTalking()) {
+                player.sendMessage(Text.of("[chat-with-npc] The NPC is talking, please wait"), false);
+                return ActionResult.PASS;
+            }
             conversationHandler.replyToEntity(message);
             return ActionResult.PASS;
         });

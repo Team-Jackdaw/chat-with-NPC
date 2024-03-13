@@ -13,6 +13,8 @@ public class ConversationHandler {
 
     long updateTime = 0L;
 
+    protected boolean isTalking = false;
+
     public ConversationHandler(NPCEntity npc) {
         this.npc = npc;
         startConversation();
@@ -33,12 +35,14 @@ public class ConversationHandler {
             npc.replyMessage("[chat-with-npc] You have not set an API key! Get one from https://beta.openai.com/account/api-keys and set it with /chat-with-npc setkey", SettingManager.range);
             return;
         }
+        setTalking(true);
         Thread t = new Thread(() -> {
             try {
                 OpenAIHandler.updateSetting();
                 String response = OpenAIHandler.sendRequest(message, messageRecord);
                 npc.replyMessage(response, SettingManager.range);
                 addMessageRecord(System.currentTimeMillis(), Record.Role.NPC, response);
+                setTalking(false);
             } catch (Exception e) {
                 npc.replyMessage("[chat-with-npc] Error getting response", SettingManager.range);
                 ChatWithNPCMod.LOGGER.error(e.getMessage());
@@ -111,4 +115,23 @@ public class ConversationHandler {
         messageRecord.popMessage();
     }
 
+    public void clearMessageRecord() {
+        messageRecord.clear();
+    }
+
+    /**
+     * 获取NPC的对话状态
+     * @return NPC的对话状态
+     */
+    public boolean isTalking() {
+        return isTalking;
+    }
+
+    /**
+     * 设置NPC的对话状态
+     * @param isTalking NPC的对话状态
+     */
+    public void setTalking(boolean isTalking) {
+        this.isTalking = isTalking;
+    }
 }

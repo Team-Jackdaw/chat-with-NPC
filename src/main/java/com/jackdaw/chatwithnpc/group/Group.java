@@ -61,6 +61,10 @@ public class Group {
         permanentPrompt.add(prompt);
     }
 
+    public void popPermanentPrompt() {
+        permanentPrompt.remove(permanentPrompt.size() - 1);
+    }
+
     public TreeSet<String> getPermanentPrompt() {
         return new TreeSet<>(permanentPrompt);
     }

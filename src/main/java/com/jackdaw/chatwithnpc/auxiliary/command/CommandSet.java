@@ -38,6 +38,30 @@ public class CommandSet {
                         ))
                 .then(literal("enable").executes(context -> setEnabled(context, true)))
                 .then(literal("disable").executes(context -> setEnabled(context, false)))
+                .then(literal("setrange")
+                        .then(argument("range", StringArgumentType.word())
+                                .executes(context -> {
+                                    SettingManager.range = Double.parseDouble(context.getArgument("range", String.class));
+                                    SettingManager.save();
+                                    context.getSource().sendFeedback(Text.of("[chat-with-npc] Range set"), true);
+                                    return 1;
+                                })))
+                .then(literal("setforgettime")
+                        .then(argument("time", StringArgumentType.word())
+                                .executes(context -> {
+                                    SettingManager.forgetTime = Long.parseLong(context.getArgument("time", String.class));
+                                    SettingManager.save();
+                                    context.getSource().sendFeedback(Text.of("[chat-with-npc] Forget time set"), true);
+                                    return 1;
+                                })))
+                .then(literal("setlanguage")
+                        .then(argument("language", StringArgumentType.word())
+                                .executes(context -> {
+                                    SettingManager.language = context.getArgument("language", String.class);
+                                    SettingManager.save();
+                                    context.getSource().sendFeedback(Text.of("[chat-with-npc] Language set"), true);
+                                    return 1;
+                                })))
                 .then(literal("npc")
                         .then(literal("setCareer")
                                 .then(argument("career", StringArgumentType.greedyString())
@@ -52,6 +76,9 @@ public class CommandSet {
                                 .then(argument("prompt", StringArgumentType.greedyString())
                                         .executes(CommandSet::setNPCPrompt)
                                 ))
+                        .then(literal("clearMemory")
+                                .executes(CommandSet::clearNPCMemory)
+                        )
                         .executes(CommandSet::npcStatus))
                 .then(literal("group")
                         .then(argument("group", StringArgumentType.word())
@@ -65,11 +92,22 @@ public class CommandSet {
                                         .then(argument("prompt", StringArgumentType.greedyString())
                                                 .executes(CommandSet::addGroupPermanentPrompt)
                                         ))
+                                .then(literal("popPermanentPrompt")
+                                        .executes(CommandSet::popGroupPermanentPrompt))
                                 .then(literal("addTempEvent")
                                         .then(argument("event", StringArgumentType.greedyString())
                                                         .executes(CommandSet::addGroupTempEvent)
                                         ))
                                 .executes(CommandSet::groupStatus)
+                        ))
+                .then(literal("addGroup")
+                        .then(argument("newGroup", StringArgumentType.word())
+                                .executes(context -> {
+                                    String group = context.getArgument("newGroup", String.class);
+                                    GroupManager.loadEnvironment(group);
+                                    context.getSource().sendFeedback(Text.of("[chat-with-npc] Group added"), true);
+                                    return 1;
+                                })
                         ))
                 .then(literal("reload")
                         .executes(context -> {
@@ -110,6 +148,13 @@ public class CommandSet {
                 .append("\nLast Load Time: ").append(Text.literal(String.valueOf(g.getLastLoadTimeString())).formatted(Formatting.GRAY))
                 .append("\nUse ").append(Text.literal("/npchat help").formatted(Formatting.GRAY)).append(" for help");
         context.getSource().sendFeedback(statusText, false);
+        return 1;
+    }
+
+    private static int popGroupPermanentPrompt(CommandContext<ServerCommandSource> context) {
+        String group = context.getArgument("group", String.class);
+        GroupManager.getGroup(group).popPermanentPrompt();
+        context.getSource().sendFeedback(Text.of("[chat-with-npc] Permanent prompt popped"), true);
         return 1;
     }
 
@@ -154,11 +199,28 @@ public class CommandSet {
                 ).formatted(Formatting.GOLD))
                 .append("\nCareer: ").append(Text.literal(npc.getCareer()).formatted(Formatting.AQUA))
                 .append("\nBackground: ").append(Text.literal(npc.getBasicPrompt()).formatted(Formatting.BLUE))
+                .append("\nIs memory: ").append(Text.literal(String.valueOf(!npc.getLongTermMemory().isEmpty())).formatted(Formatting.LIGHT_PURPLE))
                 // converge Long to real time
                 .append("\nLast Message Time: ").append(Text.literal(String.valueOf(conversation.getUpdateTimeString())).formatted(Formatting.GRAY))
                 .append("\nUse ").append(Text.literal("/npchat help").formatted(Formatting.GRAY)).append(" for help");
         context.getSource().sendFeedback(statusText, false);
         return 1;
+    }
+
+    private static int clearNPCMemory(CommandContext<ServerCommandSource> context) {
+        ServerPlayerEntity player = context.getSource().getPlayer();
+        if (player != null && ConversationManager.getConversation(player) != null){
+            ConversationHandler conversation = ConversationManager.getConversation(player);
+            if (conversation == null) return 0;
+            conversation.clearMessageRecord();
+            conversation.getNpc().deleteLongTermMemory(Long.MAX_VALUE);
+            player.sendMessage(Text.of("[chat-with-npc] Memory clear."), true);
+            return 1;
+        }
+        if (player != null) {
+            player.sendMessage(Text.of("[chat-with-npc] You are not in a conversation."), true);
+        }
+        return 0;
     }
 
     private static int setNPCPrompt(CommandContext<ServerCommandSource> context) {

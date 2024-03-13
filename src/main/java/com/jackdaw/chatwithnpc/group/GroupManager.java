@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * This class is used to manage the group of the game.
  */
 public class GroupManager {
-    // The time in milliseconds that an group is considered out of time
+    // The time in milliseconds that a group is considered out of time
     private static final long outOfTime = ChatWithNPCMod.outOfTime;
     public static final ConcurrentHashMap<String, Group> GroupMap = new ConcurrentHashMap<>();
 

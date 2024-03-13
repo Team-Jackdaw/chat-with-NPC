@@ -1,5 +1,6 @@
 package com.jackdaw.chatwithnpc.npc;
 
+import com.jackdaw.chatwithnpc.auxiliary.configuration.SettingManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
@@ -29,7 +30,7 @@ public abstract class NPCEntity {
     protected String career = "unemployed";
     protected String basicPrompt = "You are an NPC.";
     protected String group = "Global";
-    protected ArrayList<Map<Long, String>> longTermMemory;
+    protected ArrayList<Map<Long, String>> longTermMemory = new ArrayList<>();
 
     /**
      * This is a constructor used to initialize the NPC with the entity.
@@ -199,7 +200,7 @@ public abstract class NPCEntity {
         for (Map<Long, String> memory : longTermMemory) {
             long time = memory.keySet().iterator().next();
             long duration = System.currentTimeMillis() - time;
-            double probability = Math.min(1, duration / 604800000L);
+            double probability = Math.min(1, duration / SettingManager.forgetTime);
             if (Math.random() < probability) {
                 longTermMemory.removeIf(m -> m.keySet().stream().anyMatch(t -> t == time));
             }

@@ -73,7 +73,7 @@ public class Builder {
                 memoryPrompt.append(memory.values().iterator().next()).append("; ");
             }
         }
-        String languagePrompt = "Please use `" + SettingManager.language + "` language to continue the conversation. ";
+        String languagePrompt = "Please use `" + SettingManager.language + "` language to begin a new conversation. ";
         return npcbasicPrompt + npcCareerPrompt + this.npcBasicPrompt + String.join("", groupPrompt) + memoryPrompt + languagePrompt;
     }
 }

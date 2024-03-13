@@ -3,10 +3,6 @@ package com.jackdaw.chatwithnpc.conversation;
 import java.util.TreeMap;
 
 public class Record {
-    public void popMessage() {
-        messageRecord.pollFirstEntry();
-    }
-
     public enum Role {
         PLAYER, SYSTEM, NPC
     }
@@ -37,19 +33,15 @@ public class Record {
         messageRecord.put(time, new Message(role, message));
     }
 
-    /**
-     * 获取NPC的最后一次消息时间，随着时间的退役该NPC会逐渐遗忘他讲过的内容。
-     * @return NPC的最后一次消息时间
-     */
-    public long lastMessageTime() {
-        return messageRecord.lastKey();
-    }
-
     public TreeMap<Long, Message> getTreeMap() {
         return messageRecord;
     }
 
-    public void deleteMessageBefore(long time) {
-        messageRecord.remove(time);
+    public void popMessage() {
+        messageRecord.pollFirstEntry();
+    }
+
+    public void clear() {
+        messageRecord.clear();
     }
 }
