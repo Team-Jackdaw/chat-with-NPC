@@ -1,4 +1,4 @@
-package com.jackdaw.chatwithnpc.prompt;
+package com.jackdaw.chatwithnpc.conversation.prompt;
 
 import com.jackdaw.chatwithnpc.auxiliary.configuration.SettingManager;
 import com.jackdaw.chatwithnpc.group.Group;

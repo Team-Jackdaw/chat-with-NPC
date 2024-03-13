@@ -7,7 +7,8 @@
   "description": "Fork from rebane2001/aimobs. Chat with Minecraft mobs and entities by using the OpenAI API. The repository plans to modify the mod to allow players to interact and talk to specific entities under specific prompts (for use in RPG maps).",
   "authors": [
     "rebane2001",
-    "WDRshadow"
+    "WDRshadow",
+    "Lokeyli"
   ],
   "contact": {
     "homepage": "https://github.com/Team-Jackdaw/chat-with-NPC",
@@ -21,9 +22,6 @@
   "entrypoints": {
     "main": [
       "com.jackdaw.chatwithnpc.ChatWithNPCMod"
-    ],
-    "client": [
-      "com.jackdaw.chatwithnpc.ChatWithNPCModClient"
     ]
   },
   "mixins": [
@@ -37,7 +35,7 @@
   "depends": {
     "fabricloader": ">=0.12.0",
     "fabric-api": "*",
-    "minecraft": "~1.19",
+    "minecraft": ">=1.19.4",
     "java": ">=16"
   },
   "suggests": {}

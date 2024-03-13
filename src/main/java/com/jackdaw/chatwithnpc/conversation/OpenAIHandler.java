@@ -1,4 +1,4 @@
-package com.jackdaw.chatwithnpc.api;
+package com.jackdaw.chatwithnpc.conversation;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;

@@ -1,10 +1,9 @@
 package com.jackdaw.chatwithnpc.conversation;
 
 import com.jackdaw.chatwithnpc.ChatWithNPCMod;
-import com.jackdaw.chatwithnpc.api.OpenAIHandler;
 import com.jackdaw.chatwithnpc.auxiliary.configuration.SettingManager;
 import com.jackdaw.chatwithnpc.npc.Record;
-import com.jackdaw.chatwithnpc.prompt.Prompt;
+import com.jackdaw.chatwithnpc.conversation.prompt.Prompt;
 import com.jackdaw.chatwithnpc.npc.NPCEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;

@@ -1,4 +1,4 @@
-package com.jackdaw.chatwithnpc.prompt;
+package com.jackdaw.chatwithnpc.conversation.prompt;
 
 public class Prompt {
 
