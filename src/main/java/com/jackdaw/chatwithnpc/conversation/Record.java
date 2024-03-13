@@ -1,10 +1,14 @@
-package com.jackdaw.chatwithnpc.npc;
+package com.jackdaw.chatwithnpc.conversation;
 
 import java.util.TreeMap;
 
 public class Record {
+    public void popMessage() {
+        messageRecord.pollFirstEntry();
+    }
+
     public enum Role {
-        PLAYER, NPC
+        PLAYER, SYSTEM, NPC
     }
     public static final class Message {
         private final Role role;

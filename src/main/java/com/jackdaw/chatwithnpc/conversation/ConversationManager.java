@@ -3,14 +3,15 @@ package com.jackdaw.chatwithnpc.conversation;
 import com.jackdaw.chatwithnpc.ChatWithNPCMod;
 import com.jackdaw.chatwithnpc.auxiliary.configuration.SettingManager;
 import com.jackdaw.chatwithnpc.npc.NPCEntity;
+import com.jackdaw.chatwithnpc.npc.NPCEntityManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * This class is used to manage conversations between players and NPCs.
@@ -21,7 +22,7 @@ public class ConversationManager {
 
     // The time in milliseconds that a conversation is considered out of time
     private static final long outOfTime = ChatWithNPCMod.outOfTime;
-    public static final HashMap<UUID, ConversationHandler> conversationMap = new HashMap<>();
+    public static final ConcurrentHashMap<UUID, ConversationHandler> conversationMap = new ConcurrentHashMap<>();
 
     /**
      * Start a conversation for Player with an NPC
@@ -37,6 +38,10 @@ public class ConversationManager {
     }
 
     public static void endConversation(UUID uuid) {
+        conversationMap.get(uuid).getLongTermMemory();
+        NPCEntity npc = NPCEntityManager.getNPCEntity(uuid);
+        npc.getDataManager().save();
+        NPCEntityManager.removeNPCEntity(uuid);
         conversationMap.remove(uuid);
     }
 
@@ -86,6 +91,7 @@ public class ConversationManager {
      * End all conversations that are out of time
      */
     public static void endOutOfTimeConversations() {
+        if (conversationMap.isEmpty()) return;
         conversationMap.forEach((uuid, conversationHandler) -> {
             if (conversationHandler.getUpdateTime() + outOfTime < System.currentTimeMillis()) {
                 endConversation(uuid);
@@ -97,6 +103,7 @@ public class ConversationManager {
      * End all conversations
      */
     public static void endAllConversations() {
+        if (conversationMap.isEmpty()) return;
         conversationMap.forEach((uuid, conversationHandler) -> endConversation(uuid));
     }
 

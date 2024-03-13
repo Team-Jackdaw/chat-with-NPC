@@ -7,17 +7,15 @@ import com.jackdaw.chatwithnpc.npc.NPCEntityManager;
 public class UpdateStaticData {
     public static void update() {
         ConversationManager.endOutOfTimeConversations();
-        NPCEntityManager.endOutOfTimeNPCEntity();
         GroupManager.endOutOfTimeEnvironments();
     }
 
     public static void close() {
+        ChatWithNPCMod.LOGGER.info("[chat-with-npc] Saving all conversations, NPC entities, and environments.");
         try {
             ConversationManager.endAllConversations();
             NPCEntityManager.endAllNPCEntity();
             GroupManager.endAllEnvironments();
-        }
-        catch (Exception ignored) {
-        }
+        } catch (Exception ignore) {}
     }
 }

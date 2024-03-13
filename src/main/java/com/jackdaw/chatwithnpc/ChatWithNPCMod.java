@@ -78,14 +78,13 @@ public class ChatWithNPCMod implements ModInitializer {
         executorService.scheduleAtFixedRate(() -> {
             try {
                 UpdateStaticData.update();
-            } catch (Exception e) {
-                LOGGER.error(e.getMessage());
+            } catch (Exception ignore) {
             }
         }, 0, updateInterval, TimeUnit.MILLISECONDS);
         // Shutdown the executor service when the server is stopped
         ServerLifecycleEvents.SERVER_STOPPING.register(server -> {
-            UpdateStaticData.close();
             executorService.shutdown();
+            UpdateStaticData.close();
         });
     }
 }

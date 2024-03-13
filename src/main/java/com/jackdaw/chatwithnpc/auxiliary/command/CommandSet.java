@@ -44,7 +44,7 @@ public class CommandSet {
                                         .executes(CommandSet::setNPCCareer)
                                 ))
                         .then(literal("setGroup")
-                                .then(argument("group", StringArgumentType.greedyString())
+                                .then(argument("group", StringArgumentType.word())
                                         .suggests(groupSuggestionProvider)
                                         .executes(CommandSet::setNPCGroup)
                                 ))
@@ -54,10 +54,11 @@ public class CommandSet {
                                 ))
                         .executes(CommandSet::npcStatus))
                 .then(literal("group")
-                        .then(argument("group", StringArgumentType.greedyString())
+                        .then(argument("group", StringArgumentType.word())
                                 .suggests(groupSuggestionProvider)
                                 .then(literal("setParent")
-                                        .then(argument("parent", StringArgumentType.greedyString())
+                                        .then(argument("parent", StringArgumentType.word())
+                                                .suggests(groupSuggestionProvider)
                                                 .executes(CommandSet::setGroupParent)
                                         ))
                                 .then(literal("addPermanentPrompt")
@@ -72,8 +73,13 @@ public class CommandSet {
                         ))
                 .then(literal("reload")
                         .executes(context -> {
-                            UpdateStaticData.close();
-                            context.getSource().sendFeedback(Text.of("[chat-with-npc] Reloaded"), true);
+                            Thread t = new Thread(() -> {
+                                try {
+                                    UpdateStaticData.close();
+                                    context.getSource().sendFeedback(Text.of("[chat-with-npc] Reloaded"), true);
+                                } catch (Exception ignore) {}
+                            });
+                            t.start();
                             return 1;
                         })
                 )
@@ -101,7 +107,7 @@ public class CommandSet {
                 .append("\nTemp Events: ").append(Text.literal(
                         String.join(", ", g.getTempEvent().stream().map(longStringMap -> longStringMap.values().iterator().next()).toList())
                 ).formatted(Formatting.BLUE))
-                .append("\nLast Load Time: ").append(Text.literal(String.valueOf(g.getLastLoadTime())).formatted(Formatting.GRAY))
+                .append("\nLast Load Time: ").append(Text.literal(String.valueOf(g.getLastLoadTimeString())).formatted(Formatting.GRAY))
                 .append("\nUse ").append(Text.literal("/npchat help").formatted(Formatting.GRAY)).append(" for help");
         context.getSource().sendFeedback(statusText, false);
         return 1;
@@ -148,7 +154,8 @@ public class CommandSet {
                 ).formatted(Formatting.GOLD))
                 .append("\nCareer: ").append(Text.literal(npc.getCareer()).formatted(Formatting.AQUA))
                 .append("\nBackground: ").append(Text.literal(npc.getBasicPrompt()).formatted(Formatting.BLUE))
-                .append("\nLast Message Time: ").append(Text.literal(String.valueOf(npc.getLastMessageTime())).formatted(Formatting.GRAY))
+                // converge Long to real time
+                .append("\nLast Message Time: ").append(Text.literal(String.valueOf(conversation.getUpdateTimeString())).formatted(Formatting.GRAY))
                 .append("\nUse ").append(Text.literal("/npchat help").formatted(Formatting.GRAY)).append(" for help");
         context.getSource().sendFeedback(statusText, false);
         return 1;

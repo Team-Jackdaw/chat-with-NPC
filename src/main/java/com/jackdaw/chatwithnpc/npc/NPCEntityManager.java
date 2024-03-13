@@ -1,23 +1,18 @@
 package com.jackdaw.chatwithnpc.npc;
 
-import com.jackdaw.chatwithnpc.ChatWithNPCMod;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.passive.VillagerEntity;
 
-import java.util.HashMap;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
  * This class is used to manage the NPC entities.
  */
 public class NPCEntityManager {
-
-    // The time in milliseconds that an NPCEntity is considered out of time
-    private static final long outOfTime = ChatWithNPCMod.outOfTime;
-
-    public static final HashMap<UUID, NPCEntity> npcMap = new HashMap<>();
+    public static final ConcurrentHashMap<UUID, NPCEntity> npcMap = new ConcurrentHashMap<>();
 
     public static boolean isRegistered(UUID uuid) {
         return npcMap.containsKey(uuid);
@@ -45,6 +40,7 @@ public class NPCEntityManager {
     }
 
     public static void removeNPCEntity(UUID uuid) {
+        npcMap.get(uuid).randomForget();
         npcMap.get(uuid).getDataManager().save();
         npcMap.remove(uuid);
     }
@@ -53,15 +49,8 @@ public class NPCEntityManager {
         return npcMap.get(uuid);
     }
 
-    public static void endOutOfTimeNPCEntity() {
-        npcMap.forEach((uuid, npcEntity) -> {
-            if (npcEntity.getLastMessageTime() + outOfTime < System.currentTimeMillis()) {
-                removeNPCEntity(uuid);
-            }
-        });
-    }
-
     public static void endAllNPCEntity() {
+        if (npcMap.isEmpty()) return;
         npcMap.forEach((uuid, npcEntity) -> removeNPCEntity(uuid));
     }
 }

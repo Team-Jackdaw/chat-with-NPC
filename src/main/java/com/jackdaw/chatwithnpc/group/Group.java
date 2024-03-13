@@ -13,13 +13,14 @@ public class Group {
 
     private final ArrayList<Map<Long, String>> tempEvent = new ArrayList<>();
 
-    private long lastLoadTime = System.currentTimeMillis();
+    private long lastLoadTime;
 
     Group(@NotNull String name) {
         this.name = name;
         if (name.equals("Global")) {
             parentGroup = null;
         }
+        lastLoadTime = System.currentTimeMillis();
     }
 
     public String getName() {
@@ -36,6 +37,11 @@ public class Group {
 
     public long getLastLoadTime() {
         return lastLoadTime;
+    }
+
+    public String getLastLoadTimeString() {
+        // converge long to real time
+        return new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date(lastLoadTime));
     }
 
     public void updateLastLoadTime(long time) {

@@ -5,7 +5,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.jackdaw.chatwithnpc.ChatWithNPCMod;
 import com.jackdaw.chatwithnpc.auxiliary.configuration.SettingManager;
-import com.jackdaw.chatwithnpc.npc.Record;
 import org.apache.http.HttpHeaders;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -27,6 +26,7 @@ public class OpenAIHandler {
         private static String role2String(Record.Role role) {
             if (role == Record.Role.NPC) return "assistant";
             if (role == Record.Role.PLAYER) return "user";
+            if (role == Record.Role.SYSTEM) return "system";
             return "system";
         }
 

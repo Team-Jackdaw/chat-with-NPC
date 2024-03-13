@@ -6,7 +6,9 @@ import net.minecraft.text.Text;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -25,11 +27,9 @@ public abstract class NPCEntity {
     protected final UUID uuid;
     protected final String name;
     protected String career = "unemployed";
-    protected String basicPrompt = "I'm an NPC.";
+    protected String basicPrompt = "You are an NPC.";
     protected String group = "Global";
-    protected String longTermMemory = "None";
-    protected final Record messageRecord = new Record();
-    protected long lastMessageTime;
+    protected ArrayList<Map<Long, String>> longTermMemory;
 
     /**
      * This is a constructor used to initialize the NPC with the entity.
@@ -42,7 +42,6 @@ public abstract class NPCEntity {
         this.name = entity.getCustomName().getString();
         this.entity = entity;
         this.uuid = entity.getUuid();
-        this.lastMessageTime = System.currentTimeMillis();
     }
 
     /**
@@ -94,22 +93,6 @@ public abstract class NPCEntity {
     }
 
     /**
-     * 获取NPC的最后一次消息时间，随着时间的退役该NPC会逐渐遗忘他讲过的内容。
-     * @return NPC的最后一次消息时间
-     */
-    public long getLastMessageTime() {
-        return this.lastMessageTime;
-    }
-
-    /**
-     * 获取NPC的消息记录，该记录应该包括了NPC的所有消息。
-     * @return NPC的消息记录
-     */
-    public Record getMessageRecord() {
-        return this.messageRecord;
-    }
-
-    /**
      * 设置NPC的职业，该职业应该作为该NPC的特征之一。
      * @param career NPC的职业
      */
@@ -123,32 +106,6 @@ public abstract class NPCEntity {
      */
     public void setBasicPrompt(String basicPrompt) {
         this.basicPrompt = basicPrompt;
-    }
-
-    /**
-     * 设置NPC的最后一次消息时间，随着时间的退役该NPC会逐渐遗忘他讲过的内容。
-     * @param lastMessageTime NPC的最后一次消息时间
-     */
-    public void updateLastMessageTime(long lastMessageTime) {
-        this.lastMessageTime = lastMessageTime;
-    }
-
-    /**
-     * 添加NPC的消息记录，该记录应该包括了NPC的最近一条消息。
-     * @param time NPC的消息时间
-     * @param role 消息发出者的身份
-     * @param message 消息内容
-     */
-    public void addMessageRecord(long time, Record.Role role, String message) {
-        this.messageRecord.addMessage(time, role, message);
-    }
-
-    /**
-     * 删除NPC的消息记录，删除该时间以前的所有记录。
-     * @param time 保存的截止时间
-     */
-    public void deleteMessageBefore(long time) {
-        this.messageRecord.deleteMessageBefore(time);
     }
 
     /**
@@ -199,5 +156,53 @@ public abstract class NPCEntity {
      */
     public Entity getEntity() {
         return entity;
+    }
+
+    /**
+     * 添加NPC的长期记忆，该记忆应该是NPC的特征之一。
+     * @param memoryTime 记忆时间
+     * @param memory 记忆
+     */
+    public void addLongTermMemory(long memoryTime, String memory) {
+        Map<Long, String> newMemory = Map.of(memoryTime, memory);
+        longTermMemory.add(newMemory);
+    }
+
+    /**
+     * 获取NPC的长期记忆，该记忆应该是NPC的特征之一。
+     * @return NPC的长期记忆
+     */
+    public ArrayList<Map<Long, String>> getLongTermMemory() {
+        return longTermMemory;
+    }
+
+    /**
+     * 设置NPC的长期记忆，该记忆应该是NPC的特征之一。
+     * @param longTermMemory NPC的长期记忆
+     */
+    public void setLongTermMemory(ArrayList<Map<Long, String>> longTermMemory) {
+        this.longTermMemory = longTermMemory;
+    }
+
+    /**
+     * 删除某个时间以前的记忆。
+     * @param forgetTime 遗忘时间
+     */
+    public void deleteLongTermMemory(long forgetTime) {
+        longTermMemory.removeIf(memory -> memory.keySet().stream().anyMatch(time -> time < forgetTime));
+    }
+
+    /**
+     * 根据随机函数遗忘一些记忆。
+     */
+    public void randomForget() {
+        for (Map<Long, String> memory : longTermMemory) {
+            long time = memory.keySet().iterator().next();
+            long duration = System.currentTimeMillis() - time;
+            double probability = Math.min(1, duration / 604800000L);
+            if (Math.random() < probability) {
+                longTermMemory.removeIf(m -> m.keySet().stream().anyMatch(t -> t == time));
+            }
+        }
     }
 }

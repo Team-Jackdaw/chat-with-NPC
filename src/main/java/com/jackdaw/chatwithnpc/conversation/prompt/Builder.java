@@ -16,7 +16,8 @@ public class Builder {
     String npcGroup = "Global";
     String npcType = "Minecraft:villager";
     String npcCareer = "unemployed";
-    String npcBasicPrompt = "I'm an NPC.";
+    String npcBasicPrompt = "You are an NPC.";
+    ArrayList<Map<Long, String>> longTermMemory = new ArrayList<>();
 
     public Builder setNpc(UUID npcUUID) {
         NPCEntity npc = NPCEntityManager.getNPCEntity(npcUUID);
@@ -30,21 +31,7 @@ public class Builder {
         this.npcType = npc.getType();
         this.npcCareer = npc.getCareer();
         this.npcBasicPrompt = npc.getBasicPrompt();
-        return this;
-    }
-
-    public Builder setNpcName(String npcName) {
-        this.npcName = npcName;
-        return this;
-    }
-
-    public Builder setNpcCareer(String npcCareer) {
-        this.npcCareer = npcCareer;
-        return this;
-    }
-
-    public Builder setNpcBasicPrompt(String npcBasicPrompt) {
-        this.npcBasicPrompt = npcBasicPrompt;
+        this.longTermMemory = npc.getLongTermMemory();
         return this;
     }
 
@@ -79,7 +66,14 @@ public class Builder {
             prompt.append(". ");
             groupPrompt.add(prompt.toString());
         }
+        StringBuilder memoryPrompt = new StringBuilder();
+        if (!longTermMemory.isEmpty()) {
+            memoryPrompt = new StringBuilder("You have some memory about the past conversation: ");
+            for (Map<Long, String> memory : longTermMemory) {
+                memoryPrompt.append(memory.values().iterator().next()).append("; ");
+            }
+        }
         String languagePrompt = "Please use `" + SettingManager.language + "` language to continue the conversation. ";
-        return npcbasicPrompt + npcCareerPrompt + String.join("", groupPrompt) + languagePrompt;
+        return npcbasicPrompt + npcCareerPrompt + this.npcBasicPrompt + String.join("", groupPrompt) + memoryPrompt + languagePrompt;
     }
 }

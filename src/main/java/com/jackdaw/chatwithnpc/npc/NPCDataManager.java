@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -26,22 +25,14 @@ public class NPCDataManager{
         private final String careers;
         private final String localGroup;
         private final String basicPrompt;
-        private final ArrayList<Map<String, String>> messageRecord;
+        private final ArrayList<Map<Long, String>> longTermMemory;
 
         private NPCData(NPCEntity npc) {
             this.name = npc.getName();
             this.careers = npc.getCareer();
             this.localGroup = npc.getGroup();
             this.basicPrompt = npc.getBasicPrompt();
-            this.messageRecord = new ArrayList<>();
-            Record message = npc.getMessageRecord();
-            for (long time : message.getTreeMap().keySet()) {
-                Map<String, String> newMessage = new HashMap<>();
-                newMessage.put("role", message.getTreeMap().get(time).getRole().toString());
-                newMessage.put("content", message.getTreeMap().get(time).getMessage());
-                newMessage.put("time", String.valueOf(time));
-                messageRecord.add(newMessage);
-            }
+            this.longTermMemory = new ArrayList<>(npc.getLongTermMemory());
         }
 
         private String toJson() {
@@ -53,9 +44,7 @@ public class NPCDataManager{
             npc.setCareer(careers);
             npc.setGroup(localGroup);
             npc.setBasicPrompt(basicPrompt);
-            for (Map<String, String> message : messageRecord) {
-                npc.addMessageRecord(Long.parseLong(message.get("time")) , Record.Role.valueOf(message.get("role")), message.get("content"));
-            }
+            npc.setLongTermMemory(longTermMemory);
         }
     }
 
@@ -101,16 +90,6 @@ public class NPCDataManager{
             Files.write(theFile.toPath(), json.getBytes());
         } catch (IOException e) {
             logger.error("[chat-with-npc] Can't write the data file.");
-        }
-    }
-
-    public void delete() {
-        if (!isExist()) {
-            logger.warn("[chat-with-npc] The data file doesn't exist.");
-            return;
-        }
-        if (!theFile.delete()) {
-            logger.error("[chat-with-npc] Can't delete the data file.");
         }
     }
 
