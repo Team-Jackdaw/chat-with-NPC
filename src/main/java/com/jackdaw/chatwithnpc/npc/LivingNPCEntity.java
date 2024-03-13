@@ -2,7 +2,6 @@ package com.jackdaw.chatwithnpc.npc;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.text.Text;
 import org.jetbrains.annotations.NotNull;
 
 public class LivingNPCEntity extends NPCEntity{
@@ -13,11 +12,6 @@ public class LivingNPCEntity extends NPCEntity{
      */
     public LivingNPCEntity(@NotNull LivingEntity entity) {
         super(entity);
-    }
-
-    @Override
-    public void replyMessage(String message, PlayerEntity player) {
-        player.sendMessage(Text.of("<" + this.getName() + "> " + message));
     }
 
     @Override

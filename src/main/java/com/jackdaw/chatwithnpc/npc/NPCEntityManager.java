@@ -6,6 +6,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.passive.VillagerEntity;
 
 import java.util.HashMap;
+import java.util.UUID;
 
 
 /**
@@ -16,19 +17,18 @@ public class NPCEntityManager {
     // The time in milliseconds that an NPCEntity is considered out of time
     private static final long outOfTime = ChatWithNPCMod.outOfTime;
 
-    public static final HashMap<String, NPCEntity> npcMap = new HashMap<>();
+    public static final HashMap<UUID, NPCEntity> npcMap = new HashMap<>();
 
-    public static boolean isRegistered(String name) {
-        return npcMap.containsKey(name);
+    public static boolean isRegistered(UUID uuid) {
+        return npcMap.containsKey(uuid);
     }
 
     /**
      * Initialize an NPC entity if the NPC is not conversing.
-     * @param name The name of the NPC
      * @param entity The NPC entity to initialize
      */
-    public static void registerNPCEntity(String name, Entity entity) {
-        if (isRegistered(name)) {
+    public static void registerNPCEntity(Entity entity) {
+        if (isRegistered(entity.getUuid())) {
             return;
         }
         NPCEntity npcEntity;
@@ -41,29 +41,27 @@ public class NPCEntityManager {
         }
         NPCDataManager npcDataManager = npcEntity.getDataManager();
         npcDataManager.sync();
-        npcMap.put(name, npcEntity);
+        npcMap.put(entity.getUuid(), npcEntity);
     }
 
-    public static void removeNPCEntity(String name) {
-        npcMap.get(name).getDataManager().save();
-        npcMap.remove(name);
+    public static void removeNPCEntity(UUID uuid) {
+        npcMap.get(uuid).getDataManager().save();
+        npcMap.remove(uuid);
     }
 
-    public static NPCEntity getNPCEntity(String name) {
-        return npcMap.get(name);
+    public static NPCEntity getNPCEntity(UUID uuid) {
+        return npcMap.get(uuid);
     }
 
     public static void endOutOfTimeNPCEntity() {
-        npcMap.forEach((name, npcEntity) -> {
+        npcMap.forEach((uuid, npcEntity) -> {
             if (npcEntity.getLastMessageTime() + outOfTime < System.currentTimeMillis()) {
-                removeNPCEntity(name);
+                removeNPCEntity(uuid);
             }
         });
     }
 
     public static void endAllNPCEntity() {
-        npcMap.forEach((name, npcEntity) -> {
-            removeNPCEntity(name);
-        });
+        npcMap.forEach((uuid, npcEntity) -> removeNPCEntity(uuid));
     }
 }

@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.UUID;
 
 public class Builder {
     String npcName = "NPC";
@@ -17,8 +18,8 @@ public class Builder {
     String npcCareer = "unemployed";
     String npcBasicPrompt = "I'm an NPC.";
 
-    public Builder setNpc(String npcName) {
-        NPCEntity npc = NPCEntityManager.getNPCEntity(npcName);
+    public Builder setNpc(UUID npcUUID) {
+        NPCEntity npc = NPCEntityManager.getNPCEntity(npcUUID);
         setNpc(npc);
         return this;
     }

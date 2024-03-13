@@ -8,7 +8,6 @@ import com.jackdaw.chatwithnpc.group.Group;
 import com.jackdaw.chatwithnpc.group.GroupManager;
 import com.jackdaw.chatwithnpc.npc.NPCEntity;
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
@@ -36,10 +35,6 @@ public class CommandSet {
                 .then(literal("setmodel")
                         .then(argument("model", StringArgumentType.string())
                                 .executes(CommandSet::setModel)
-                        ))
-                .then(literal("settemp")
-                        .then(argument("temperature", FloatArgumentType.floatArg(0,1))
-                                .executes(CommandSet::setTemp)
                         ))
                 .then(literal("enable").executes(context -> setEnabled(context, true)))
                 .then(literal("disable").executes(context -> setEnabled(context, false)))
@@ -141,6 +136,7 @@ public class CommandSet {
     private static int npcStatus(CommandContext<ServerCommandSource> context) {
         ServerPlayerEntity player = context.getSource().getPlayer();
         ConversationHandler conversation = ConversationManager.getConversation(player);
+        if (conversation == null) return 0;
         NPCEntity npc = conversation.getNpc();
         // show all the properties of the npc
         Text statusText = Text.literal("")
@@ -162,7 +158,9 @@ public class CommandSet {
         ServerPlayerEntity player = context.getSource().getPlayer();
         String prompt = context.getArgument("prompt", String.class);
         if (player != null && ConversationManager.getConversation(player) != null){
-            ConversationManager.getConversation(player).getNpc().setBasicPrompt(prompt);
+            ConversationHandler conversation = ConversationManager.getConversation(player);
+            if (conversation == null) return 0;
+            conversation.getNpc().setBasicPrompt(prompt);
             player.sendMessage(Text.of("[chat-with-npc] Background set."), true);
             return 1;
         }
@@ -176,7 +174,9 @@ public class CommandSet {
         ServerPlayerEntity player = context.getSource().getPlayer();
         String group = context.getArgument("group", String.class);
         if (player != null && ConversationManager.getConversation(player) != null){
-            ConversationManager.getConversation(player).getNpc().setGroup(group);
+            ConversationHandler conversation = ConversationManager.getConversation(player);
+            if (conversation == null) return 0;
+            conversation.getNpc().setGroup(group);
             player.sendMessage(Text.of("[chat-with-npc] Group set."), true);
             return 1;
         }
@@ -190,7 +190,9 @@ public class CommandSet {
         ServerPlayerEntity player = context.getSource().getPlayer();
         String career = context.getArgument("career", String.class);
         if (player != null && ConversationManager.getConversation(player) != null){
-            ConversationManager.getConversation(player).getNpc().setCareer(career);
+            ConversationHandler conversation = ConversationManager.getConversation(player);
+            if (conversation == null) return 0;
+            conversation.getNpc().setCareer(career);
             player.sendMessage(Text.of("[chat-with-npc] Career set."), true);
             return 1;
         }
@@ -217,8 +219,7 @@ public class CommandSet {
                 .append("\nEnabled: ").append(SettingManager.enabled ? yes : no)
                 .append("\nAPI Key: ").append(hasKey ? yes : no)
                 .append("\nModel: ").append(SettingManager.model)
-                .append("\nTemp: ").append(String.valueOf(SettingManager.temperature))
-                .append("\n\nUse ").append(Text.literal("/npchat help").formatted(Formatting.GRAY)).append(" for help");
+                .append("\nUse ").append(Text.literal("/npchat help").formatted(Formatting.GRAY)).append(" for help");
         context.getSource().sendFeedback(helpText, false);
         return 1;
     }
@@ -256,11 +257,5 @@ public class CommandSet {
             return 1;
         }
         return 0;
-    }
-    public static int setTemp(CommandContext<ServerCommandSource> context) {
-        SettingManager.temperature = context.getArgument("temperature", float.class);
-        SettingManager.save();
-        context.getSource().sendFeedback(Text.of("[chat-with-npc] Temperature set"), true);
-        return 1;
     }
 }

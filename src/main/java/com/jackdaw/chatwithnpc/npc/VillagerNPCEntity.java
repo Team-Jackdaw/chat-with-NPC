@@ -2,7 +2,6 @@ package com.jackdaw.chatwithnpc.npc;
 
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.text.Text;
 import org.jetbrains.annotations.NotNull;
 
 public class VillagerNPCEntity extends NPCEntity {
@@ -14,11 +13,6 @@ public class VillagerNPCEntity extends NPCEntity {
      */
     public VillagerNPCEntity(@NotNull VillagerEntity entity) {
         super(entity);
-    }
-
-    @Override
-    public void replyMessage(String message, PlayerEntity player) {
-        player.sendMessage(Text.of("<" + this.getName() + "> " + message));
     }
 
     @Override

@@ -2,7 +2,12 @@ package com.jackdaw.chatwithnpc.npc;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.text.Text;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
+import java.util.UUID;
 
 /**
  * 这是一个用于定义与 NPC 交互的类。
@@ -17,6 +22,7 @@ import org.jetbrains.annotations.NotNull;
 public abstract class NPCEntity {
 
     protected final Entity entity;
+    protected final UUID uuid;
     protected final String name;
     protected String career = "unemployed";
     protected String basicPrompt = "I'm an NPC.";
@@ -35,6 +41,7 @@ public abstract class NPCEntity {
         }
         this.name = entity.getCustomName().getString();
         this.entity = entity;
+        this.uuid = entity.getUuid();
         this.lastMessageTime = System.currentTimeMillis();
     }
 
@@ -155,9 +162,21 @@ public abstract class NPCEntity {
     /**
      * 接收玩家的消息，该消息应该是NPC对玩家的交互。
      * @param message NPC的信息
-     * @param player 玩家的实体
+     * @param range 玩家的范围
      */
-    public abstract void replyMessage(String message, PlayerEntity player);
+    public void replyMessage(String message, double range) {
+        findNearbyPlayers(range).forEach(player -> player.sendMessage(Text.of("<" + name + "> " + message)));
+    }
+
+    /**
+     * 获取附近的玩家，该玩家应该是NPC的交互对象。
+     * @param range 玩家的范围
+     * @return 附近的玩家
+     */
+    public List<PlayerEntity> findNearbyPlayers(double range) {
+        World world = entity.world;
+        return world.getEntitiesByClass(PlayerEntity.class, entity.getBoundingBox().expand(range), player -> true);
+    }
 
     /**
      * 执行动作，该动作应该是NPC对玩家的交互。
@@ -165,4 +184,20 @@ public abstract class NPCEntity {
      * @param player 玩家的实体
      */
     public abstract void doAction(Actions action, PlayerEntity player);
+
+    /**
+     * 获取NPC的UUID，该UUID应该作为该NPC的唯一标识。
+     * @return NPC的UUID
+     */
+    public UUID getUUID() {
+        return uuid;
+    }
+
+    /**
+     * 获取NPC的实体，该实体应该是该NPC的实体。
+     * @return NPC的实体
+     */
+    public Entity getEntity() {
+        return entity;
+    }
 }

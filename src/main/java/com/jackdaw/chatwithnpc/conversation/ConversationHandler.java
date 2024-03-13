@@ -2,44 +2,34 @@ package com.jackdaw.chatwithnpc.conversation;
 
 import com.jackdaw.chatwithnpc.ChatWithNPCMod;
 import com.jackdaw.chatwithnpc.auxiliary.configuration.SettingManager;
-import com.jackdaw.chatwithnpc.npc.Record;
 import com.jackdaw.chatwithnpc.conversation.prompt.Prompt;
 import com.jackdaw.chatwithnpc.npc.NPCEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
+import com.jackdaw.chatwithnpc.npc.Record;
 
 public class ConversationHandler {
 
     final NPCEntity npc;
 
-    final PlayerEntity player;
-
     long updateTime = 0L;
 
-    public ConversationHandler(NPCEntity npc, PlayerEntity player) {
+    public ConversationHandler(NPCEntity npc) {
         this.npc = npc;
-        this.player = player;
         startConversation();
     }
 
     private void sendWaitMessage() {
-        player.sendMessage(Text.of("<" + npc.getName() + "> ..."));
-    }
-
-    public ServerPlayerEntity getPlayer() {
-        return (ServerPlayerEntity) player;
+        npc.replyMessage("...", SettingManager.range);
     }
 
     public NPCEntity getNpc() {
         return npc;
     }
 
-    public void getResponse(PlayerEntity player, String message) {
+    public void getResponse(String message) {
         // 1.5 second cooldown between requests
 //        if (npc.getLastMessageTime() + 1500L > System.currentTimeMillis()) return;
         if (SettingManager.apiKey.isEmpty()) {
-            player.sendMessage(Text.of("[chat-with-npc] You have not set an API key! Get one from https://beta.openai.com/account/api-keys and set it with /chat-with-npc setkey"));
+            npc.replyMessage("[chat-with-npc] You have not set an API key! Get one from https://beta.openai.com/account/api-keys and set it with /chat-with-npc setkey", SettingManager.range);
             return;
         }
         npc.updateLastMessageTime(System.currentTimeMillis());
@@ -47,10 +37,10 @@ public class ConversationHandler {
             try {
                 OpenAIHandler.updateSetting();
                 String response = OpenAIHandler.sendRequest(message, npc.getMessageRecord());
-                player.sendMessage(Text.of("<" + npc.getName() + "> " + response));
+                npc.replyMessage(response, SettingManager.range);
                 npc.addMessageRecord(System.currentTimeMillis(), Record.Role.NPC, response);
             } catch (Exception e) {
-                player.sendMessage(Text.of("[chat-with-npc] Error getting response"));
+                npc.replyMessage("[chat-with-npc] Error getting response", SettingManager.range);
                 ChatWithNPCMod.LOGGER.error(e.getMessage());
             }
         });
@@ -59,7 +49,7 @@ public class ConversationHandler {
 
     private void startConversation() {
         sendWaitMessage();
-        getResponse(player, Prompt.builder()
+        getResponse(Prompt.builder()
                 .setNpc(npc)
                 .build()
                 .getInitialPrompt());
@@ -69,7 +59,7 @@ public class ConversationHandler {
     public void replyToEntity(String message) {
         sendWaitMessage();
         npc.addMessageRecord(System.currentTimeMillis(), Record.Role.PLAYER, message);
-        getResponse(player, Prompt.builder()
+        getResponse(Prompt.builder()
                 .setNpc(npc)
                 .build()
                 .getInitialPrompt());

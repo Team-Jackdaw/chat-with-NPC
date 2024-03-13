@@ -2,6 +2,7 @@ package com.jackdaw.chatwithnpc;
 
 import com.jackdaw.chatwithnpc.auxiliary.command.CommandSet;
 import com.jackdaw.chatwithnpc.auxiliary.configuration.SettingManager;
+import com.jackdaw.chatwithnpc.conversation.ConversationHandler;
 import com.jackdaw.chatwithnpc.conversation.ConversationManager;
 import com.jackdaw.chatwithnpc.listener.PlayerSendMessageCallback;
 import com.jackdaw.chatwithnpc.npc.NPCEntityManager;
@@ -57,10 +58,9 @@ public class ChatWithNPCMod implements ModInitializer {
             if (!player.isSneaking()) return ActionResult.PASS;
             // The entity must have a custom name to be an NPC
             if (entity.getCustomName() == null) return ActionResult.PASS;
-            String name = entity.getCustomName().getString();
             // register the NPC entity and start a conversation
-            NPCEntityManager.registerNPCEntity(name, entity);
-            ConversationManager.startConversation(NPCEntityManager.getNPCEntity(name), player);
+            NPCEntityManager.registerNPCEntity(entity);
+            ConversationManager.startConversation(NPCEntityManager.getNPCEntity(entity.getUuid()));
             return ActionResult.FAIL;
         });
         // Register the player chat listener
@@ -68,8 +68,9 @@ public class ChatWithNPCMod implements ModInitializer {
             // The mod must be enabled
             if (!SettingManager.enabled) return ActionResult.PASS;
             // The player must be in a conversation
-            if (!ConversationManager.isConversing(player)) return ActionResult.PASS;
-            ConversationManager.getConversation(player).replyToEntity(message);
+            ConversationHandler conversationHandler = ConversationManager.getConversation(player);
+            if (conversationHandler == null) return ActionResult.PASS;
+            conversationHandler.replyToEntity(message);
             return ActionResult.PASS;
         });
         // Check for out of time static data

@@ -22,30 +22,29 @@ public class SettingManager {
     private static final File configFile = ChatWithNPCMod.workingDirectory.resolve("config.json").toFile();
 
     // use for confirming the setting version is the same with the plugin
-    private static final String lastVersion = "v2.0";
+    private static final String lastVersion = "v2.1";
 
     public static boolean enabled = true;
-
+    public static double range = 10.0;
     public static String language = "Chinese";
     public static String apiKey = "";
     public static String model = "gpt-3.5-turbo";
-    public static float temperature = 0.6f;
 
     private static final class Config {
-        private final String lastVersion = "v2.0";
+        private String lastVersion = "v2.1";
         private boolean enabled = true;
+        private double range = 10.0;
         private String language = "Chinese";
         private String apiKey = "";
         private String model = "gpt-3.5-turbo";
-        private float temperature = 0.6f;
 
         private static String toJson() {
             Config config = new Config();
             config.enabled = SettingManager.enabled;
+            config.range = SettingManager.range;
             config.language = SettingManager.language;
             config.apiKey = SettingManager.apiKey;
             config.model = SettingManager.model;
-            config.temperature = SettingManager.temperature;
             Gson gson = new Gson();
             return gson.toJson(config);
         }
@@ -60,7 +59,6 @@ public class SettingManager {
             SettingManager.language = language;
             SettingManager.apiKey = apiKey;
             SettingManager.model = model;
-            SettingManager.temperature = temperature;
         }
 
     }
