@@ -28,8 +28,8 @@ public class ConversationManager {
      * Start a conversation for Player with an NPC
      * @param entity The Entity to start a conversation with
      */
-    public static void startConversation(Entity entity) {
-        NPCEntityManager.registerNPCEntity(entity);
+    public static void startConversation(Entity entity, boolean isOP) {
+        NPCEntityManager.registerNPCEntity(entity, isOP);
         NPCEntity npc = NPCEntityManager.getNPCEntity(entity.getUuid());
         if (npc == null) return;
         if (isConversing(npc)) {

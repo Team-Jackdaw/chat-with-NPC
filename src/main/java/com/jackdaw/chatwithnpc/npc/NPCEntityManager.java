@@ -22,7 +22,7 @@ public class NPCEntityManager {
      * Initialize an NPC entity if the NPC is not conversing.
      * @param entity The NPC entity to initialize
      */
-    public static void registerNPCEntity(Entity entity) {
+    public static void registerNPCEntity(Entity entity, boolean isOP) {
         if (isRegistered(entity.getUuid())) {
             return;
         }
@@ -35,6 +35,7 @@ public class NPCEntityManager {
             return;
         }
         NPCDataManager npcDataManager = npcEntity.getDataManager();
+        if (!isOP && !npcDataManager.isExist()) return;
         npcDataManager.sync();
         npcMap.put(entity.getUuid(), npcEntity);
     }

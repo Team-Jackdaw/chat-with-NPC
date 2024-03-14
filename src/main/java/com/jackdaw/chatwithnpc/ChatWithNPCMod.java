@@ -59,7 +59,7 @@ public class ChatWithNPCMod implements ModInitializer {
             // The entity must have a custom name to be an NPC
             if (entity.getCustomName() == null) return ActionResult.PASS;
             // register the NPC entity and start a conversation
-            ConversationManager.startConversation(entity);
+            ConversationManager.startConversation(entity, player.hasPermissionLevel(4));
             return ActionResult.FAIL;
         });
         // Register the player chat listener
