@@ -32,7 +32,7 @@ public class SettingManager {
     public static String apiKey = "";
     public static String model = "gpt-3.5-turbo";
     public static String apiURL = "api.openai.com";
-    public static String maxTokens = "512";
+    public static int maxTokens = 512;
 
     private static final class Config {
         private String lastVersion = "v2.3";
@@ -43,7 +43,7 @@ public class SettingManager {
         private String apiKey = "";
         private String model = "gpt-3.5-turbo";
         private String apiURL = "api.openai.com";
-        private String maxTokens = "512";
+        private int maxTokens = 512;
 
         private static String toJson() {
             Config config = new Config();

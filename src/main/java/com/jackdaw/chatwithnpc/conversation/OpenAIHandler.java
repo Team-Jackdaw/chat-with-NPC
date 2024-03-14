@@ -6,6 +6,7 @@ import com.google.gson.JsonParser;
 import com.jackdaw.chatwithnpc.ChatWithNPCMod;
 import com.jackdaw.chatwithnpc.auxiliary.configuration.SettingManager;
 import org.apache.http.HttpHeaders;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -22,7 +23,7 @@ public class OpenAIHandler {
     private static final class RequestJson {
         private String model = OpenAIHandler.model;
         private final ArrayList<Map<String, String>> messages = new ArrayList<>();
-        private String max_tokens = OpenAIHandler.maxTokens;
+        private int max_tokens = OpenAIHandler.maxTokens;
 
         private static String role2String(Record.Role role) {
             if (role == Record.Role.NPC) return "assistant";
@@ -62,7 +63,7 @@ public class OpenAIHandler {
     private static String url = "https://api.openai.com/v1/chat/completions";
     private static String apiKey = "";
     private static String model = "gpt-3.5-turbo";
-    private static String maxTokens = "512";
+    private static int maxTokens = 512;
 
     public static void updateSetting() {
         apiKey = SettingManager.apiKey;
@@ -84,7 +85,15 @@ public class OpenAIHandler {
      * @throws Exception If the request fails
      */
     public static String senRequest (String requestJson) throws Exception {
-        try (CloseableHttpClient client = HttpClients.createDefault()) {
+        ChatWithNPCMod.LOGGER.debug("[chat-with-npc] Request: \n" + requestJson);
+
+        RequestConfig requestConfig = RequestConfig.custom()
+                .setCookieSpec("ignoreCookies")
+                .build();
+
+        try (CloseableHttpClient client = HttpClients.custom()
+                .setDefaultRequestConfig(requestConfig)
+                .build()) {
             HttpPost request = new HttpPost(url);
 
             // 设置请求头
@@ -96,7 +105,7 @@ public class OpenAIHandler {
 
             try (CloseableHttpResponse response = client.execute(request)) {
                 String res =  EntityUtils.toString(response.getEntity());
-                ChatWithNPCMod.LOGGER.debug("[chat-with-npc] Draft Response: \n" + res);
+                ChatWithNPCMod.LOGGER.debug("[chat-with-npc] Response: \n" + res);
                 JsonObject jsonObject = JsonParser.parseString(res).getAsJsonObject();
                 return jsonObject.getAsJsonArray("choices")
                         .get(0).getAsJsonObject()

@@ -45,6 +45,7 @@ public class ConversationHandler {
                 addMessageRecord(System.currentTimeMillis(), Record.Role.NPC, response, npc.getName());
                 setTalking(false);
             } catch (Exception e) {
+                setTalking(false);
                 npc.replyMessage("[chat-with-npc] Error getting response", SettingManager.range);
                 ChatWithNPCMod.LOGGER.error(e.getMessage());
             }

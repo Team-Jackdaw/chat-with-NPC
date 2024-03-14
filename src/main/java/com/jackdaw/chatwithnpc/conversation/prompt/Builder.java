@@ -50,7 +50,7 @@ public class Builder {
             if (group.getName().equals("Global")) {
                 prompt.append("The overall environment is ");
             } else {
-                prompt.append("You belongs to `").append(group.getName()).append("` where is ");
+                prompt.append("You living in(/belongs to/are member of) `").append(group.getName()).append("` where is ");
             }
             prompt.append(String.join(", ", group.getPermanentPrompt()));
             if (!group.getTempEvent().isEmpty()) {
