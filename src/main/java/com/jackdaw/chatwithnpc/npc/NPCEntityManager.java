@@ -48,9 +48,4 @@ public class NPCEntityManager {
     public static NPCEntity getNPCEntity(UUID uuid) {
         return npcMap.get(uuid);
     }
-
-    public static void endAllNPCEntity() {
-        if (npcMap.isEmpty()) return;
-        npcMap.forEach((uuid, npcEntity) -> removeNPCEntity(uuid));
-    }
 }

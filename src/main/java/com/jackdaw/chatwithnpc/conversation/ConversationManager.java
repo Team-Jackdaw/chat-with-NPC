@@ -26,9 +26,11 @@ public class ConversationManager {
 
     /**
      * Start a conversation for Player with an NPC
-     * @param npc The NPC to start a conversation with
+     * @param entity The Entity to start a conversation with
      */
-    public static void startConversation(NPCEntity npc) {
+    public static void startConversation(Entity entity) {
+        NPCEntityManager.registerNPCEntity(entity);
+        NPCEntity npc = NPCEntityManager.getNPCEntity(entity.getUuid());
         if (npc == null) return;
         if (isConversing(npc)) {
             return;
@@ -43,15 +45,6 @@ public class ConversationManager {
         npc.getDataManager().save();
         NPCEntityManager.removeNPCEntity(uuid);
         conversationMap.remove(uuid);
-    }
-
-    /**
-     * Get the conversation with an NPC
-     * @param npcEntity The NPC to get the conversation with
-     * @return The conversation with the NPC
-     */
-    public static ConversationHandler getConversation(NPCEntity npcEntity) {
-        return conversationMap.get(npcEntity.getUUID());
     }
 
     /**
