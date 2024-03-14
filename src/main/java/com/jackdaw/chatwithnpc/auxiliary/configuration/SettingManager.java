@@ -22,7 +22,7 @@ public class SettingManager {
     private static final File configFile = ChatWithNPCMod.workingDirectory.resolve("config.json").toFile();
 
     // use for confirming the setting version is the same with the plugin
-    private static final String lastVersion = "v2.2";
+    private static final String lastVersion = "v2.3";
 
     public static boolean enabled = true;
     public static double range = 10.0;
@@ -31,15 +31,19 @@ public class SettingManager {
     public static String language = "Chinese";
     public static String apiKey = "";
     public static String model = "gpt-3.5-turbo";
+    public static String apiURL = "api.openai.com";
+    public static String maxTokens = "512";
 
     private static final class Config {
-        private String lastVersion = "v2.2";
+        private String lastVersion = "v2.3";
         private boolean enabled = true;
         private double range = 10.0;
         private long forgetTime = 604800000;
         private String language = "Chinese";
         private String apiKey = "";
         private String model = "gpt-3.5-turbo";
+        private String apiURL = "api.openai.com";
+        private String maxTokens = "512";
 
         private static String toJson() {
             Config config = new Config();
@@ -49,6 +53,8 @@ public class SettingManager {
             config.language = SettingManager.language;
             config.apiKey = SettingManager.apiKey;
             config.model = SettingManager.model;
+            config.apiURL = SettingManager.apiURL;
+            config.maxTokens = SettingManager.maxTokens;
             Gson gson = new Gson();
             return gson.toJson(config);
         }
@@ -65,6 +71,8 @@ public class SettingManager {
             SettingManager.language = language;
             SettingManager.apiKey = apiKey;
             SettingManager.model = model;
+            SettingManager.apiURL = apiURL;
+            SettingManager.maxTokens = maxTokens;
         }
 
     }

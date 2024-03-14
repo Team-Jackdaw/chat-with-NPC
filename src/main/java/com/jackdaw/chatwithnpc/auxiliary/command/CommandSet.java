@@ -26,6 +26,7 @@ public class CommandSet {
 
     public static void setupCommand(@NotNull CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess, CommandManager.RegistrationEnvironment environment) {
         dispatcher.register(literal("npchat")
+                .requires(serverCommandSource -> serverCommandSource.hasPermissionLevel(4))
                 .executes(CommandSet::status)
                 .then(literal("help").executes(CommandSet::help))
                 .then(literal("setkey")
@@ -60,6 +61,22 @@ public class CommandSet {
                                     SettingManager.language = context.getArgument("language", String.class);
                                     SettingManager.save();
                                     context.getSource().sendFeedback(Text.of("[chat-with-npc] Language set"), true);
+                                    return 1;
+                                })))
+                .then(literal("setmaxtokens")
+                        .then(argument("maxTokens", StringArgumentType.word())
+                                .executes(context -> {
+                                    SettingManager.maxTokens = context.getArgument("maxTokens", String.class);
+                                    SettingManager.save();
+                                    context.getSource().sendFeedback(Text.of("[chat-with-npc] Max tokens set"), true);
+                                    return 1;
+                                })))
+                .then(literal("setURL")
+                        .then(argument("url", StringArgumentType.string())
+                                .executes(context -> {
+                                    SettingManager.apiURL = context.getArgument("url", String.class);
+                                    SettingManager.save();
+                                    context.getSource().sendFeedback(Text.of("[chat-with-npc] URL set"), true);
                                     return 1;
                                 })))
                 .then(literal("npc")

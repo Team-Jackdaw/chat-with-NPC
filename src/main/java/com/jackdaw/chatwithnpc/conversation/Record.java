@@ -10,9 +10,17 @@ public class Record {
         private final Role role;
         private final String message;
 
+        private String entityName;
+
         public Message(Role role, String message) {
             this.role = role;
             this.message = message;
+        }
+
+        public Message(Role role, String message, String name) {
+            this.role = role;
+            this.message = message;
+            this.entityName = name;
         }
 
         public Role getRole() {
@@ -21,6 +29,10 @@ public class Record {
 
         public String getMessage() {
             return message;
+        }
+
+        public String getEntityName() {
+            return entityName;
         }
     }
     private final TreeMap<Long, Message> messageRecord = new TreeMap<>();
@@ -31,6 +43,10 @@ public class Record {
 
     public void addMessage(long time, Role role, String message) {
         messageRecord.put(time, new Message(role, message));
+    }
+
+    public void addMessage(long time, Role role, String message, String name) {
+        messageRecord.put(time, new Message(role, message, name));
     }
 
     public TreeMap<Long, Message> getTreeMap() {

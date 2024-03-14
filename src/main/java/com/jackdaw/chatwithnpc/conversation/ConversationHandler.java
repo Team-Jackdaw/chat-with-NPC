@@ -39,9 +39,10 @@ public class ConversationHandler {
         Thread t = new Thread(() -> {
             try {
                 OpenAIHandler.updateSetting();
-                String response = OpenAIHandler.sendRequest(message, messageRecord);
+                String response;
+                response = OpenAIHandler.sendRequest(message, npc.getLongTermMemory(), messageRecord);
                 npc.replyMessage(response, SettingManager.range);
-                addMessageRecord(System.currentTimeMillis(), Record.Role.NPC, response);
+                addMessageRecord(System.currentTimeMillis(), Record.Role.NPC, response, npc.getName());
                 setTalking(false);
             } catch (Exception e) {
                 npc.replyMessage("[chat-with-npc] Error getting response", SettingManager.range);
@@ -60,9 +61,9 @@ public class ConversationHandler {
         updateTime = System.currentTimeMillis();
     }
 
-    public void replyToEntity(String message) {
+    public void replyToEntity(String message, String playerName) {
         sendWaitMessage();
-        addMessageRecord(System.currentTimeMillis(), Record.Role.PLAYER, message);
+        addMessageRecord(System.currentTimeMillis(), Record.Role.PLAYER, message, playerName);
         getResponse(Prompt.builder()
                 .setNpc(npc)
                 .build()
@@ -92,9 +93,10 @@ public class ConversationHandler {
      * @param time 消息时间
      * @param role 消息发出者的身份
      * @param message 消息内容
+     * @param name 消息发出者的名称
      */
-    public void addMessageRecord(long time, Record.Role role, String message) {
-        this.messageRecord.addMessage(time, role, message);
+    public void addMessageRecord(long time, Record.Role role, String message, String name) {
+        this.messageRecord.addMessage(time, role, message, name);
     }
 
     /**
@@ -102,11 +104,11 @@ public class ConversationHandler {
      */
     public void getLongTermMemory() {
         if (messageRecord.isEmpty() || SettingManager.apiKey.isEmpty()) return;
-        String endingPrompt = "You are an NPC and you are having a conversation with a user as an assistant.";
-        messageRecord.addMessage(System.currentTimeMillis(), Record.Role.SYSTEM, "Now the conversation is over. Please summarize it within a few short sentence. No more than 50 words.");
+        String endingPrompt = "You are an NPC name '"+ npc.getName() +"' and you are having a conversation with users: ";
+        messageRecord.addMessage(System.currentTimeMillis(), Record.Role.SYSTEM, "Now the conversation is over. Please summarize it within a few short sentence (No more than 30 words)");
         try {
             OpenAIHandler.updateSetting();
-            String memory = OpenAIHandler.sendRequest(endingPrompt, messageRecord);
+            String memory = OpenAIHandler.sendRequest(endingPrompt, null, messageRecord);
             messageRecord.popMessage();
             npc.addLongTermMemory(System.currentTimeMillis(), memory);
         } catch (Exception e) {

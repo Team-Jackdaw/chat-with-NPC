@@ -12,6 +12,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -19,23 +20,35 @@ import java.util.Map;
 public class OpenAIHandler {
 
     private static final class RequestJson {
-        private final String model;
+        private String model = OpenAIHandler.model;
         private final ArrayList<Map<String, String>> messages = new ArrayList<>();
-        private final int max_tokens;
+        private String max_tokens = OpenAIHandler.maxTokens;
 
         private static String role2String(Record.Role role) {
             if (role == Record.Role.NPC) return "assistant";
             if (role == Record.Role.PLAYER) return "user";
-            if (role == Record.Role.SYSTEM) return "system";
             return "system";
         }
 
-        private RequestJson(String model, String initialPrompt, Record messages, int max_tokens) {
-            this.model = model;
-            this.max_tokens = max_tokens;
+        private RequestJson(String initialPrompt, ArrayList<Map<Long, String>> longTermMemory, Record messages) {
             this.messages.add(Map.of("role", "system", "content", initialPrompt));
-            for (Record.Message message : messages.getTreeMap().values()) {
-                this.messages.add(Map.of("role", role2String(message.getRole()), "content", message.getMessage()));
+            if (longTermMemory != null && !longTermMemory.isEmpty()) {
+                for (Map<Long, String> memory : longTermMemory) {
+                    for (Map.Entry<Long, String> entry : memory.entrySet()) {
+                        this.messages.add(Map.of("role", "system", "content", "This is a summary of one of the previous conversations: " + entry.getValue()));
+                    }
+                }
+            }
+            if (messages != null && !messages.isEmpty()) {
+                for (Record.Message message : messages.getTreeMap().values()) {
+                    if (message.getEntityName() != null) {
+                        this.messages.add(Map.of("role", role2String(message.getRole()), "content", message.getMessage(), "name", message.getEntityName()));
+                    } else {
+                        this.messages.add(Map.of("role", role2String(message.getRole()), "content", message.getMessage()));
+                    }
+                }
+            } else {
+                this.messages.add(Map.of("role", "system", "content", "Please start the conversation with a greeting."));
             }
         }
 
@@ -46,24 +59,31 @@ public class OpenAIHandler {
         }
     }
 
-    private static final String url = "https://api.openai.com/v1/chat/completions";
+    private static String url = "https://api.openai.com/v1/chat/completions";
     private static String apiKey = "";
     private static String model = "gpt-3.5-turbo";
-    private static final int maxTokens = 512;
+    private static String maxTokens = "512";
 
     public static void updateSetting() {
         apiKey = SettingManager.apiKey;
         model = SettingManager.model;
+        maxTokens = SettingManager.maxTokens;
+        url = "https://" + SettingManager.apiURL + "/v1/chat/completions";
+    }
+
+    public static String sendRequest(@NotNull String initialPrompt, ArrayList<Map<Long, String>> longTermMemory, Record messageRecord) throws Exception {
+        if (initialPrompt.length() > 4096) initialPrompt = initialPrompt.substring(initialPrompt.length() - 4096);
+        RequestJson requestJson = new RequestJson(initialPrompt, longTermMemory, messageRecord);
+        return senRequest(requestJson.toJson());
     }
 
     /**
      * Send a request to the OpenAI API
-     * @param initialPrompt The initialPrompt to send
+     * @param requestJson The request to send
      * @return The response from the API
      * @throws Exception If the request fails
      */
-    public static String sendRequest(String initialPrompt, Record messageRecord) throws Exception {
-        if (initialPrompt.length() > 4096) initialPrompt = initialPrompt.substring(initialPrompt.length() - 4096);
+    public static String senRequest (String requestJson) throws Exception {
         try (CloseableHttpClient client = HttpClients.createDefault()) {
             HttpPost request = new HttpPost(url);
 
@@ -72,8 +92,7 @@ public class OpenAIHandler {
             request.setHeader(HttpHeaders.CONTENT_TYPE, "application/json");
 
             // 构建请求体
-            RequestJson requestJson = new RequestJson(model, initialPrompt, messageRecord, maxTokens);
-            request.setEntity(new StringEntity(requestJson.toJson(), "UTF-8"));
+            request.setEntity(new StringEntity(requestJson, "UTF-8"));
 
             try (CloseableHttpResponse response = client.execute(request)) {
                 String res =  EntityUtils.toString(response.getEntity());

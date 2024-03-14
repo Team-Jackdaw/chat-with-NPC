@@ -73,7 +73,7 @@ public class ChatWithNPCMod implements ModInitializer {
                 player.sendMessage(Text.of("[chat-with-npc] The NPC is talking, please wait"), false);
                 return ActionResult.PASS;
             }
-            conversationHandler.replyToEntity(message);
+            conversationHandler.replyToEntity(message, player.getName().getString());
             return ActionResult.PASS;
         });
         // Check for out of time static data
