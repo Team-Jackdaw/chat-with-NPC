@@ -2,6 +2,8 @@ package com.jackdaw.chatwithnpc.npc;
 
 import com.jackdaw.chatwithnpc.auxiliary.configuration.SettingManager;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.decoration.DisplayEntity.TextDisplayEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.world.World;
@@ -123,6 +125,8 @@ public abstract class NPCEntity {
      * @param range 玩家的范围
      */
     public void replyMessage(String message, double range) {
+        textBubbleEntity textBubble = new textBubbleEntity(EntityType.TEXT_DISPLAY, entity.world);
+        textBubble.display(entity, message);
         findNearbyPlayers(range).forEach(player -> player.sendMessage(Text.of("<" + name + "> " + message)));
     }
 
