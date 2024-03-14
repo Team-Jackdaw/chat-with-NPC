@@ -5,7 +5,6 @@ import com.jackdaw.chatwithnpc.auxiliary.configuration.SettingManager;
 import com.jackdaw.chatwithnpc.conversation.ConversationHandler;
 import com.jackdaw.chatwithnpc.conversation.ConversationManager;
 import com.jackdaw.chatwithnpc.listener.PlayerSendMessageCallback;
-import com.jackdaw.chatwithnpc.npc.NPCEntityManager;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -60,8 +59,7 @@ public class ChatWithNPCMod implements ModInitializer {
             // The entity must have a custom name to be an NPC
             if (entity.getCustomName() == null) return ActionResult.PASS;
             // register the NPC entity and start a conversation
-            NPCEntityManager.registerNPCEntity(entity);
-            ConversationManager.startConversation(NPCEntityManager.getNPCEntity(entity.getUuid()));
+            ConversationManager.startConversation(entity, player.hasPermissionLevel(4));
             return ActionResult.FAIL;
         });
         // Register the player chat listener
@@ -75,7 +73,7 @@ public class ChatWithNPCMod implements ModInitializer {
                 player.sendMessage(Text.of("[chat-with-npc] The NPC is talking, please wait"), false);
                 return ActionResult.PASS;
             }
-            conversationHandler.replyToEntity(message);
+            conversationHandler.replyToEntity(message, player.getName().getString());
             return ActionResult.PASS;
         });
         // Check for out of time static data

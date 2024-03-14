@@ -44,14 +44,13 @@ public class Builder {
         String npcbasicPrompt = "You are an NPC with type `" + npcType + "` and named `" + npcName + "`. ";
         String npcCareerPrompt = "You career is `" + npcCareer + "`. ";
         ArrayList<String> groupPrompt = new ArrayList<>();
-        groupPrompt.add("You are living in places as listed: ");
         for (Group group : GroupManager.getParentGroups(npcGroup)) {
             // connect the group.permanentPrompt to the groupPrompt with ",";
             StringBuilder prompt = new StringBuilder();
             if (group.getName().equals("Global")) {
-                prompt.append("The global environment where is ");
+                prompt.append("The overall environment is ");
             } else {
-                prompt.append("`").append(group.getName()).append("` where is ");
+                prompt.append("You living in(/belongs to/are member of) `").append(group.getName()).append("` where is ");
             }
             prompt.append(String.join(", ", group.getPermanentPrompt()));
             if (!group.getTempEvent().isEmpty()) {
@@ -66,14 +65,7 @@ public class Builder {
             prompt.append(". ");
             groupPrompt.add(prompt.toString());
         }
-        StringBuilder memoryPrompt = new StringBuilder();
-        if (!longTermMemory.isEmpty()) {
-            memoryPrompt = new StringBuilder("You have some memory about the past conversation: ");
-            for (Map<Long, String> memory : longTermMemory) {
-                memoryPrompt.append(memory.values().iterator().next()).append("; ");
-            }
-        }
-        String languagePrompt = "Please use `" + SettingManager.language + "` language to begin a new conversation. ";
-        return npcbasicPrompt + npcCareerPrompt + this.npcBasicPrompt + String.join("", groupPrompt) + memoryPrompt + languagePrompt;
+        String languagePrompt = "Please use `" + SettingManager.language + "` language to communicate.";
+        return npcbasicPrompt + npcCareerPrompt + this.npcBasicPrompt + String.join("", groupPrompt) + languagePrompt;
     }
 }

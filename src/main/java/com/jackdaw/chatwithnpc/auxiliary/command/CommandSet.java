@@ -27,100 +27,116 @@ public class CommandSet {
     public static void setupCommand(@NotNull CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess, CommandManager.RegistrationEnvironment environment) {
         dispatcher.register(literal("npchat")
                 .executes(CommandSet::status)
-                .then(literal("help").executes(CommandSet::help))
+                .then(literal("help")
+                        .requires(serverCommandSource -> serverCommandSource.hasPermissionLevel(4))
+                        .executes(CommandSet::help))
                 .then(literal("setkey")
+                        .requires(serverCommandSource -> serverCommandSource.hasPermissionLevel(4))
                         .then(argument("key", StringArgumentType.string())
-                                .executes(CommandSet::setAPIKey)
-                        ))
+                                .executes(CommandSet::setAPIKey)))
                 .then(literal("setmodel")
+                        .requires(serverCommandSource -> serverCommandSource.hasPermissionLevel(4))
                         .then(argument("model", StringArgumentType.string())
-                                .executes(CommandSet::setModel)
-                        ))
-                .then(literal("enable").executes(context -> setEnabled(context, true)))
-                .then(literal("disable").executes(context -> setEnabled(context, false)))
+                                .executes(CommandSet::setModel)))
+                .then(literal("enable")
+                        .requires(serverCommandSource -> serverCommandSource.hasPermissionLevel(4))
+                        .executes(context -> setEnabled(context, true)))
+                .then(literal("disable")
+                        .requires(serverCommandSource -> serverCommandSource.hasPermissionLevel(4))
+                        .executes(context -> setEnabled(context, false)))
                 .then(literal("setrange")
+                        .requires(serverCommandSource -> serverCommandSource.hasPermissionLevel(4))
                         .then(argument("range", StringArgumentType.word())
                                 .executes(context -> {
                                     SettingManager.range = Double.parseDouble(context.getArgument("range", String.class));
                                     SettingManager.save();
                                     context.getSource().sendFeedback(Text.of("[chat-with-npc] Range set"), true);
-                                    return 1;
-                                })))
+                                    return 1;})))
                 .then(literal("setforgettime")
+                        .requires(serverCommandSource -> serverCommandSource.hasPermissionLevel(4))
                         .then(argument("time", StringArgumentType.word())
                                 .executes(context -> {
                                     SettingManager.forgetTime = Long.parseLong(context.getArgument("time", String.class));
                                     SettingManager.save();
                                     context.getSource().sendFeedback(Text.of("[chat-with-npc] Forget time set"), true);
-                                    return 1;
-                                })))
+                                    return 1;})))
                 .then(literal("setlanguage")
+                        .requires(serverCommandSource -> serverCommandSource.hasPermissionLevel(4))
                         .then(argument("language", StringArgumentType.word())
                                 .executes(context -> {
                                     SettingManager.language = context.getArgument("language", String.class);
                                     SettingManager.save();
                                     context.getSource().sendFeedback(Text.of("[chat-with-npc] Language set"), true);
-                                    return 1;
-                                })))
+                                    return 1;})))
+                .then(literal("setmaxtokens")
+                        .requires(serverCommandSource -> serverCommandSource.hasPermissionLevel(4))
+                        .then(argument("maxTokens", StringArgumentType.word())
+                                .executes(context -> {
+                                    SettingManager.maxTokens = context.getArgument("maxTokens", Integer.class);
+                                    SettingManager.save();
+                                    context.getSource().sendFeedback(Text.of("[chat-with-npc] Max tokens set"), true);
+                                    return 1;})))
+                .then(literal("setURL")
+                        .requires(serverCommandSource -> serverCommandSource.hasPermissionLevel(4))
+                        .then(argument("url", StringArgumentType.string())
+                                .executes(context -> {
+                                    SettingManager.apiURL = context.getArgument("url", String.class);
+                                    SettingManager.save();
+                                    context.getSource().sendFeedback(Text.of("[chat-with-npc] URL set"), true);
+                                    return 1;})))
                 .then(literal("npc")
+                        .requires(serverCommandSource -> serverCommandSource.hasPermissionLevel(4))
                         .then(literal("setCareer")
                                 .then(argument("career", StringArgumentType.greedyString())
-                                        .executes(CommandSet::setNPCCareer)
-                                ))
+                                        .executes(CommandSet::setNPCCareer)))
                         .then(literal("setGroup")
                                 .then(argument("group", StringArgumentType.word())
                                         .suggests(groupSuggestionProvider)
-                                        .executes(CommandSet::setNPCGroup)
-                                ))
+                                        .executes(CommandSet::setNPCGroup)))
                         .then(literal("setBackground")
                                 .then(argument("prompt", StringArgumentType.greedyString())
-                                        .executes(CommandSet::setNPCPrompt)
-                                ))
+                                        .executes(CommandSet::setNPCPrompt)))
                         .then(literal("clearMemory")
-                                .executes(CommandSet::clearNPCMemory)
-                        )
+                                .executes(CommandSet::clearNPCMemory))
                         .executes(CommandSet::npcStatus))
                 .then(literal("group")
+                        .requires(serverCommandSource -> serverCommandSource.hasPermissionLevel(4))
                         .then(argument("group", StringArgumentType.word())
                                 .suggests(groupSuggestionProvider)
                                 .then(literal("setParent")
                                         .then(argument("parent", StringArgumentType.word())
                                                 .suggests(groupSuggestionProvider)
-                                                .executes(CommandSet::setGroupParent)
-                                        ))
+                                                .executes(CommandSet::setGroupParent)))
                                 .then(literal("addPermanentPrompt")
                                         .then(argument("prompt", StringArgumentType.greedyString())
-                                                .executes(CommandSet::addGroupPermanentPrompt)
-                                        ))
+                                                .executes(CommandSet::addGroupPermanentPrompt)))
                                 .then(literal("popPermanentPrompt")
                                         .executes(CommandSet::popGroupPermanentPrompt))
                                 .then(literal("addTempEvent")
                                         .then(argument("event", StringArgumentType.greedyString())
-                                                        .executes(CommandSet::addGroupTempEvent)
-                                        ))
-                                .executes(CommandSet::groupStatus)
-                        ))
+                                                        .executes(CommandSet::addGroupTempEvent)))
+                                .executes(CommandSet::groupStatus)))
                 .then(literal("addGroup")
+                        .requires(serverCommandSource -> serverCommandSource.hasPermissionLevel(4))
                         .then(argument("newGroup", StringArgumentType.word())
                                 .executes(context -> {
                                     String group = context.getArgument("newGroup", String.class);
                                     GroupManager.loadEnvironment(group);
                                     context.getSource().sendFeedback(Text.of("[chat-with-npc] Group added"), true);
-                                    return 1;
-                                })
-                        ))
+                                    return 1;})))
                 .then(literal("reload")
+                        .requires(serverCommandSource -> serverCommandSource.hasPermissionLevel(4))
                         .executes(context -> {
                             Thread t = new Thread(() -> {
                                 try {
                                     UpdateStaticData.close();
+                                    SettingManager.sync();
                                     context.getSource().sendFeedback(Text.of("[chat-with-npc] Reloaded"), true);
                                 } catch (Exception ignore) {}
                             });
                             t.start();
                             return 1;
-                        })
-                )
+                        }))
         );
     }
 
@@ -294,6 +310,14 @@ public class CommandSet {
     }
 
     public static int help(CommandContext<ServerCommandSource> context) {
+        if (!context.getSource().hasPermissionLevel(4)) {
+            Text helpText = Text.literal("")
+                    .append("[chat-with-npc] ChatWithNPC mod:").formatted(Formatting.UNDERLINE)
+                    .append("\nYou can start a conversation to mobs by shift-clicking on them!")
+                    .append("\nOnce you are in a conversation, you can reply to the NPC by typing in the chat.");
+            context.getSource().sendFeedback(helpText, false);
+            return 1;
+        }
         Text helpText = Text.literal("")
                 .append("[chat-with-npc] ChatWithNPC Commands").formatted(Formatting.UNDERLINE)
                 .append("").formatted(Formatting.RESET)
@@ -302,8 +326,29 @@ public class CommandSet {
                 .append("\n/npchat enable/disable - Enable/disable the mod")
                 .append("\n/npchat setkey <key> - Set OpenAI API key")
                 .append("\n/npchat setmodel <model> - Set AI model")
-                .append("\n/npchat settemp <temperature> - Set model temperature")
-                .append("\nYou can talk to mobs by shift-clicking on them!");
+                .append("\n/npchat setrange <range> - Set the range of the conversation")
+                .append("\n/npchat setforgettime <time> - Set the time to forget the memory")
+                .append("\n/npchat setlanguage <language> - Set the response language")
+                .append("\n/npchat setmaxtokens <maxTokens> - Set the max tokens of a conversation")
+                .append("\n/npchat setURL <url> - Set the AI Model URL")
+                .append("\n/npchat reload - Reload the plugin")
+                .append("\n --------------------------------")
+                .append("\nOnce you are in a conversation, you can use /npchat npc to set the properties of the NPC.")
+                .append("\n/npchat npc - NPC commands")
+                .append("\n/npchat npc setCareer <career> - Set the career for the closest NPC.")
+                .append("\n/npchat npc setGroup <group> - Set the group for the closest NPC.")
+                .append("\n/npchat npc setBackground <prompt> - Set the background for the closest NPC.")
+                .append("\n/npchat npc clearMemory - Clear the memory for the closest NPC.")
+                .append("\n --------------------------------")
+                .append("\n/npchat group <group> - Group commands")
+                .append("\n/npchat group <group> setParent <parent> - Set the parent group for the group.")
+                .append("\n/npchat group <group> addPermanentPrompt <prompt> - Add a permanent prompt to the group.")
+                .append("\n/npchat group <group> popPermanentPrompt - Pop a permanent prompt from the group.")
+                .append("\n/npchat group <group> addTempEvent <event> - Add a temporary event to the group.")
+                .append("\n/npchat addGroup <newGroup> - Add a new group")
+                .append("\n --------------------------------")
+                .append("\nYou can start a conversation to mobs by shift-clicking on them!")
+                .append("\nOnce you are in a conversation, you can reply to the NPC by typing in the chat.");
         context.getSource().sendFeedback(helpText, false);
         return 1;
     }
