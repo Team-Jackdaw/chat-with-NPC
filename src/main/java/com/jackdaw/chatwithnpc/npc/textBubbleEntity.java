@@ -61,11 +61,10 @@ public class textBubbleEntity extends TextDisplayEntity {
             this.discard();
             executorService.shutdown();
         }, 5, TimeUnit.SECONDS);
-    }
-
-    if (DEBUG) {
-        // Debug print this's nbt in plain text
-        System.out.println(nbtData.toString());
+        if (DEBUG) {
+            // Debug print this's nbt in plain text
+            System.out.println(nbtData.toString());
+        }
     }
     
 }
