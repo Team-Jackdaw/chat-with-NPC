@@ -197,6 +197,7 @@ public abstract class NPCEntity {
      * 根据随机函数遗忘一些记忆。
      */
     public void randomForget() {
+        if (longTermMemory.size() < 20) return;
         for (Map<Long, String> memory : longTermMemory) {
             long time = memory.keySet().iterator().next();
             long duration = System.currentTimeMillis() - time;

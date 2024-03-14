@@ -29,8 +29,6 @@ public class ConversationHandler {
     }
 
     public void getResponse(String message) {
-        // 1.5 second cooldown between requests
-//        if (npc.getLastMessageTime() + 1500L > System.currentTimeMillis()) return;
         if (SettingManager.apiKey.isEmpty()) {
             npc.replyMessage("[chat-with-npc] You have not set an API key! Get one from https://beta.openai.com/account/api-keys and set it with /chat-with-npc setkey", SettingManager.range);
             return;
@@ -40,7 +38,7 @@ public class ConversationHandler {
             try {
                 OpenAIHandler.updateSetting();
                 String response;
-                response = OpenAIHandler.sendRequest(message, npc.getLongTermMemory(), messageRecord);
+                response = OpenAIHandler.sendRequest(message, npc.getLongTermMemory(), messageRecord, npc.getName());
                 npc.replyMessage(response, SettingManager.range);
                 addMessageRecord(System.currentTimeMillis(), Record.Role.NPC, response, npc.getName());
                 setTalking(false);
@@ -82,14 +80,6 @@ public class ConversationHandler {
     }
 
     /**
-     * 获取当前会话的消息记录。
-     * @return 当前会话的消息记录
-     */
-    public Record getMessageRecord() {
-        return this.messageRecord;
-    }
-
-    /**
      * 添加一条消息记录，该记录应该包括了当前会话的最近一条消息。
      * @param time 消息时间
      * @param role 消息发出者的身份
@@ -101,21 +91,22 @@ public class ConversationHandler {
     }
 
     /**
-     * 通过模型，获取当前会话的长期记忆。
+     * 通过模型，获取当前会话的长期记忆。并清空当前会话的消息记录。
      */
     public void getLongTermMemory() {
         if (messageRecord.isEmpty() || SettingManager.apiKey.isEmpty()) return;
-        String endingPrompt = "You are an NPC name '"+ npc.getName() +"' and you are having a conversation with users: ";
-        messageRecord.addMessage(System.currentTimeMillis(), Record.Role.SYSTEM, "Now the conversation is over. Please summarize it within a few short sentence (No more than 30 words)");
+        messageRecord.changeAllRole(Record.Role.PLAYER);
+        String endingPrompt = "The Minecraft NPC '"+ npc.getName() +"' is having conversation with players. The first message was sent by '" + npc.getName() + "'. Chat crosses over.";
+        messageRecord.addMessage(System.currentTimeMillis(), Record.Role.SYSTEM, "Now the conversation is over. Summarize the above conversation in the tone you informed '" + npc.getName() + "'. (No more than 50 words)");
         try {
             OpenAIHandler.updateSetting();
-            String memory = OpenAIHandler.sendRequest(endingPrompt, null, messageRecord);
+            String memory = OpenAIHandler.sendRequest(endingPrompt, null, messageRecord, null);
             messageRecord.popMessage();
             npc.addLongTermMemory(System.currentTimeMillis(), memory);
         } catch (Exception e) {
             ChatWithNPCMod.LOGGER.error(e.getMessage());
         }
-        messageRecord.popMessage();
+        messageRecord.clear();
     }
 
     public void clearMessageRecord() {

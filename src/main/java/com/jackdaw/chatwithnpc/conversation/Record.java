@@ -60,4 +60,13 @@ public class Record {
     public void clear() {
         messageRecord.clear();
     }
+
+    public void changeAllRole(Role role) {
+        TreeMap<Long, Message> newMessageRecord = new TreeMap<>();
+        messageRecord.forEach((time, message) -> {
+            newMessageRecord.put(time, new Message(role, message.getMessage(), message.getEntityName()));
+        });
+        messageRecord.clear();
+        messageRecord.putAll(newMessageRecord);
+    }
 }

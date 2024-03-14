@@ -31,7 +31,7 @@ public class OpenAIHandler {
             return "system";
         }
 
-        private RequestJson(String initialPrompt, ArrayList<Map<Long, String>> longTermMemory, Record messages) {
+        private RequestJson(String initialPrompt, ArrayList<Map<Long, String>> longTermMemory, Record messages, String npcName) {
             this.messages.add(Map.of("role", "system", "content", initialPrompt));
             if (longTermMemory != null && !longTermMemory.isEmpty()) {
                 for (Map<Long, String> memory : longTermMemory) {
@@ -49,7 +49,7 @@ public class OpenAIHandler {
                     }
                 }
             } else {
-                this.messages.add(Map.of("role", "system", "content", "Please start the conversation with a greeting."));
+                this.messages.add(Map.of("role", "system", "content", "Please start the conversation as " + npcName + " with a greeting."));
             }
         }
 
@@ -72,9 +72,9 @@ public class OpenAIHandler {
         url = "https://" + SettingManager.apiURL + "/v1/chat/completions";
     }
 
-    public static String sendRequest(@NotNull String initialPrompt, ArrayList<Map<Long, String>> longTermMemory, Record messageRecord) throws Exception {
+    public static String sendRequest(@NotNull String initialPrompt, ArrayList<Map<Long, String>> longTermMemory, Record messageRecord, String npcName) throws Exception {
         if (initialPrompt.length() > 4096) initialPrompt = initialPrompt.substring(initialPrompt.length() - 4096);
-        RequestJson requestJson = new RequestJson(initialPrompt, longTermMemory, messageRecord);
+        RequestJson requestJson = new RequestJson(initialPrompt, longTermMemory, messageRecord, npcName);
         return senRequest(requestJson.toJson());
     }
 
