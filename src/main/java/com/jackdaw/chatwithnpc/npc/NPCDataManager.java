@@ -56,7 +56,7 @@ public class NPCDataManager{
     public NPCDataManager(NPCEntity npc) {
         this.npc = npc;
         mkdir();
-        this.theFile = new File(ChatWithNPCMod.workingDirectory.toFile(), "npc/" + npc.getName() + ".json");
+        this.theFile = new File(ChatWithNPCMod.workingDirectory.toFile(), "npc/" + npc.getUUID().toString() + ".json");
     }
 
     public boolean isExist() {

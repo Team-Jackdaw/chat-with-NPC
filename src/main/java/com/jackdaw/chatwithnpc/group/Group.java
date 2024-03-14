@@ -82,4 +82,9 @@ public class Group {
         this.tempEvent.clear();
         this.tempEvent.addAll(tempEvent);
     }
+
+    public void autoDeleteTempEvent() {
+        long now = System.currentTimeMillis();
+        tempEvent.removeIf(map -> map.keySet().iterator().next() < now);
+    }
 }

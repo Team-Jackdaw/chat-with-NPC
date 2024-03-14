@@ -35,7 +35,9 @@ public class GroupManager {
     }
 
     public static void removeEnvironment(String name) {
-        GroupMap.get(name).getDataManager().save();
+        Group current = GroupMap.get(name);
+        current.autoDeleteTempEvent();
+        current.getDataManager().save();
         GroupMap.remove(name);
     }
 
