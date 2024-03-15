@@ -39,6 +39,7 @@ public class ConversationHandler {
                 OpenAIHandler.updateSetting();
                 String response;
                 response = OpenAIHandler.sendRequest(message, npc.getLongTermMemory(), messageRecord, npc.getName());
+                if (response == null) throw new Exception("Error getting response");
                 npc.replyMessage(response, SettingManager.range);
                 addMessageRecord(System.currentTimeMillis(), Record.Role.NPC, response, npc.getName());
                 setTalking(false);
@@ -101,6 +102,7 @@ public class ConversationHandler {
         try {
             OpenAIHandler.updateSetting();
             String memory = OpenAIHandler.sendRequest(endingPrompt, null, messageRecord, null);
+            if (memory == null) throw new Exception("Error getting response");
             messageRecord.popMessage();
             npc.addLongTermMemory(System.currentTimeMillis(), memory);
         } catch (Exception e) {

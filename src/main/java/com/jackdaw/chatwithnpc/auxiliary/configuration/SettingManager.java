@@ -15,14 +15,14 @@ import java.nio.file.Files;
  * Configure the setting if a specific module is enabled or disabled.
  *
  * @author WDRshadow
- * @version v1.0
+ * @version v2.4
  */
 public class SettingManager {
     private static final Logger logger = ChatWithNPCMod.LOGGER;
     private static final File configFile = ChatWithNPCMod.workingDirectory.resolve("config.json").toFile();
 
     // use for confirming the setting version is the same with the plugin
-    private static final String lastVersion = "v2.3";
+    private static final String lastVersion = "v2.4";
 
     public static boolean enabled = true;
     public static double range = 10.0;
@@ -32,10 +32,12 @@ public class SettingManager {
     public static String apiKey = "";
     public static String model = "gpt-3.5-turbo";
     public static String apiURL = "api.openai.com";
+    public static boolean isBubble = true;
+    public static boolean isChatBar = false;
     public static int maxTokens = 512;
 
     private static final class Config {
-        private String lastVersion = "v2.3";
+        private String lastVersion = "v2.4";
         private boolean enabled = true;
         private double range = 10.0;
         private long forgetTime = 604800000;
@@ -43,6 +45,8 @@ public class SettingManager {
         private String apiKey = "";
         private String model = "gpt-3.5-turbo";
         private String apiURL = "api.openai.com";
+        private boolean isBubble = true;
+        private boolean isChatBar = false;
         private int maxTokens = 512;
 
         private static String toJson() {
@@ -54,6 +58,8 @@ public class SettingManager {
             config.apiKey = SettingManager.apiKey;
             config.model = SettingManager.model;
             config.apiURL = SettingManager.apiURL;
+            config.isBubble = SettingManager.isBubble;
+            config.isChatBar = SettingManager.isChatBar;
             config.maxTokens = SettingManager.maxTokens;
             Gson gson = new Gson();
             return gson.toJson(config);
@@ -72,6 +78,8 @@ public class SettingManager {
             SettingManager.apiKey = apiKey;
             SettingManager.model = model;
             SettingManager.apiURL = apiURL;
+            SettingManager.isBubble = isBubble;
+            SettingManager.isChatBar = isChatBar;
             SettingManager.maxTokens = maxTokens;
         }
 

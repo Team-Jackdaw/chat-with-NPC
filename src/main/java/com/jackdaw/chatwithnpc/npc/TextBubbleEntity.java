@@ -1,33 +1,26 @@
 package com.jackdaw.chatwithnpc.npc;
 
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.decoration.DisplayEntity.TextDisplayEntity;
-import net.minecraft.text.Text;
-
-import org.jetbrains.annotations.NotNull;
-
-import com.jackdaw.chatwithnpc.ChatWithNPCMod;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.text.Text;
+import org.jetbrains.annotations.NotNull;
 
 
 
 
 public class TextBubbleEntity extends TextDisplayEntity {
 
-    private Entity speaker; 
-    private double textSizeY = 1.0D;
+    private final Entity speaker;
+    private final double textSizeY = 0.55D;
     private long lastUpdateTime = 0L;
-    private long displayTimeOut = 10000L;
+    private final long displayTimeOut = 10000L;
     
     public TextBubbleEntity(@NotNull Entity speaker) {
         super(EntityType.TEXT_DISPLAY, speaker.world);
         this.speaker = speaker;
         speaker.world.spawnEntity(this);
-        ServerLifecycleEvents.SERVER_STOPPING.register(server -> {
-            this.ServerStopping();
-        });
     }
 
     @Override
@@ -51,11 +44,6 @@ public class TextBubbleEntity extends TextDisplayEntity {
         nbtData.putInt("background", 1073741824);
         this.readNbt(nbtData);
         lastUpdateTime = System.currentTimeMillis();
-        ChatWithNPCMod.LOGGER.error(this.writeNbt(new NbtCompound()).toString());
-    }
-    
-    private void ServerStopping(){
-        this.discard();
     }
 
 }

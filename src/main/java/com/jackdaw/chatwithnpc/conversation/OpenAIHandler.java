@@ -14,6 +14,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -72,7 +73,7 @@ public class OpenAIHandler {
         url = "https://" + SettingManager.apiURL + "/v1/chat/completions";
     }
 
-    public static String sendRequest(@NotNull String initialPrompt, ArrayList<Map<Long, String>> longTermMemory, Record messageRecord, String npcName) throws Exception {
+    public static @Nullable String sendRequest(@NotNull String initialPrompt, ArrayList<Map<Long, String>> longTermMemory, Record messageRecord, String npcName) throws Exception {
         if (initialPrompt.length() > 4096) initialPrompt = initialPrompt.substring(initialPrompt.length() - 4096);
         RequestJson requestJson = new RequestJson(initialPrompt, longTermMemory, messageRecord, npcName);
         return senRequest(requestJson.toJson());
@@ -84,7 +85,7 @@ public class OpenAIHandler {
      * @return The response from the API
      * @throws Exception If the request fails
      */
-    public static String senRequest (String requestJson) throws Exception {
+    public static @Nullable String senRequest (String requestJson) throws Exception {
         ChatWithNPCMod.LOGGER.debug("[chat-with-npc] Request: \n" + requestJson);
 
         RequestConfig requestConfig = RequestConfig.custom()
@@ -107,10 +108,16 @@ public class OpenAIHandler {
                 String res =  EntityUtils.toString(response.getEntity());
                 ChatWithNPCMod.LOGGER.debug("[chat-with-npc] Response: \n" + res);
                 JsonObject jsonObject = JsonParser.parseString(res).getAsJsonObject();
-                return jsonObject.getAsJsonArray("choices")
-                        .get(0).getAsJsonObject()
-                        .getAsJsonObject("message")
-                        .get("content").getAsString();
+                try {
+                    return jsonObject.getAsJsonArray("choices")
+                            .get(0).getAsJsonObject()
+                            .getAsJsonObject("message")
+                            .get("content").getAsString();
+                } catch (Exception e) {
+                    ChatWithNPCMod.LOGGER.error("[chat-with-npc] Failed to parse the response from OpenAI API.", e);
+                    ChatWithNPCMod.LOGGER.error("[chat-with-npc] Response: \n" + res);
+                    return null;
+                }
             }
         }
     }

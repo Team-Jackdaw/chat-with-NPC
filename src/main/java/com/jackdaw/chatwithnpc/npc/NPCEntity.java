@@ -2,8 +2,6 @@ package com.jackdaw.chatwithnpc.npc;
 
 import com.jackdaw.chatwithnpc.auxiliary.configuration.SettingManager;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.decoration.DisplayEntity.TextDisplayEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.world.World;
@@ -127,8 +125,8 @@ public abstract class NPCEntity {
      * @param range 玩家的范围
      */
     public void replyMessage(String message, double range) {
-        textBubble.update(message);
-        findNearbyPlayers(range).forEach(player -> player.sendMessage(Text.of("<" + name + "> " + message)));
+        if (SettingManager.isBubble) textBubble.update(message);
+        if (SettingManager.isChatBar) findNearbyPlayers(range).forEach(player -> player.sendMessage(Text.of("<" + name + "> " + message)));
     }
 
     /**
@@ -211,5 +209,14 @@ public abstract class NPCEntity {
                 longTermMemory.removeIf(m -> m.keySet().stream().anyMatch(t -> t == time));
             }
         }
+    }
+
+    /**
+     * 保存NPC的数据。
+     */
+    public void discard() {
+        this.randomForget();
+        this.getDataManager().save();
+        this.textBubble.discard();
     }
 }

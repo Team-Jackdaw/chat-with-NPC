@@ -84,6 +84,22 @@ public class CommandSet {
                                     SettingManager.save();
                                     context.getSource().sendFeedback(Text.of("[chat-with-npc] URL set"), true);
                                     return 1;})))
+                .then(literal("setbubble")
+                        .requires(serverCommandSource -> serverCommandSource.hasPermissionLevel(4))
+                        .then(argument("isBubble", StringArgumentType.word())
+                                .executes(context -> {
+                                    SettingManager.isBubble = context.getArgument("isBubble", Boolean.class);
+                                    SettingManager.save();
+                                    context.getSource().sendFeedback(Text.of("[chat-with-npc] Bubble set"), true);
+                                    return 1;})))
+                .then(literal("setchatbar")
+                        .requires(serverCommandSource -> serverCommandSource.hasPermissionLevel(4))
+                        .then(argument("isChatBar", StringArgumentType.word())
+                                .executes(context -> {
+                                    SettingManager.isChatBar = context.getArgument("isChatBar", Boolean.class);
+                                    SettingManager.save();
+                                    context.getSource().sendFeedback(Text.of("[chat-with-npc] Chat bar set"), true);
+                                    return 1;})))
                 .then(literal("npc")
                         .requires(serverCommandSource -> serverCommandSource.hasPermissionLevel(4))
                         .then(literal("setCareer")
@@ -295,29 +311,40 @@ public class CommandSet {
     }
 
     public static int status(CommandContext<ServerCommandSource> context) {
-        boolean hasKey = !SettingManager.apiKey.isEmpty();
         Text yes = Text.literal("Yes").formatted(Formatting.GREEN);
         Text no = Text.literal("No").formatted(Formatting.RED);
+        if (!context.getSource().hasPermissionLevel(4)) {
+            Text helpText = Text.literal("")
+                    .append("[chat-with-npc] ChatWithNPC:").formatted(Formatting.UNDERLINE)
+                    .append("\nEnabled: ").append(SettingManager.enabled ? yes : no)
+                    .append("\nChat Bubble: ").append(SettingManager.isBubble ? yes : no)
+                    .append("\nChat Bar: ").append(SettingManager.isChatBar ? yes : no)
+                    .append("\nModel: ").append(SettingManager.model)
+                    .append("\nLanguage: ").append(SettingManager.language)
+                    .append("\nYou can start a conversation to mobs by shift-clicking on them!")
+                    .append("\nOnce you are in a conversation, you can reply to the NPC by typing in the chat.");
+            context.getSource().sendFeedback(helpText, false);
+            return 1;
+        }
+        boolean hasKey = !SettingManager.apiKey.isEmpty();
         Text helpText = Text.literal("")
                 .append(Text.literal("[chat-with-npc] ChatWithNPC").formatted(Formatting.UNDERLINE))
                 .append("").formatted(Formatting.RESET)
                 .append("\nEnabled: ").append(SettingManager.enabled ? yes : no)
                 .append("\nAPI Key: ").append(hasKey ? yes : no)
+                .append("\nChat Bubble: ").append(SettingManager.isBubble ? yes : no)
+                .append("\nChat Bar: ").append(SettingManager.isChatBar ? yes : no)
                 .append("\nModel: ").append(SettingManager.model)
+                .append("\nRange: ").append(String.valueOf(SettingManager.range))
+                .append("\nForget Time: ").append(String.valueOf(SettingManager.forgetTime))
+                .append("\nLanguage: ").append(SettingManager.language)
+                .append("\nMax Tokens: ").append(String.valueOf(SettingManager.maxTokens))
                 .append("\nUse ").append(Text.literal("/npchat help").formatted(Formatting.GRAY)).append(" for help");
         context.getSource().sendFeedback(helpText, false);
         return 1;
     }
 
     public static int help(CommandContext<ServerCommandSource> context) {
-        if (!context.getSource().hasPermissionLevel(4)) {
-            Text helpText = Text.literal("")
-                    .append("[chat-with-npc] ChatWithNPC mod:").formatted(Formatting.UNDERLINE)
-                    .append("\nYou can start a conversation to mobs by shift-clicking on them!")
-                    .append("\nOnce you are in a conversation, you can reply to the NPC by typing in the chat.");
-            context.getSource().sendFeedback(helpText, false);
-            return 1;
-        }
         Text helpText = Text.literal("")
                 .append("[chat-with-npc] ChatWithNPC Commands").formatted(Formatting.UNDERLINE)
                 .append("").formatted(Formatting.RESET)

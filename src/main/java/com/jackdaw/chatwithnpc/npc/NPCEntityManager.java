@@ -23,6 +23,8 @@ public class NPCEntityManager {
      * @param entity The NPC entity to initialize
      */
     public static void registerNPCEntity(Entity entity, boolean isOP) {
+        if (entity.getCustomName() == null) return;
+        if (!entity.getCustomName().getString().matches("^[a-zA-Z0-9_-]{1,64}$")) return;
         if (isRegistered(entity.getUuid())) {
             return;
         }
@@ -41,8 +43,7 @@ public class NPCEntityManager {
     }
 
     public static void removeNPCEntity(UUID uuid) {
-        npcMap.get(uuid).randomForget();
-        npcMap.get(uuid).getDataManager().save();
+        npcMap.get(uuid).discard();
         npcMap.remove(uuid);
     }
 
