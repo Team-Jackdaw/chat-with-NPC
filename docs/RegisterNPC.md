@@ -19,7 +19,7 @@
 
 ## 3. Rules for NPC Setting
 
-1. **NPC's Name**: 
-2. **NPC's Career**: 
-3. **NPC's Group**: 
-4. **NPC's Background**: 
+1. **NPC's Name**: The NPC name needs to meet the regular pattern `^[a-zA-Z0-9_-]{1,64}$`, that is, only alphanumeric underscores and horizontal bars are allowed.
+2. **NPC's Career**: No restrictions, but English is recommended.
+3. **NPC's Group**: The group name must conform to the regular pattern `^[a-zA-Z0-9_-]{1,64}$`, that is, only alphanumeric underscores and dashes are allowed. Please see [RegisterGroup](RegisterGroup.md) for details.
+4. **NPC's Background**: No restrictions, but English is recommended.

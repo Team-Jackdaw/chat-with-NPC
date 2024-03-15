@@ -56,6 +56,13 @@ If you are administrator, see the [Installation](#5-installation) for more infor
 - `/npchat setURL <url>` - Set the OpenAI API proxy URL
 - `/npchat reload` - Reload the plugin
 
-## 7. Reference
+## 7. To do list
+
+- [ ] Improve the chat bubble.
+- [ ] NPCs chat with each other and communicate their opinion of events.
+- [ ] NPCs have their opinion on every event in their `Group`.
+- [ ] NPCs performing actions based on the chat content.
+
+## 8. Reference
 
 - [AIMobs](https://github.com/rebane2001/aimobs) by [rebane2001](https://github.com/rebane2001) and [Eianex](https://github.com/Eianex)

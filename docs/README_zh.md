@@ -56,5 +56,12 @@ NPC的对话可以被所有人看到（在他们头顶的**聊天气泡**中）�
 - `/npchat setURL <url>` - 设置OpenAI API代理URL
 - `/npchat reload` - 重新加载插件
 
-## 7. 参考
-- [OpenAI GPT-3](https://platform.openai.com/docs/guides/gpt)
+## 7. 待做列表
+
+- [ ] 改进聊天气泡。
+- [ ] NPC之间可以相互聊天，并交流观点。
+- [ ] NPC会对他们所属的`Group`中的事件有自己的看法。
+- [ ] NPC会对聊天内容作出动作反应。
+
+## 8. 参考
+- [AIMobs](https://github.com/rebane2001/aimobs) by [rebane2001](https://github.com/rebane2001) and [Eianex](https://github.com/Eianex)
