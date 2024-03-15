@@ -33,6 +33,7 @@ public abstract class NPCEntity {
     protected String basicPrompt = "You are an NPC.";
     protected String group = "Global";
     protected ArrayList<Map<Long, String>> longTermMemory = new ArrayList<>();
+    protected TextBubbleEntity textBubble;
 
     /**
      * This is a constructor used to initialize the NPC with the entity.
@@ -45,6 +46,7 @@ public abstract class NPCEntity {
         this.name = entity.getCustomName().getString();
         this.entity = entity;
         this.uuid = entity.getUuid();
+        this.textBubble = new TextBubbleEntity(entity);
     }
 
     /**
@@ -125,8 +127,7 @@ public abstract class NPCEntity {
      * @param range 玩家的范围
      */
     public void replyMessage(String message, double range) {
-        textBubbleEntity textBubble = new textBubbleEntity(EntityType.TEXT_DISPLAY, entity.world);
-        textBubble.display(entity, message);
+        textBubble.update(message);
         findNearbyPlayers(range).forEach(player -> player.sendMessage(Text.of("<" + name + "> " + message)));
     }
 
