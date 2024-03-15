@@ -89,6 +89,8 @@ public class OpenAIHandler {
         ChatWithNPCMod.LOGGER.debug("[chat-with-npc] Request: \n" + requestJson);
 
         RequestConfig requestConfig = RequestConfig.custom()
+                .setConnectTimeout(10 * 1000)
+                .setSocketTimeout(10 * 1000)
                 .setCookieSpec("ignoreCookies")
                 .build();
 

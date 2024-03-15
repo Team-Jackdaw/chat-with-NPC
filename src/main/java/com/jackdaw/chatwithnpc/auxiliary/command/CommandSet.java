@@ -8,6 +8,7 @@ import com.jackdaw.chatwithnpc.group.Group;
 import com.jackdaw.chatwithnpc.group.GroupManager;
 import com.jackdaw.chatwithnpc.npc.NPCEntity;
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
@@ -86,7 +87,7 @@ public class CommandSet {
                                     return 1;})))
                 .then(literal("setbubble")
                         .requires(serverCommandSource -> serverCommandSource.hasPermissionLevel(4))
-                        .then(argument("isBubble", StringArgumentType.word())
+                        .then(argument("isBubble", BoolArgumentType.bool())
                                 .executes(context -> {
                                     SettingManager.isBubble = context.getArgument("isBubble", Boolean.class);
                                     SettingManager.save();
@@ -94,7 +95,7 @@ public class CommandSet {
                                     return 1;})))
                 .then(literal("setchatbar")
                         .requires(serverCommandSource -> serverCommandSource.hasPermissionLevel(4))
-                        .then(argument("isChatBar", StringArgumentType.word())
+                        .then(argument("isChatBar", BoolArgumentType.bool())
                                 .executes(context -> {
                                     SettingManager.isChatBar = context.getArgument("isChatBar", Boolean.class);
                                     SettingManager.save();
@@ -315,14 +316,16 @@ public class CommandSet {
         Text no = Text.literal("No").formatted(Formatting.RED);
         if (!context.getSource().hasPermissionLevel(4)) {
             Text helpText = Text.literal("")
-                    .append("[chat-with-npc] ChatWithNPC:").formatted(Formatting.UNDERLINE)
+                    .append(Text.literal("[chat-with-npc] ChatWithNPC").formatted(Formatting.UNDERLINE))
+                    .append("").formatted(Formatting.RESET)
                     .append("\nEnabled: ").append(SettingManager.enabled ? yes : no)
                     .append("\nChat Bubble: ").append(SettingManager.isBubble ? yes : no)
                     .append("\nChat Bar: ").append(SettingManager.isChatBar ? yes : no)
                     .append("\nModel: ").append(SettingManager.model)
                     .append("\nLanguage: ").append(SettingManager.language)
-                    .append("\nYou can start a conversation to mobs by shift-clicking on them!")
-                    .append("\nOnce you are in a conversation, you can reply to the NPC by typing in the chat.");
+                    .append(Text.literal("\nYou can start a conversation to mobs by shift-clicking on them! " +
+                            "\nOnce you are in a conversation, you can reply to the NPC by typing in the chat.")
+                            .formatted(Formatting.UNDERLINE));
             context.getSource().sendFeedback(helpText, false);
             return 1;
         }
@@ -339,6 +342,7 @@ public class CommandSet {
                 .append("\nForget Time: ").append(String.valueOf(SettingManager.forgetTime))
                 .append("\nLanguage: ").append(SettingManager.language)
                 .append("\nMax Tokens: ").append(String.valueOf(SettingManager.maxTokens))
+                .append("\nAPI URL: ").append(SettingManager.apiURL)
                 .append("\nUse ").append(Text.literal("/npchat help").formatted(Formatting.GRAY)).append(" for help");
         context.getSource().sendFeedback(helpText, false);
         return 1;

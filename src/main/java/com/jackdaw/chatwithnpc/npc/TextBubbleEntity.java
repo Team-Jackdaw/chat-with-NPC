@@ -20,6 +20,7 @@ public class TextBubbleEntity extends TextDisplayEntity {
     public TextBubbleEntity(@NotNull Entity speaker) {
         super(EntityType.TEXT_DISPLAY, speaker.world);
         this.speaker = speaker;
+        this.setPosition(speaker.getX(), speaker.getY() + speaker.getHeight() + textSizeY, speaker.getZ());
         speaker.world.spawnEntity(this);
     }
 
