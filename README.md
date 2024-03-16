@@ -1,42 +1,74 @@
 # Chat-with-NPC
-Chat-with-NPC allow players to interact and talk to specific entities under specific prompts (for use in RPG maps).
 
-This mode is a fork of [AIMobs](https://github.com/rebane2001/aimobs) by [rebane2001](https://github.com/rebane2001) and [Eianex](https://github.com/Eianex).
+![GitHub release](https://img.shields.io/github/v/release/Team-Jackdaw/chat-with-NPC?include_prereleases)
+![GitHub license](https://img.shields.io/github/license/Team-Jackdaw/chat-with-NPC)
+![test workflow](https://github.com/Team-Jackdaw/chat-with-NPC/actions/workflows/build.yml/badge.svg)
 
-AIMobs is a mod that lets you chat with Minecraft mobs and other entities by creating prompts and using the OpenAI API. This mod has the following changes:
+[Chinese Version](docs/README_zh.md)
 
-- The mod is now a server-side mod, so it can be used in multiplayer servers.
-- ...... (to be continued)
+## 1. Introduction
+**Chat With NPC** allows players to freely chat with NPCs, who will answer questions based on his setting (Basic Prompt) and the setting of their Groups (Nation, City, Town ,etc.). Suitable for RPG maps or puzzle maps. The NPCs would not change the game rule, i.e. the actions of the entity are not affected by the chat content (either in Adventure or Survival modes), that means it can be used even on Survival servers to make the game more interesting.
 
-### Requirements
-- Minecraft 1.19.*
-- Fabric
-- Fabric API
+In the future version, we will add innovative features such as NPCs performing actions based on chat content, NPCs chatting with each other, NPCs' viewpoints on events, etc., so that NPCs in the same Group can interact with each other.
 
-**The mod is still being modified.** The information below is from the original README.md file of AIMobs.
+## 2. How to use
+Any player can **talk to NPCs by shift+clicking** on them, if the NPC has been registered by OPs. Then the NPC will greet with players.
 
----
+The NPC's speech can be seen by everyone (in the **chat bubble** above their head), or by players within a certain range around NPC (in the **Chat bar**). 
 
-### Usage
-After installing the mod, grab your OpenAI API key from [here](https://beta.openai.com/account/api-keys), and set it with the `/aimobs setkey <key>` command.
+![image](docs/images/greeting.png)
 
-You should now be able to **talk to mobs by shift+clicking** on them!
+Any nearby players can **reply to the NPC in the chat bar directly** (or the nearest NPC if there are multiple NPCs near the player).
 
-### Commands
-- `/aimobs` - View configuration status
-- `/aimobs help` - View commands help
-- `/aimobs enable/disable` - Enable/disable the mod
-- `/aimobs setkey <key>` - Set OpenAI API key
-- `/aimobs setmodel <model>` - Set AI model
-- `/aimobs settemp <temperature>` - Set model temperature
+![image](docs/images/reply.png)
 
-### Notes
-This project was initially made in 1.12 as a client Forge mod, then ported to 1.19 PaperMC as a server plugin, then ported to Fabric 1.19. Because of this, the code can be a little messy and weird. A couple hardcoded limits are 512 as the max token length and 4096 as the max prompt length (longer prompts will get the beginning cut off), these could be made configurable in the future.
+If you are administrator, see the [Installation](#5-installation) for more information.
 
-Some plans for the future:  
-- Support for the Forge modloader.
-- Support for other AI APIs.
+## 3. Features
 
-An unofficial community-made fork is available with support for Ukranian and Español at [Eianex/aimobs](https://github.com/Eianex/aimobs/releases).
+1. Each `NPC` has his own `BasicPrompt`, and he can belong to a `Group`.
+2. Each `NPC` will record the content of his conversation to generate a `LongTermMemory`, which will affect his subsequent conversations and will be gradually forgotten.
+3. Each `Group` has some `PermanentPrompt` to describe them, and can also record some `TempEvent`, which will end after a period of time.
+4. Each `Group` can record a `ParentGroup` until the group's parent group is `Global`, `Global` cannot have a parent group.
+5. Each `NPC`'s conversation will combine his own `BasicPrompt`, his `LongTermMemory`, the `MeeageRecord` of this conversation, the `PermanentPrompt` of his `Group` and all its `ParentGroup`, and the content of `TempEvent`.
 
-The icon used is the **🧠** emoji from [Twemoji](https://twemoji.twitter.com/) (CC BY 4.0)
+## 4. Requirements
+- Minecraft Server 1.19.4 or higher
+- Fabric Loader 0.12.0 or higher
+- Fabric API included
+
+## 5. Installation
+1. After installing the mod in `mods` folder, grab your OpenAI API key from [here](https://platform.openai.com/api-keys), and set it with the `/npchat setkey <key>` command.
+2. You can use the command in [Commands](#6-commands) to set the basic configuration of the mod.
+3. For register the NPCs, please read [RegisterNPC](docs/RegisterNPC.md).
+4. For register the Groups, please read [RegisterGroup](docs/RegisterGroup.md).
+5. To know about the configuration of the mod, please read [Configuration](docs/Config.md).
+
+## 6. Commands
+- `/npchat` - View configuration status
+- `/npchat help` - View commands help
+- `/npchat enable/disable` - Enable/disable the mod 
+- `/npchat setkey <key>` - Set OpenAI API key
+- `/npchat setmodel <model>` - Set AI model
+- `/npchat setrange <range>` - Set the range of the conversation
+- `/npchat setforgettime <time>` - Set the time to forget the memory (in milliseconds)
+- `/npchat setlanguage <language>` - Set the response language
+- `/npchat setmaxtokens <maxTokens>` - Set the max tokens of a conversation
+- `/npchat setURL <url>` - Set the OpenAI API proxy URL
+- `/npchat reload` - Reload the plugin
+
+## 7. To do list
+
+- [ ] Improve the chat bubble.
+- [ ] NPCs chat with each other and communicate their opinion of events.
+- [ ] NPCs have their opinion on every event in their `Group`.
+- [ ] NPCs performing actions based on the chat content.
+
+## 8. Build
+
+1. Clone the repository.
+2. Run `./gradlew build` in the root directory of the repository.
+3. The jar file will be generated in the `build/libs` directory.
+
+## 9. Reference
+- [AIMobs](https://github.com/rebane2001/aimobs) by [rebane2001](https://github.com/rebane2001) and [Eianex](https://github.com/Eianex)
