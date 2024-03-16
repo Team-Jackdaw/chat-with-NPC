@@ -42,6 +42,7 @@ If you are administrator, see the [Installation](#5-installation) for more infor
 2. You can use the command in [Commands](#6-commands) to set the basic configuration of the mod.
 3. For register the NPCs, please read [RegisterNPC](docs/RegisterNPC.md).
 4. For register the Groups, please read [RegisterGroup](docs/RegisterGroup.md).
+5. To know about the configuration of the mod, please read [Configuration](docs/Config.md).
 
 ## 6. Commands
 - `/npchat` - View configuration status
@@ -50,7 +51,7 @@ If you are administrator, see the [Installation](#5-installation) for more infor
 - `/npchat setkey <key>` - Set OpenAI API key
 - `/npchat setmodel <model>` - Set AI model
 - `/npchat setrange <range>` - Set the range of the conversation
-- `/npchat setforgettime <time>` - Set the time to forget the memory
+- `/npchat setforgettime <time>` - Set the time to forget the memory (in milliseconds)
 - `/npchat setlanguage <language>` - Set the response language
 - `/npchat setmaxtokens <maxTokens>` - Set the max tokens of a conversation
 - `/npchat setURL <url>` - Set the OpenAI API proxy URL
@@ -63,6 +64,11 @@ If you are administrator, see the [Installation](#5-installation) for more infor
 - [ ] NPCs have their opinion on every event in their `Group`.
 - [ ] NPCs performing actions based on the chat content.
 
-## 8. Reference
+## 8. Build
 
+1. Clone the repository.
+2. Run `./gradlew build` in the root directory of the repository.
+3. The jar file will be generated in the `build/libs` directory.
+
+## 9. Reference
 - [AIMobs](https://github.com/rebane2001/aimobs) by [rebane2001](https://github.com/rebane2001) and [Eianex](https://github.com/Eianex)
