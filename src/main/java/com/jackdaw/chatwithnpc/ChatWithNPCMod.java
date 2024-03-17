@@ -70,7 +70,7 @@ public class ChatWithNPCMod implements ModInitializer {
                 player.sendMessage(Text.of("[chat-with-npc] The NPC is talking, please wait"), false);
                 return ActionResult.PASS;
             }
-            conversationHandler.replyToEntity(message, player.getName().getString());
+            conversationHandler.replyToEntity(message, player.getName().getString(), true);
             return ActionResult.PASS;
         });
         // Start the live cycle manager

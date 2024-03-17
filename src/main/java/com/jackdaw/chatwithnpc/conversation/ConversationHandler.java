@@ -4,6 +4,10 @@ import com.jackdaw.chatwithnpc.ChatWithNPCMod;
 import com.jackdaw.chatwithnpc.auxiliary.configuration.SettingManager;
 import com.jackdaw.chatwithnpc.conversation.prompt.Prompt;
 import com.jackdaw.chatwithnpc.npc.NPCEntity;
+import com.jackdaw.chatwithnpc.openaiapi.Assistant;
+import com.jackdaw.chatwithnpc.openaiapi.AsyncTaskStack;
+import com.jackdaw.chatwithnpc.openaiapi.Run;
+import com.jackdaw.chatwithnpc.openaiapi.Threads;
 import org.jetbrains.annotations.NotNull;
 
 public class ConversationHandler {
@@ -12,10 +16,11 @@ public class ConversationHandler {
     final NPCEntity npc;
     protected boolean isTalking = false;
     long updateTime = 0L;
+    public AsyncTaskStack taskStack = new AsyncTaskStack();
 
-    public ConversationHandler(NPCEntity npc) {
+    public ConversationHandler(@NotNull NPCEntity npc) {
         this.npc = npc;
-        startConversation();
+        startConversation(true);
     }
 
     private void sendWaitMessage() {
@@ -48,6 +53,10 @@ public class ConversationHandler {
         t.start();
     }
 
+    public void getResponse(String requestJson, boolean newAPI) {
+        if (!newAPI) getResponse(requestJson);
+    }
+
     private @NotNull String tryResponse(String requestJson, int times) throws Exception {
         Exception e = new Exception("Error getting response");
         if (times <= 0) throw e;
@@ -69,6 +78,31 @@ public class ConversationHandler {
         updateTime = System.currentTimeMillis();
     }
 
+    private void startConversation(boolean newAPI) {
+        if (!newAPI) {
+            startConversation();
+            return;
+        }
+        setTalking(true);
+        taskStack.addTask(() -> {
+            try {
+                if (!npc.hasAssistant()) {
+                    Assistant.createAssistant(npc);
+                }
+                if (!npc.hasThreadId()) {
+                    Threads.createThread(this);
+                }
+                Threads.addMessage(npc.getThreadId(), "Hello!");
+                Run.run(this);
+                setTalking(false);
+            } catch (Exception e) {
+                ChatWithNPCMod.LOGGER.error(e.getMessage());
+                taskStack.clear();
+                setTalking(false);
+            }
+        });
+    }
+
     public void replyToEntity(String message, String playerName) {
         sendWaitMessage();
         addMessageRecord(System.currentTimeMillis(), Record.Role.PLAYER, message, playerName);
@@ -77,6 +111,25 @@ public class ConversationHandler {
                 .build()
                 .toRequestJson());
         updateTime = System.currentTimeMillis();
+    }
+
+    public void replyToEntity(String message, String playerName, boolean newAPI) {
+        if (!newAPI) {
+            replyToEntity(message, playerName);
+            return;
+        }
+        setTalking(true);
+        taskStack.addTask(() -> {
+            try {
+                Threads.addMessage(npc.getThreadId(), message);
+                Run.run(this);
+                setTalking(false);
+            } catch (Exception e) {
+                ChatWithNPCMod.LOGGER.error(e.getMessage());
+                taskStack.clear();
+                setTalking(false);
+            }
+        });
     }
 
     public long getUpdateTime() {

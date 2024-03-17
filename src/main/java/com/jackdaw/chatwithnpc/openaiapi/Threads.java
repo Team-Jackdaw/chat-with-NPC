@@ -7,40 +7,26 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.Map;
 
-public class Thread {
+public class Threads {
     private String id;
 
     private static String toJson(Map<String, String> map) {
         return new Gson().toJson(map);
     }
 
-    private static Thread fromJson(String json) {
-        return new Gson().fromJson(json, Thread.class);
+    private static Threads fromJson(String json) {
+        return new Gson().fromJson(json, Threads.class);
     }
 
-    public static void createThread(@NotNull ConversationHandler conversationHandler) {
-        java.lang.Thread t = new java.lang.Thread(() -> {
-            try {
-                String res = Request.sendRequest("", "threads", Header.buildBeta());
-                String id = fromJson(res).id;
-                conversationHandler.getNpc().setThreadId(id);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
-        t.start();
+    public static void createThread(@NotNull ConversationHandler conversationHandler) throws Exception {
+        String res = Request.sendRequest("", "threads", Header.buildBeta());
+        String id = fromJson(res).id;
+        conversationHandler.getNpc().setThreadId(id);
     }
 
-    public static void addMessage(String threadId, String message) {
+    public static void addMessage(String threadId, String message) throws Exception {
         Map<String, String> content = Map.of("role", "user", "content", message);
-        java.lang.Thread t = new java.lang.Thread(() -> {
-            try {
-                String res = Request.sendRequest(toJson(content), "threads/" + threadId + "/messages", Header.buildBeta());
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
-        t.start();
+        String ignore = Request.sendRequest(toJson(content), "threads/" + threadId + "/messages", Header.buildBeta());
     }
 
     static String getLastMessage(String threadId) throws Exception {

@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.jackdaw.chatwithnpc.auxiliary.configuration.SettingManager;
 import com.jackdaw.chatwithnpc.npc.NPCEntity;
 import com.jackdaw.chatwithnpc.openaiapi.prompt.GroupPrompt;
+import com.jackdaw.chatwithnpc.openaiapi.prompt.NPCPrompt;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
@@ -24,26 +25,19 @@ public class Assistant {
         return new Gson().fromJson(json, Assistant.class);
     }
 
-    public static void createAssistant(@NotNull NPCEntity npc) {
+    public static void createAssistant(@NotNull NPCEntity npc) throws Exception {
         Map<String, String> createAssistantRequest = Map.of(
                 "name", npc.getName(),
                 "model", SettingManager.model,
-                "instructions", npc.getInstructions(),
-                "description", npc.getBasicPrompt() + GroupPrompt.getGroupsPrompt(npc.getGroup())
+                "instructions", NPCPrompt.instructions(npc),
+                "description", NPCPrompt.description(npc) + GroupPrompt.getGroupsPrompt(npc.getGroup())
         );
-        java.lang.Thread t = new java.lang.Thread(() -> {
-            try {
-                String res = Request.sendRequest(toJson(createAssistantRequest), "assistants", Header.buildBeta());
-                String id = fromJson(res).id;
-                npc.setAssistantId(id);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
-        t.start();
+        String res = Request.sendRequest(toJson(createAssistantRequest), "assistants", Header.buildBeta());
+        String id = fromJson(res).id;
+        npc.setAssistantId(id);
     }
 
-    public static void modifyAssistant(@NotNull NPCEntity npc) {
+    public static void modifyAssistant(@NotNull NPCEntity npc) throws Exception {
         if (npc.getAssistantId() == null) return;
         Map<String, String> modifyAssistantRequest = Map.of(
                 "name", npc.getName(),
@@ -51,13 +45,6 @@ public class Assistant {
                 "instructions", npc.getInstructions(),
                 "description", npc.getBasicPrompt()
         );
-        java.lang.Thread t = new java.lang.Thread(() -> {
-            try {
-                String ignore = Request.sendRequest(toJson(modifyAssistantRequest), "assistants/" + npc.getAssistantId(), Header.buildBeta());
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
-        t.start();
+        String ignore = Request.sendRequest(toJson(modifyAssistantRequest), "assistants/" + npc.getAssistantId(), Header.buildBeta());
     }
 }

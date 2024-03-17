@@ -22,30 +22,23 @@ public class Run {
         return new Gson().fromJson(json, Run.class);
     }
 
-    public static void run(@NotNull ConversationHandler conversation) {
+    public static void run(@NotNull ConversationHandler conversation) throws Exception {
         String threadId = conversation.getNpc().getThreadId();
         String assistantId = conversation.getNpc().getAssistantId();
         Map<String, String> assistant = Map.of("assistant_id", assistantId);
-        java.lang.Thread t = new java.lang.Thread(() -> {
+        String res = Request.sendRequest(toJson(assistant), "threads/" + threadId + "/runs", Header.buildBeta());
+        Run run = fromJson(res);
+        // Wait for the run to complete or timeout
+        long startTime = System.currentTimeMillis();
+        while (!run.isCompleted() && System.currentTimeMillis() - startTime < 10000) {
+            run.updateStatus();
             try {
-                String res = Request.sendRequest(toJson(assistant), "threads/" + threadId + "/runs", Header.buildBeta());
-                Run run = fromJson(res);
-                // Wait for the run to complete or timeout
-                long startTime = System.currentTimeMillis();
-                while (!run.isCompleted() && System.currentTimeMillis() - startTime < 10000) {
-                    run.updateStatus();
-                    try {
-                        java.lang.Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-                run.callback(conversation);
-            } catch (Exception e) {
+                java.lang.Thread.sleep(100);
+            } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-        });
-        t.start();
+        }
+        run.callback(conversation);
     }
 
     private void updateStatus() throws Exception {
@@ -66,7 +59,7 @@ public class Run {
     }
 
     private void callback(@NotNull ConversationHandler conversation) throws Exception {
-        String response = Thread.getLastMessage(threadId);
+        String response = Threads.getLastMessage(threadId);
         conversation.getNpc().replyMessage(response, SettingManager.range);
     }
 }
