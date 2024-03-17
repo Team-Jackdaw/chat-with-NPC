@@ -18,40 +18,32 @@ import java.util.Map;
  *
  * <p>Read or Write the data file with some information, each file just record one relative information.</p>
  */
-public class GroupDataManager{
-
-    private static final class GroupData {
-        private final String name;
-
-        private final String parentGroup;
-
-        private final ArrayList<String> permanentPrompt;
-
-        private final ArrayList<Map<Long, String>> tempEvent;
-
-        private GroupData(Group group) {
-            this.name = group.getName();
-            this.parentGroup = group.getParentGroup();
-            permanentPrompt = new ArrayList<>(group.getPermanentPrompt());
-            tempEvent = new ArrayList<>(group.getTempEvent());
-        }
-
-        private void set(Group group) {
-            group.setParentGroup(parentGroup);
-            group.setPermanentPrompt(permanentPrompt);
-            group.setTempEvent(tempEvent);
-        }
-    }
+public class GroupDataManager {
 
     private static final Logger logger = ChatWithNPCMod.LOGGER;
     private final File theFile;
-
     private final Group group;
 
     public GroupDataManager(Group group) {
         this.group = group;
         mkdir();
         this.theFile = new File(ChatWithNPCMod.workingDirectory.toFile(), "group/" + group.getName() + ".json");
+    }
+
+    /**
+     * Create the directory.
+     */
+    private static void mkdir() {
+        Path workingDirectory = ChatWithNPCMod.workingDirectory.resolve("group");
+        if (!Files.exists(workingDirectory)) {
+            try {
+                Files.createDirectories(workingDirectory);
+            } catch (IOException e) {
+                ChatWithNPCMod.LOGGER.error("[chat-with-npc] Failed to create the npc directory");
+                ChatWithNPCMod.LOGGER.error(e.getMessage());
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     public boolean isExist() {
@@ -101,19 +93,26 @@ public class GroupDataManager{
         }
     }
 
-    /**
-     * Create the directory.
-     */
-    private static void mkdir() {
-        Path workingDirectory = ChatWithNPCMod.workingDirectory.resolve("group");
-        if (!Files.exists(workingDirectory)) {
-            try {
-                Files.createDirectories(workingDirectory);
-            } catch (IOException e) {
-                ChatWithNPCMod.LOGGER.error("[chat-with-npc] Failed to create the npc directory");
-                ChatWithNPCMod.LOGGER.error(e.getMessage());
-                throw new RuntimeException(e);
-            }
+    private static final class GroupData {
+        private final String name;
+
+        private final String parentGroup;
+
+        private final ArrayList<String> permanentPrompt;
+
+        private final ArrayList<Map<Long, String>> tempEvent;
+
+        private GroupData(Group group) {
+            this.name = group.getName();
+            this.parentGroup = group.getParentGroup();
+            permanentPrompt = new ArrayList<>(group.getPermanentPrompt());
+            tempEvent = new ArrayList<>(group.getTempEvent());
+        }
+
+        private void set(Group group) {
+            group.setParentGroup(parentGroup);
+            group.setPermanentPrompt(permanentPrompt);
+            group.setTempEvent(tempEvent);
         }
     }
 }

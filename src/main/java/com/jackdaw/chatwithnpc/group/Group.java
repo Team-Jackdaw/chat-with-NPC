@@ -2,17 +2,16 @@ package com.jackdaw.chatwithnpc.group;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.TreeSet;
 
 public class Group {
     private final String name;
-
-    private String parentGroup = "Global";
-
     private final ArrayList<String> permanentPrompt = new ArrayList<>(Arrays.asList("good weather", "very save"));
-
     private final ArrayList<Map<Long, String>> tempEvent = new ArrayList<>();
-
+    private String parentGroup = "Global";
     private long lastLoadTime;
 
     Group(@NotNull String name) {
@@ -27,12 +26,12 @@ public class Group {
         return name;
     }
 
-    public void setParentGroup(String parentGroup) {
-        this.parentGroup = parentGroup;
-    }
-
     public String getParentGroup() {
         return parentGroup;
+    }
+
+    public void setParentGroup(String parentGroup) {
+        this.parentGroup = parentGroup;
     }
 
     public long getLastLoadTime() {
@@ -47,14 +46,23 @@ public class Group {
     public void updateLastLoadTime(long time) {
         lastLoadTime = time;
     }
-    
+
     public void addTempEvent(String event, long time) {
         long now = System.currentTimeMillis();
         tempEvent.add(Map.of(now + time, event));
     }
 
+    public void popTempEvent() {
+        tempEvent.remove(tempEvent.size() - 1);
+    }
+
     public ArrayList<Map<Long, String>> getTempEvent() {
         return new ArrayList<>(tempEvent);
+    }
+
+    public void setTempEvent(ArrayList<Map<Long, String>> tempEvent) {
+        this.tempEvent.clear();
+        this.tempEvent.addAll(tempEvent);
     }
 
     public void addPermanentPrompt(String prompt) {
@@ -73,13 +81,13 @@ public class Group {
         this.permanentPrompt.clear();
         this.permanentPrompt.addAll(permanentPrompt);
     }
-    
+
     public GroupDataManager getDataManager() {
         return new GroupDataManager(this);
     }
 
-    public void setTempEvent(ArrayList<Map<Long, String>> tempEvent) {
-        this.tempEvent.clear();
-        this.tempEvent.addAll(tempEvent);
+    public void autoDeleteTempEvent() {
+        long now = System.currentTimeMillis();
+        tempEvent.removeIf(map -> map.keySet().iterator().next() < now);
     }
 }

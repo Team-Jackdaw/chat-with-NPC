@@ -11,9 +11,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * This class is used to manage the group of the game.
  */
 public class GroupManager {
+    public static final ConcurrentHashMap<String, Group> GroupMap = new ConcurrentHashMap<>();
     // The time in milliseconds that a group is considered out of time
     private static final long outOfTime = ChatWithNPCMod.outOfTime;
-    public static final ConcurrentHashMap<String, Group> GroupMap = new ConcurrentHashMap<>();
 
     public static boolean isLoaded(String name) {
         return GroupMap.containsKey(name);
@@ -22,9 +22,10 @@ public class GroupManager {
 
     /**
      * Initialize a group if the group is not conversing.
+     *
      * @param name The name of the group
      */
-    public static void loadEnvironment(String name) {
+    public static void loadGroup(String name) {
         if (isLoaded(name)) {
             return;
         }
@@ -34,21 +35,23 @@ public class GroupManager {
         GroupMap.put(name, group);
     }
 
-    public static void removeEnvironment(String name) {
-        GroupMap.get(name).getDataManager().save();
+    public static void removeGroup(String name) {
+        Group current = GroupMap.get(name);
+        current.autoDeleteTempEvent();
+        current.getDataManager().save();
         GroupMap.remove(name);
     }
 
     public static @NotNull Group getGroup(String name) {
         if (!isLoaded(name)) {
-            loadEnvironment(name);
+            loadGroup(name);
         }
         Group group = GroupMap.get(name);
         group.updateLastLoadTime(System.currentTimeMillis());
         return group;
     }
 
-    public static void endOutOfTimeEnvironments() {
+    public static void endOutOfTimeGroup() {
         if (GroupMap.isEmpty()) return;
         GroupMap.forEach((name, environment) -> {
             if (environment.getName().equals("Global")) {
@@ -56,14 +59,14 @@ public class GroupManager {
             }
             if (environment.getLastLoadTime() + outOfTime < System.currentTimeMillis()) {
                 environment.getDataManager().save();
-                removeEnvironment(name);
+                removeGroup(name);
             }
         });
     }
 
     public static void endAllEnvironments() {
         if (GroupMap.isEmpty()) return;
-        GroupMap.forEach((name, environment) -> removeEnvironment(name));
+        GroupMap.forEach((name, environment) -> removeGroup(name));
     }
 
     /**

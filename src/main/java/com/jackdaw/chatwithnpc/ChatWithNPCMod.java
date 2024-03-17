@@ -18,9 +18,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 public class ChatWithNPCMod implements ModInitializer {
 
@@ -59,7 +56,7 @@ public class ChatWithNPCMod implements ModInitializer {
             // The entity must have a custom name to be an NPC
             if (entity.getCustomName() == null) return ActionResult.PASS;
             // register the NPC entity and start a conversation
-            ConversationManager.startConversation(entity);
+            ConversationManager.startConversation(entity, player.hasPermissionLevel(4));
             return ActionResult.FAIL;
         });
         // Register the player chat listener
@@ -73,21 +70,15 @@ public class ChatWithNPCMod implements ModInitializer {
                 player.sendMessage(Text.of("[chat-with-npc] The NPC is talking, please wait"), false);
                 return ActionResult.PASS;
             }
-            conversationHandler.replyToEntity(message);
+            conversationHandler.replyToEntity(message, player.getName().getString());
             return ActionResult.PASS;
         });
-        // Check for out of time static data
-        ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-        executorService.scheduleAtFixedRate(() -> {
-            try {
-                UpdateStaticData.update();
-            } catch (Exception ignore) {
-            }
-        }, 0, updateInterval, TimeUnit.MILLISECONDS);
+        // Start the live cycle manager
+        LiveCycleManager.start(updateInterval);
         // Shutdown the executor service when the server is stopped
         ServerLifecycleEvents.SERVER_STOPPING.register(server -> {
-            executorService.shutdown();
-            UpdateStaticData.close();
+            LiveCycleManager.shutdown();
+            LiveCycleManager.saveAll();
         });
     }
 }
