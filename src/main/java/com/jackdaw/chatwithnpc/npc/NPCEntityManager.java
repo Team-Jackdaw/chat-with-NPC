@@ -20,6 +20,7 @@ public class NPCEntityManager {
 
     /**
      * Initialize an NPC entity if the NPC is not conversing.
+     *
      * @param entity The NPC entity to initialize
      */
     public static void registerNPCEntity(Entity entity, boolean isOP) {

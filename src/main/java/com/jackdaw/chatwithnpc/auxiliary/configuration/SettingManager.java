@@ -36,6 +36,41 @@ public class SettingManager {
     public static boolean isChatBar = false;
     public static int maxTokens = 512;
 
+    /**
+     * Load the setting from the config file.
+     */
+    public static void sync() {
+        if (configFile.exists()) {
+            try {
+                String json = new String(Files.readAllBytes(configFile.toPath()));
+                Gson gson = new Gson();
+                Config config = gson.fromJson(json, Config.class);
+                config.set();
+            } catch (IOException e) {
+                logger.error("[chat-with-npc] Can't open the config file.");
+            }
+        } else {
+            save();
+        }
+    }
+
+    /**
+     * Write the setting to the config file.
+     */
+    public static void save() {
+        try {
+            if (!configFile.exists()) {
+                if (!configFile.createNewFile()) {
+                    logger.error("[chat-with-npc] Can't create the config file.");
+                    return;
+                }
+            }
+            Files.write(configFile.toPath(), Config.toJson().getBytes());
+        } catch (IOException e) {
+            logger.error("[chat-with-npc] Can't write the config file.");
+        }
+    }
+
     private static final class Config {
         private String lastVersion = "v2.4";
         private boolean enabled = true;
@@ -83,41 +118,5 @@ public class SettingManager {
             SettingManager.maxTokens = maxTokens;
         }
 
-    }
-
-
-    /**
-     * Load the setting from the config file.
-     */
-    public static void sync(){
-        if (configFile.exists()) {
-            try {
-                String json = new String(Files.readAllBytes(configFile.toPath()));
-                Gson gson = new Gson();
-                Config config = gson.fromJson(json, Config.class);
-                config.set();
-            } catch (IOException e) {
-                logger.error("[chat-with-npc] Can't open the config file.");
-            }
-        } else {
-            save();
-        }
-    }
-
-    /**
-     * Write the setting to the config file.
-     */
-    public static void save() {
-        try {
-            if (!configFile.exists()) {
-                if (!configFile.createNewFile()) {
-                    logger.error("[chat-with-npc] Can't create the config file.");
-                    return;
-                }
-            }
-            Files.write(configFile.toPath(), Config.toJson().getBytes());
-        } catch (IOException e) {
-            logger.error("[chat-with-npc] Can't write the config file.");
-        }
     }
 }

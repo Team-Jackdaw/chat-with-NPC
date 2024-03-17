@@ -7,6 +7,7 @@
 - `/npchat group <group> addPermanentPrompt <prompt>` - Add a permanent prompt to the group (adjective or sentence).
 - `/npchat group <group> popPermanentPrompt` - Pop a permanent prompt from the group.
 - `/npchat group <group> addTempEvent <event>` - Add a temporary event to the group (valid for 7 days).
+- `/npchat group <group> popTempEvent` - Pop a temporary event from the group.
 - `/npchat addGroup <newGroup>` - Add a new group
 
 

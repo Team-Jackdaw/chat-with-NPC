@@ -4,7 +4,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import org.jetbrains.annotations.NotNull;
 
-public class LivingNPCEntity extends NPCEntity{
+public class LivingNPCEntity extends NPCEntity {
     /**
      * This is a constructor used to initialize the NPC with the entity.
      *

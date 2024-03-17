@@ -13,12 +13,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(PlayerManager.class)
 public abstract class PlayerSendMessageMixin {
-	@Inject(at = @At("TAIL"), method = "broadcast(Lnet/minecraft/network/message/SignedMessage;Lnet/minecraft/server/network/ServerPlayerEntity;Lnet/minecraft/network/message/MessageType$Parameters;)V", cancellable = true)
-	private void onSend(SignedMessage message, ServerPlayerEntity sender, MessageType.Parameters params, CallbackInfo ci) {
-		ActionResult result = PlayerSendMessageCallback.EVENT.invoker().interact(sender, message.getContent().getString());
+    @Inject(at = @At("TAIL"), method = "broadcast(Lnet/minecraft/network/message/SignedMessage;Lnet/minecraft/server/network/ServerPlayerEntity;Lnet/minecraft/network/message/MessageType$Parameters;)V", cancellable = true)
+    private void onSend(SignedMessage message, ServerPlayerEntity sender, MessageType.Parameters params, CallbackInfo ci) {
+        ActionResult result = PlayerSendMessageCallback.EVENT.invoker().interact(sender, message.getContent().getString());
 
-		if(result == ActionResult.FAIL) {
-			ci.cancel();
-		}
-	}
+        if (result == ActionResult.FAIL) {
+            ci.cancel();
+        }
+    }
 }

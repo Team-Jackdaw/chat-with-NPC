@@ -1,6 +1,6 @@
 package com.jackdaw.chatwithnpc.auxiliary.command;
 
-import com.jackdaw.chatwithnpc.UpdateStaticData;
+import com.jackdaw.chatwithnpc.LiveCycleManager;
 import com.jackdaw.chatwithnpc.auxiliary.configuration.SettingManager;
 import com.jackdaw.chatwithnpc.conversation.ConversationHandler;
 import com.jackdaw.chatwithnpc.conversation.ConversationManager;
@@ -24,6 +24,13 @@ import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
 public class CommandSet {
+
+    static SuggestionProvider<ServerCommandSource> groupSuggestionProvider = (context, builder) -> {
+        for (String group : GroupManager.getGroupList()) {
+            builder.suggest(group);
+        }
+        return builder.buildFuture();
+    };
 
     public static void setupCommand(@NotNull CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess, CommandManager.RegistrationEnvironment environment) {
         dispatcher.register(literal("npchat")
@@ -52,7 +59,8 @@ public class CommandSet {
                                     SettingManager.range = Double.parseDouble(context.getArgument("range", String.class));
                                     SettingManager.save();
                                     context.getSource().sendFeedback(Text.of("[chat-with-npc] Range set"), true);
-                                    return 1;})))
+                                    return 1;
+                                })))
                 .then(literal("setforgettime")
                         .requires(serverCommandSource -> serverCommandSource.hasPermissionLevel(4))
                         .then(argument("time", StringArgumentType.word())
@@ -60,7 +68,8 @@ public class CommandSet {
                                     SettingManager.forgetTime = Long.parseLong(context.getArgument("time", String.class));
                                     SettingManager.save();
                                     context.getSource().sendFeedback(Text.of("[chat-with-npc] Forget time set"), true);
-                                    return 1;})))
+                                    return 1;
+                                })))
                 .then(literal("setlanguage")
                         .requires(serverCommandSource -> serverCommandSource.hasPermissionLevel(4))
                         .then(argument("language", StringArgumentType.word())
@@ -68,7 +77,8 @@ public class CommandSet {
                                     SettingManager.language = context.getArgument("language", String.class);
                                     SettingManager.save();
                                     context.getSource().sendFeedback(Text.of("[chat-with-npc] Language set"), true);
-                                    return 1;})))
+                                    return 1;
+                                })))
                 .then(literal("setmaxtokens")
                         .requires(serverCommandSource -> serverCommandSource.hasPermissionLevel(4))
                         .then(argument("maxTokens", StringArgumentType.word())
@@ -76,7 +86,8 @@ public class CommandSet {
                                     SettingManager.maxTokens = context.getArgument("maxTokens", Integer.class);
                                     SettingManager.save();
                                     context.getSource().sendFeedback(Text.of("[chat-with-npc] Max tokens set"), true);
-                                    return 1;})))
+                                    return 1;
+                                })))
                 .then(literal("setURL")
                         .requires(serverCommandSource -> serverCommandSource.hasPermissionLevel(4))
                         .then(argument("url", StringArgumentType.string())
@@ -84,7 +95,8 @@ public class CommandSet {
                                     SettingManager.apiURL = context.getArgument("url", String.class);
                                     SettingManager.save();
                                     context.getSource().sendFeedback(Text.of("[chat-with-npc] URL set"), true);
-                                    return 1;})))
+                                    return 1;
+                                })))
                 .then(literal("setbubble")
                         .requires(serverCommandSource -> serverCommandSource.hasPermissionLevel(4))
                         .then(argument("isBubble", BoolArgumentType.bool())
@@ -92,7 +104,8 @@ public class CommandSet {
                                     SettingManager.isBubble = context.getArgument("isBubble", Boolean.class);
                                     SettingManager.save();
                                     context.getSource().sendFeedback(Text.of("[chat-with-npc] Bubble set"), true);
-                                    return 1;})))
+                                    return 1;
+                                })))
                 .then(literal("setchatbar")
                         .requires(serverCommandSource -> serverCommandSource.hasPermissionLevel(4))
                         .then(argument("isChatBar", BoolArgumentType.bool())
@@ -100,7 +113,8 @@ public class CommandSet {
                                     SettingManager.isChatBar = context.getArgument("isChatBar", Boolean.class);
                                     SettingManager.save();
                                     context.getSource().sendFeedback(Text.of("[chat-with-npc] Chat bar set"), true);
-                                    return 1;})))
+                                    return 1;
+                                })))
                 .then(literal("npc")
                         .requires(serverCommandSource -> serverCommandSource.hasPermissionLevel(4))
                         .then(literal("setCareer")
@@ -131,25 +145,29 @@ public class CommandSet {
                                         .executes(CommandSet::popGroupPermanentPrompt))
                                 .then(literal("addTempEvent")
                                         .then(argument("event", StringArgumentType.greedyString())
-                                                        .executes(CommandSet::addGroupTempEvent)))
+                                                .executes(CommandSet::addGroupTempEvent)))
+                                .then(literal("popTempEvent")
+                                        .executes(CommandSet::popTempEvent))
                                 .executes(CommandSet::groupStatus)))
                 .then(literal("addGroup")
                         .requires(serverCommandSource -> serverCommandSource.hasPermissionLevel(4))
                         .then(argument("newGroup", StringArgumentType.word())
                                 .executes(context -> {
                                     String group = context.getArgument("newGroup", String.class);
-                                    GroupManager.loadEnvironment(group);
+                                    GroupManager.loadGroup(group);
                                     context.getSource().sendFeedback(Text.of("[chat-with-npc] Group added"), true);
-                                    return 1;})))
+                                    return 1;
+                                })))
                 .then(literal("reload")
                         .requires(serverCommandSource -> serverCommandSource.hasPermissionLevel(4))
                         .executes(context -> {
                             Thread t = new Thread(() -> {
                                 try {
-                                    UpdateStaticData.close();
+                                    LiveCycleManager.saveAll();
                                     SettingManager.sync();
                                     context.getSource().sendFeedback(Text.of("[chat-with-npc] Reloaded"), true);
-                                } catch (Exception ignore) {}
+                                } catch (Exception ignore) {
+                                }
                             });
                             t.start();
                             return 1;
@@ -157,12 +175,12 @@ public class CommandSet {
         );
     }
 
-    static SuggestionProvider<ServerCommandSource> groupSuggestionProvider = (context, builder) -> {
-        for (String group : GroupManager.getGroupList()) {
-            builder.suggest(group);
-        }
-        return builder.buildFuture();
-    };
+    private static int popTempEvent(CommandContext<ServerCommandSource> context) {
+        String group = context.getArgument("group", String.class);
+        GroupManager.getGroup(group).popTempEvent();
+        context.getSource().sendFeedback(Text.of("[chat-with-npc] Temp event popped"), true);
+        return 1;
+    }
 
     private static int groupStatus(CommandContext<ServerCommandSource> context) {
         String group = context.getArgument("group", String.class);
@@ -242,7 +260,7 @@ public class CommandSet {
 
     private static int clearNPCMemory(CommandContext<ServerCommandSource> context) {
         ServerPlayerEntity player = context.getSource().getPlayer();
-        if (player != null && ConversationManager.getConversation(player) != null){
+        if (player != null && ConversationManager.getConversation(player) != null) {
             ConversationHandler conversation = ConversationManager.getConversation(player);
             if (conversation == null) return 0;
             conversation.clearMessageRecord();
@@ -259,7 +277,7 @@ public class CommandSet {
     private static int setNPCPrompt(CommandContext<ServerCommandSource> context) {
         ServerPlayerEntity player = context.getSource().getPlayer();
         String prompt = context.getArgument("prompt", String.class);
-        if (player != null && ConversationManager.getConversation(player) != null){
+        if (player != null && ConversationManager.getConversation(player) != null) {
             ConversationHandler conversation = ConversationManager.getConversation(player);
             if (conversation == null) return 0;
             conversation.getNpc().setBasicPrompt(prompt);
@@ -275,7 +293,7 @@ public class CommandSet {
     private static int setNPCGroup(CommandContext<ServerCommandSource> context) {
         ServerPlayerEntity player = context.getSource().getPlayer();
         String group = context.getArgument("group", String.class);
-        if (player != null && ConversationManager.getConversation(player) != null){
+        if (player != null && ConversationManager.getConversation(player) != null) {
             ConversationHandler conversation = ConversationManager.getConversation(player);
             if (conversation == null) return 0;
             conversation.getNpc().setGroup(group);
@@ -291,7 +309,7 @@ public class CommandSet {
     private static int setNPCCareer(CommandContext<ServerCommandSource> context) {
         ServerPlayerEntity player = context.getSource().getPlayer();
         String career = context.getArgument("career", String.class);
-        if (player != null && ConversationManager.getConversation(player) != null){
+        if (player != null && ConversationManager.getConversation(player) != null) {
             ConversationHandler conversation = ConversationManager.getConversation(player);
             if (conversation == null) return 0;
             conversation.getNpc().setCareer(career);
@@ -324,7 +342,7 @@ public class CommandSet {
                     .append("\nModel: ").append(SettingManager.model)
                     .append("\nLanguage: ").append(SettingManager.language)
                     .append(Text.literal("\nYou can start a conversation to mobs by shift-clicking on them! " +
-                            "\nOnce you are in a conversation, you can reply to the NPC by typing in the chat.")
+                                    "\nOnce you are in a conversation, you can reply to the NPC by typing in the chat.")
                             .formatted(Formatting.UNDERLINE));
             context.getSource().sendFeedback(helpText, false);
             return 1;
@@ -376,6 +394,7 @@ public class CommandSet {
                 .append("\n/npchat group <group> addPermanentPrompt <prompt> - Add a permanent prompt to the group.")
                 .append("\n/npchat group <group> popPermanentPrompt - Pop a permanent prompt from the group.")
                 .append("\n/npchat group <group> addTempEvent <event> - Add a temporary event to the group.")
+                .append("\n/npchat group <group> popTempEvent - Pop a temporary event from the group.")
                 .append("\n/npchat addGroup <newGroup> - Add a new group")
                 .append("\n --------------------------------")
                 .append("\nYou can start a conversation to mobs by shift-clicking on them!")
@@ -383,6 +402,7 @@ public class CommandSet {
         context.getSource().sendFeedback(helpText, false);
         return 1;
     }
+
     public static int setAPIKey(CommandContext<ServerCommandSource> context) {
         String apiKey = context.getArgument("key", String.class);
         if (!apiKey.isEmpty()) {
@@ -393,6 +413,7 @@ public class CommandSet {
         }
         return 0;
     }
+
     public static int setModel(CommandContext<ServerCommandSource> context) {
         String model = context.getArgument("model", String.class);
         if (!model.isEmpty()) {

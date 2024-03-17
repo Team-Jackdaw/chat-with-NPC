@@ -7,6 +7,7 @@
 - `/npchat group <group> addPermanentPrompt <prompt>` - 向群组添加一条永久提示（形容词或句）。
 - `/npchat group <group> popPermanentPrompt` - 从群组中删除最近一条永久提示。
 - `/npchat group <group> addTempEvent <event>` - 向群组添加一条临时事件（有效期现实7天）。
+- `/npchat group <group> popTempEvent` - 从群组中删除最近一条临时事件。
 - `/npchat addGroup <newGroup>` - 添加一个新的群组
 
 
