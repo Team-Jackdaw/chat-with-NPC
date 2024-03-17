@@ -41,8 +41,7 @@ public class ConversationManager {
     }
 
     public static void endConversation(UUID uuid) {
-//        conversationMap.get(uuid).getLongTermMemory();
-        conversationMap.get(uuid).taskStack.shutdown();
+        conversationMap.get(uuid).discard();
         NPCEntityManager.removeNPCEntity(uuid);
         conversationMap.remove(uuid);
     }

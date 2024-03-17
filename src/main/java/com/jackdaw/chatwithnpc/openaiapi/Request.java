@@ -3,8 +3,7 @@ package com.jackdaw.chatwithnpc.openaiapi;
 import com.jackdaw.chatwithnpc.ChatWithNPCMod;
 import com.jackdaw.chatwithnpc.auxiliary.configuration.SettingManager;
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.*;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -15,6 +14,11 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Map;
 
 public class Request {
+    public enum Action {
+        GET,
+        POST,
+        DELETE
+    }
     private static String url = "https://api.openai.com/v1/";
 
     public static void updateSetting() {
@@ -29,9 +33,10 @@ public class Request {
      * @return The response from the API in Json format
      * @throws Exception If the request fails
      */
-    public static @NotNull String sendRequest(@Nullable String requestJson, @NotNull String routing, @NotNull Map<String, String> headers) throws Exception {
+    public static @NotNull String sendRequest(@Nullable String requestJson, @NotNull String routing, @NotNull Map<String, String> headers, @NotNull Action action) throws Exception {
         updateSetting();
-        ChatWithNPCMod.LOGGER.debug("[chat-with-npc] Request: \n" + requestJson);
+        ChatWithNPCMod.LOGGER.info("[chat-with-npc] Request roting: \n" + routing);
+        ChatWithNPCMod.LOGGER.info("[chat-with-npc] Request: \n" + requestJson);
 
         RequestConfig requestConfig = RequestConfig.custom()
                 .setConnectTimeout(10 * 1000)
@@ -42,22 +47,35 @@ public class Request {
         try (CloseableHttpClient client = HttpClients.custom()
                 .setDefaultRequestConfig(requestConfig)
                 .build()) {
-            HttpPost request = new HttpPost(url + routing);
-
-            // 设置请求头
-            for (Map.Entry<String, String> entry : headers.entrySet()) {
-                request.setHeader(entry.getKey(), entry.getValue());
-            }
+            HttpRequestBase request = getHttpRequestBase(routing, headers, action);
 
             // 构建请求体
-            if (requestJson != null) {
-                request.setEntity(new StringEntity(requestJson, "UTF-8"));
+            if (requestJson != null && request instanceof HttpPost) {
+                ((HttpPost) request).setEntity(new StringEntity(requestJson, "UTF-8"));
             }
 
             try (CloseableHttpResponse response = client.execute(request)) {
-                return EntityUtils.toString(response.getEntity());
+                String res = EntityUtils.toString(response.getEntity());
+                ChatWithNPCMod.LOGGER.info("[chat-with-npc] Response: \n" + res);
+                return res;
             }
         }
+    }
+
+    @NotNull
+    private static HttpRequestBase getHttpRequestBase(@NotNull String routing, @NotNull Map<String, String> headers, @NotNull Action action) {
+        HttpRequestBase request = null;
+        if (action == Action.GET) {
+            request = new HttpGet(url + routing);
+        } else if (action == Action.POST) {
+            request = new HttpPost(url + routing);
+        } else if (action == Action.DELETE) {
+            request = new HttpDelete(url + routing);
+        }
+        for (Map.Entry<String, String> entry : headers.entrySet()) {
+            request.setHeader(entry.getKey(), entry.getValue());
+        }
+        return request;
     }
 }
 

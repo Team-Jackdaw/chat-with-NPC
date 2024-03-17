@@ -14,15 +14,11 @@ public class LiveCycleManager {
     public static void start(long updateInterval) {
         // Check for out of time static data
         executorService = Executors.newSingleThreadScheduledExecutor();
-        executorService.scheduleAtFixedRate(() -> {
-            try {
-                LiveCycleManager.update();
-            } catch (Exception ignore) {
-            }
-        }, 0, updateInterval, TimeUnit.MILLISECONDS);
+        executorService.scheduleAtFixedRate(LiveCycleManager::update, 0, updateInterval, TimeUnit.MILLISECONDS);
     }
 
     public static void update() {
+        ChatWithNPCMod.LOGGER.info("[chat-with-npc] Updating conversations and environments.");
         ConversationManager.endOutOfTimeConversations();
         GroupManager.endOutOfTimeGroup();
     }

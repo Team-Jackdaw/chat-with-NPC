@@ -53,10 +53,6 @@ public class ConversationHandler {
         t.start();
     }
 
-    public void getResponse(String requestJson, boolean newAPI) {
-        if (!newAPI) getResponse(requestJson);
-    }
-
     private @NotNull String tryResponse(String requestJson, int times) throws Exception {
         Exception e = new Exception("Error getting response");
         if (times <= 0) throw e;
@@ -84,14 +80,15 @@ public class ConversationHandler {
             return;
         }
         setTalking(true);
+        sendWaitMessage();
         taskStack.addTask(() -> {
             try {
                 if (!npc.hasAssistant()) {
                     Assistant.createAssistant(npc);
+                } else {
+                    Assistant.modifyAssistant(npc);
                 }
-                if (!npc.hasThreadId()) {
-                    Threads.createThread(this);
-                }
+                if (!npc.hasThreadId()) Threads.createThread(this);
                 Threads.addMessage(npc.getThreadId(), "Hello!");
                 Run.run(this);
                 setTalking(false);
@@ -101,6 +98,7 @@ public class ConversationHandler {
                 setTalking(false);
             }
         });
+        updateTime = System.currentTimeMillis();
     }
 
     public void replyToEntity(String message, String playerName) {
@@ -119,8 +117,11 @@ public class ConversationHandler {
             return;
         }
         setTalking(true);
+        sendWaitMessage();
         taskStack.addTask(() -> {
             try {
+                if (!npc.hasAssistant()) Assistant.createAssistant(npc);
+                if(!npc.hasThreadId()) Threads.createThread(this);
                 Threads.addMessage(npc.getThreadId(), message);
                 Run.run(this);
                 setTalking(false);
@@ -130,6 +131,7 @@ public class ConversationHandler {
                 setTalking(false);
             }
         });
+        updateTime = System.currentTimeMillis();
     }
 
     public long getUpdateTime() {
@@ -196,5 +198,10 @@ public class ConversationHandler {
 
     public Record getMessageRecord() {
         return messageRecord;
+    }
+
+    public void discard() {
+        taskStack.shutdown();
+//        getLongTermMemory();
     }
 }

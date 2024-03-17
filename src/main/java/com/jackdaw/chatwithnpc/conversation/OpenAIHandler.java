@@ -18,7 +18,7 @@ public class OpenAIHandler {
      * @throws Exception If the request fails
      */
     public static @Nullable String sendRequest(String requestJson) throws Exception {
-        String res = Request.sendRequest(requestJson, roting, Header.buildDefault());
+        String res = Request.sendRequest(requestJson, roting, Header.buildDefault(), Request.Action.POST);
         JsonObject jsonObject = JsonParser.parseString(res).getAsJsonObject();
         try {
             return jsonObject.getAsJsonArray("choices")

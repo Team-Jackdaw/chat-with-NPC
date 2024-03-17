@@ -44,6 +44,7 @@ public class AsyncTaskStack {
     }
 
     public void shutdown() {
+        tasks.clear();
         workerThread.interrupt();
     }
 }

@@ -1,5 +1,6 @@
 package com.jackdaw.chatwithnpc.auxiliary.command;
 
+import com.jackdaw.chatwithnpc.ChatWithNPCMod;
 import com.jackdaw.chatwithnpc.LiveCycleManager;
 import com.jackdaw.chatwithnpc.auxiliary.configuration.SettingManager;
 import com.jackdaw.chatwithnpc.conversation.ConversationHandler;
@@ -7,6 +8,9 @@ import com.jackdaw.chatwithnpc.conversation.ConversationManager;
 import com.jackdaw.chatwithnpc.group.Group;
 import com.jackdaw.chatwithnpc.group.GroupManager;
 import com.jackdaw.chatwithnpc.npc.NPCEntity;
+import com.jackdaw.chatwithnpc.npc.NPCEntityManager;
+import com.jackdaw.chatwithnpc.openaiapi.Assistant;
+import com.jackdaw.chatwithnpc.openaiapi.Threads;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -130,6 +134,8 @@ public class CommandSet {
                         .then(literal("setInstructions")
                                 .then(argument("instructions", StringArgumentType.greedyString())
                                         .executes(CommandSet::setNPCInstructions)))
+                        .then(literal("update")
+                                .executes(CommandSet::npcUpdate))
                         .then(literal("clearMemory")
                                 .executes(CommandSet::clearNPCMemory))
                         .executes(CommandSet::npcStatus))
@@ -176,6 +182,27 @@ public class CommandSet {
                             return 1;
                         }))
         );
+    }
+
+    private static int npcUpdate(CommandContext<ServerCommandSource> context) {
+        ServerPlayerEntity player = context.getSource().getPlayer();
+        ConversationHandler conversation = ConversationManager.getConversation(player);
+        if (player != null && conversation != null) {
+            conversation = ConversationManager.getConversation(player);
+            if (conversation == null) return 0;
+            NPCEntity npc = conversation.getNpc();
+            npc.getDataManager().sync();
+            if (npc.hasAssistant()) {
+                conversation.taskStack.addTask(() -> {
+                    try {
+                        Assistant.modifyAssistant(npc);
+                    } catch (Exception e) {
+                        ChatWithNPCMod.LOGGER.error(e.getMessage());
+                    }
+                });
+            }
+        }
+        return 1;
     }
 
     private static int popTempEvent(CommandContext<ServerCommandSource> context) {
@@ -268,7 +295,19 @@ public class CommandSet {
             conversation = ConversationManager.getConversation(player);
             if (conversation == null) return 0;
             conversation.clearMessageRecord();
-            conversation.getNpc().deleteLongTermMemory(Long.MAX_VALUE);
+            NPCEntity npc = conversation.getNpc();
+            npc.deleteLongTermMemory(Long.MAX_VALUE);
+            if (npc.getThreadId() != null){
+                conversation.taskStack.addTask(() -> {
+                    try {
+                        Threads.discardThread(npc.getThreadId());
+                        npc.setThreadId(null);
+                        NPCEntityManager.getNPCEntity(npc.getUUID()).getDataManager().save();
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+            }
             player.sendMessage(Text.of("[chat-with-npc] Memory clear."), true);
             return 1;
         }
@@ -406,6 +445,7 @@ public class CommandSet {
                 .append("\n/npchat npc setBasicPrompt <prompt> - Set the basic prompt for the closest NPC.")
                 .append("\n/npchat npc setInstructions <instructions> - Set the instructions for the closest NPC.")
                 .append("\n/npchat npc clearMemory - Clear the memory for the closest NPC.")
+                .append("\n/npchat npc update - Update the properties of the closest NPC. The NPC will update to OpenAI api.")
                 .append("\n --------------------------------")
                 .append("\n/npchat group <group> - Group commands")
                 .append("\n/npchat group <group> setParent <parent> - Set the parent group for the group.")

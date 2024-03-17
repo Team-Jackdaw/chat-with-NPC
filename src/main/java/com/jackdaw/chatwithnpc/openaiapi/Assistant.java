@@ -1,6 +1,7 @@
 package com.jackdaw.chatwithnpc.openaiapi;
 
 import com.google.gson.Gson;
+import com.jackdaw.chatwithnpc.ChatWithNPCMod;
 import com.jackdaw.chatwithnpc.auxiliary.configuration.SettingManager;
 import com.jackdaw.chatwithnpc.npc.NPCEntity;
 import com.jackdaw.chatwithnpc.openaiapi.prompt.GroupPrompt;
@@ -29,11 +30,15 @@ public class Assistant {
         Map<String, String> createAssistantRequest = Map.of(
                 "name", npc.getName(),
                 "model", SettingManager.model,
-                "instructions", NPCPrompt.instructions(npc),
+                "instructions", NPCPrompt.description(npc) + GroupPrompt.getGroupsPrompt(npc.getGroup()) + NPCPrompt.instructions(npc),
                 "description", NPCPrompt.description(npc) + GroupPrompt.getGroupsPrompt(npc.getGroup())
         );
-        String res = Request.sendRequest(toJson(createAssistantRequest), "assistants", Header.buildBeta());
+        String res = Request.sendRequest(toJson(createAssistantRequest), "assistants", Header.buildBeta(), Request.Action.POST);
         String id = fromJson(res).id;
+        if (id == null) {
+            ChatWithNPCMod.LOGGER.error("[chat-with-npc] API error: " + res);
+            throw new Exception("Assistant id is null");
+        }
         npc.setAssistantId(id);
     }
 
@@ -42,9 +47,14 @@ public class Assistant {
         Map<String, String> modifyAssistantRequest = Map.of(
                 "name", npc.getName(),
                 "model", SettingManager.model,
-                "instructions", npc.getInstructions(),
-                "description", npc.getBasicPrompt()
+                "instructions", NPCPrompt.description(npc) + GroupPrompt.getGroupsPrompt(npc.getGroup()) + NPCPrompt.instructions(npc),
+                "description", NPCPrompt.description(npc) + GroupPrompt.getGroupsPrompt(npc.getGroup())
         );
-        String ignore = Request.sendRequest(toJson(modifyAssistantRequest), "assistants/" + npc.getAssistantId(), Header.buildBeta());
+        String res = Request.sendRequest(toJson(modifyAssistantRequest), "assistants/" + npc.getAssistantId(), Header.buildBeta(), Request.Action.POST);
+        String id = fromJson(res).id;
+        if (id == null) {
+            ChatWithNPCMod.LOGGER.error("[chat-with-npc] API error: " + res);
+            throw new Exception("Assistant id is null");
+        }
     }
 }
