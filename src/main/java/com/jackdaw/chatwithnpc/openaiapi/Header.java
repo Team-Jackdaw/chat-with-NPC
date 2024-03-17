@@ -5,13 +5,13 @@ import org.apache.http.HttpHeaders;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class Header {
-    private final Map<String, String> header;
+    private final Map<String, String> header = new HashMap<>();
 
     private Header() {
-        header = Map.of();
     }
 
     @Contract(value = " -> new", pure = true)

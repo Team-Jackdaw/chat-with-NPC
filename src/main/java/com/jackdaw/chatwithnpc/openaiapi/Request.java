@@ -45,10 +45,8 @@ public class Request {
             HttpPost request = new HttpPost(url + routing);
 
             // 设置请求头
-            if (headers != null) {
-                for (Map.Entry<String, String> entry : headers.entrySet()) {
-                    request.setHeader(entry.getKey(), entry.getValue());
-                }
+            for (Map.Entry<String, String> entry : headers.entrySet()) {
+                request.setHeader(entry.getKey(), entry.getValue());
             }
 
             // 构建请求体
