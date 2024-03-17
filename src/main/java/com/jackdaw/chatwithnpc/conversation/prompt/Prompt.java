@@ -1,7 +1,6 @@
 package com.jackdaw.chatwithnpc.conversation.prompt;
 
 import com.google.gson.Gson;
-import com.jackdaw.chatwithnpc.ChatWithNPCMod;
 import com.jackdaw.chatwithnpc.auxiliary.configuration.SettingManager;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -10,12 +9,9 @@ import java.util.ArrayList;
 import java.util.Map;
 
 public final class Prompt {
-
-    private final String systemMessage;
     private final ArrayList<Map<String, String>> messages = new ArrayList<>();
 
-    Prompt(String systemMessage, ArrayList<Map<String, String>> messages) {
-        this.systemMessage = systemMessage;
+    Prompt(ArrayList<Map<String, String>> messages) {
         this.messages.addAll(messages);
     }
 
@@ -26,12 +22,7 @@ public final class Prompt {
 
     public String toRequestJson() {
         Gson gson = new Gson();
-        ChatWithNPCMod.LOGGER.debug("[chat-with-npc] Draft Request: \n" + gson.toJson(this));
         return gson.toJson(new Request(this.messages));
-    }
-
-    public String getSystemMessage() {
-        return systemMessage;
     }
 
     private final static class Request {

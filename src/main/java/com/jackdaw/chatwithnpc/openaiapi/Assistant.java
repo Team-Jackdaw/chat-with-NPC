@@ -1,62 +1,63 @@
 package com.jackdaw.chatwithnpc.openaiapi;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.jackdaw.chatwithnpc.auxiliary.configuration.SettingManager;
-import org.apache.http.HttpHeaders;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
+import com.jackdaw.chatwithnpc.npc.NPCEntity;
+import com.jackdaw.chatwithnpc.openaiapi.prompt.GroupPrompt;
+import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
-import java.lang.reflect.Type;
 import java.util.Map;
 
 public class Assistant {
+
+    private String id;
     private String name;
     private String instructions;
-    private final String model = SettingManager.model;
-    private String id;
-
-
-    public Assistant(String name, String instructions) {
-        this.name = name;
-        this.instructions = instructions;
-    }
+    private String description;
+    private String model;
 
     private static String toJson(Map<String, String> map) {
         return new Gson().toJson(map);
     }
 
-    public void createAssistant() {
+    private static Assistant fromJson(String json) {
+        return new Gson().fromJson(json, Assistant.class);
+    }
+
+    public static void createAssistant(@NotNull NPCEntity npc) {
         Map<String, String> createAssistantRequest = Map.of(
-                "name", name,
-                "model", model,
-                "instructions", instructions
+                "name", npc.getName(),
+                "model", SettingManager.model,
+                "instructions", npc.getInstructions(),
+                "description", npc.getBasicPrompt() + GroupPrompt.getGroupsPrompt(npc.getGroup())
         );
         java.lang.Thread t = new java.lang.Thread(() -> {
-            try (CloseableHttpClient client = HttpClients.createDefault()) {
-                HttpPost request = new HttpPost("https://api.openai.com/v1/assistants");
-                request.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + SettingManager.apiKey);
-                request.setHeader(HttpHeaders.CONTENT_TYPE, "application/json");
-                request.setEntity(new StringEntity(toJson(createAssistantRequest), "UTF-8"));
-                try (CloseableHttpResponse response = client.execute(request)) {
-                    String res =  EntityUtils.toString(response.getEntity());
-                    Gson gson = new Gson();
-                    Type type = new TypeToken<Map<String, String>>() {}.getType();
-                    Map<String, String> map = gson.fromJson(res, type);
-                    createCallback(map);
-                }
-            } catch (IOException e) {
+            try {
+                String res = Request.sendRequest(toJson(createAssistantRequest), "assistants", Header.buildBeta());
+                String id = fromJson(res).id;
+                npc.setAssistantId(id);
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         });
+        t.start();
     }
 
-    private void createCallback(Map<String, String> response) {
-
+    public static void modifyAssistant(@NotNull NPCEntity npc) {
+        if (npc.getAssistantId() == null) return;
+        Map<String, String> modifyAssistantRequest = Map.of(
+                "name", npc.getName(),
+                "model", SettingManager.model,
+                "instructions", npc.getInstructions(),
+                "description", npc.getBasicPrompt()
+        );
+        java.lang.Thread t = new java.lang.Thread(() -> {
+            try {
+                String ignore = Request.sendRequest(toJson(modifyAssistantRequest), "assistants/" + npc.getAssistantId(), Header.buildBeta());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+        t.start();
     }
 }

@@ -16,7 +16,6 @@ import java.util.Map;
 public class Builder {
 
     final ArrayList<Map<String, String>> messages = new ArrayList<>();
-    private final StringBuilder systemMessage = new StringBuilder();
 
     @Contract(pure = true)
     static @NotNull String role2String(Record.Role role) {
@@ -32,7 +31,7 @@ public class Builder {
 
     public Builder fromNPC(@NotNull NPCEntity npc) {
         ArrayList<Map<Long, String>> longTermMemory = npc.getLongTermMemory();
-        return addInitialMessage(npc.getName(), npc.getType(), npc.getCareer(), npc.getBasicPrompt())
+        return addInitialMessage(npc.getName(), npc.getType(), npc.getCareer(), npc.getBasicPrompt() + npc.getInstructions())
                 .addGroupMessages(npc.getGroup())
                 .addLongTermMemoryMessages(longTermMemory);
     }
@@ -50,7 +49,6 @@ public class Builder {
         String basicInfo = "You are an NPC with type `" + npcType + "` and named `" + npcName + "`. ";
         String npcCareerPrompt = "You career is `" + npcCareer + "`. ";
         String languagePrompt = "You can only use `" + SettingManager.language + "` language to communicate. ";
-        this.systemMessage.append(basicInfo).append(npcCareerPrompt).append(npcBasicPrompt).append(languagePrompt);
         this.messages.add(Map.of("role", "system", "content", basicInfo + npcCareerPrompt + npcBasicPrompt + languagePrompt));
         return this;
     }
@@ -112,7 +110,7 @@ public class Builder {
     }
 
     public Prompt build() {
-        return new Prompt(this.systemMessage.toString(), this.messages);
+        return new Prompt(this.messages);
     }
 
 }

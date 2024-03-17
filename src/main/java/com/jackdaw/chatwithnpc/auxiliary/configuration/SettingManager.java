@@ -72,7 +72,7 @@ public class SettingManager {
     }
 
     private static final class Config {
-        private String lastVersion = "v2.4";
+        private final String lastVersion = "v2.4";
         private boolean enabled = true;
         private double range = 10.0;
         private long forgetTime = 604800000;

@@ -24,11 +24,14 @@ import java.util.UUID;
  */
 public abstract class NPCEntity {
 
+    protected final String name;
     protected final Entity entity;
     protected final UUID uuid;
-    protected final String name;
+    protected String assistantId;
+    protected String ThreadId;
     protected String career = "unemployed";
     protected String basicPrompt = "You are an NPC.";
+    protected String instructions = "";
     protected String group = "Global";
     protected ArrayList<Map<Long, String>> longTermMemory = new ArrayList<>();
     protected TextBubbleEntity textBubble;
@@ -100,6 +103,24 @@ public abstract class NPCEntity {
      */
     public void setBasicPrompt(String basicPrompt) {
         this.basicPrompt = basicPrompt;
+    }
+
+    /**
+     * 获取对NPC的指示，该信息应该作为该NPC的基本信息之一。
+     *
+     * @return 对NPC的指示
+     */
+    public String getInstructions() {
+        return this.instructions;
+    }
+
+    /**
+     * 设置对NPC的指示，该信息应该作为该NPC的基本信息之一。
+     *
+     * @param instructions 对NPC的指示
+     */
+    public void setInstructions(String instructions) {
+        this.instructions = instructions;
     }
 
     /**
@@ -238,5 +259,59 @@ public abstract class NPCEntity {
         this.randomForget();
         this.getDataManager().save();
         this.textBubble.discard();
+    }
+
+    /**
+     * 查看是否已经注册了助手。
+     *
+     * @return 是否已经注册了助手
+     */
+    public boolean hasAssistant() {
+        return this.assistantId != null;
+    }
+
+    /**
+     * 获取NPC的助手ID。
+     *
+     * @return NPC的助手ID
+     */
+    public String getAssistantId() {
+        return this.assistantId;
+    }
+
+    /**
+     * 设置NPC的助手ID。
+     *
+     * @param id 助手ID
+     */
+    public void setAssistantId(String id) {
+        this.assistantId = id;
+    }
+
+    /**
+     * 获取当前会话的线程ID。
+     *
+     * @return 当前会话的线程ID
+     */
+    public String getThreadId() {
+        return ThreadId;
+    }
+
+    /**
+     * 设置当前会话的线程ID。
+     *
+     * @param threadId 当前会话的线程ID
+     */
+    public void setThreadId(String threadId) {
+        ThreadId = threadId;
+    }
+
+    /**
+     * 查看是否已经注册了线程。
+     *
+     * @return 是否已经注册了线程
+     */
+    public boolean hasThreadId() {
+        return ThreadId != null;
     }
 }

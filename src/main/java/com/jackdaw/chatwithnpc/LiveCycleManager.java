@@ -21,6 +21,7 @@ public class LiveCycleManager {
             }
         }, 0, updateInterval, TimeUnit.MILLISECONDS);
     }
+
     public static void update() {
         ConversationManager.endOutOfTimeConversations();
         GroupManager.endOutOfTimeGroup();

@@ -82,16 +82,22 @@ public class NPCDataManager {
 
     private static final class NPCData {
         private final String name;
+        private final String assistantID;
+        private final String threadID;
         private final String careers;
         private final String localGroup;
         private final String basicPrompt;
+        private final String instruction;
         private final ArrayList<Map<Long, String>> longTermMemory;
 
         private NPCData(NPCEntity npc) {
             this.name = npc.getName();
+            this.assistantID = npc.getAssistantId();
+            this.threadID = npc.getThreadId();
             this.careers = npc.getCareer();
             this.localGroup = npc.getGroup();
             this.basicPrompt = npc.getBasicPrompt();
+            this.instruction = npc.getInstructions();
             this.longTermMemory = new ArrayList<>(npc.getLongTermMemory());
         }
 
@@ -101,9 +107,12 @@ public class NPCDataManager {
         }
 
         private void set(NPCEntity npc) {
+            npc.setAssistantId(assistantID);
+            npc.setThreadId(threadID);
             npc.setCareer(careers);
             npc.setGroup(localGroup);
             npc.setBasicPrompt(basicPrompt);
+            npc.setInstructions(instruction);
             npc.setLongTermMemory(longTermMemory);
         }
     }
