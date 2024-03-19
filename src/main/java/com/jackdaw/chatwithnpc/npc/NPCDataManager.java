@@ -57,7 +57,7 @@ public class NPCDataManager {
         }
         try {
             String json = new String(Files.readAllBytes(theFile.toPath()));
-            NPCData data = new Gson().fromJson(json, NPCData.class);
+            NPCData data = NPCData.fromJson(json);
             data.set(npc);
         } catch (IOException e) {
             logger.error("[chat-with-npc] Can't open the data file.");
@@ -87,6 +87,7 @@ public class NPCDataManager {
         private final String careers;
         private final String localGroup;
         private final String basicPrompt;
+        private final boolean needMemory;
         private final String instruction;
         private final ArrayList<Map<Long, String>> longTermMemory;
 
@@ -98,12 +99,8 @@ public class NPCDataManager {
             this.localGroup = npc.getGroup();
             this.basicPrompt = npc.getBasicPrompt();
             this.instruction = npc.getInstructions();
+            this.needMemory = npc.isNeedMemory();
             this.longTermMemory = new ArrayList<>(npc.getLongTermMemory());
-        }
-
-        private String toJson() {
-            Gson gson = new Gson();
-            return gson.toJson(this);
         }
 
         private void set(NPCEntity npc) {
@@ -113,7 +110,18 @@ public class NPCDataManager {
             npc.setGroup(localGroup);
             npc.setBasicPrompt(basicPrompt);
             npc.setInstructions(instruction);
+            npc.setNeedMemory(needMemory);
             npc.setLongTermMemory(longTermMemory);
+        }
+
+        private String toJson() {
+            Gson gson = new Gson();
+            return gson.toJson(this);
+        }
+
+        private static NPCData fromJson(String json) {
+            Gson gson = new Gson();
+            return gson.fromJson(json, NPCData.class);
         }
     }
 }
