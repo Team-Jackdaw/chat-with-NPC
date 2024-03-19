@@ -35,8 +35,10 @@ public class Request {
      */
     public static @NotNull String sendRequest(@Nullable String requestJson, @NotNull String routing, @NotNull Map<String, String> headers, @NotNull Action action) throws Exception {
         updateSetting();
-        ChatWithNPCMod.LOGGER.info("[chat-with-npc] Request roting: \n" + routing);
-        ChatWithNPCMod.LOGGER.info("[chat-with-npc] Request: \n" + requestJson);
+        if (ChatWithNPCMod.debug) {
+            ChatWithNPCMod.LOGGER.info("[chat-with-npc] Request roting: \n" + routing);
+            ChatWithNPCMod.LOGGER.info("[chat-with-npc] Request: \n" + requestJson);
+        }
 
         RequestConfig requestConfig = RequestConfig.custom()
                 .setConnectTimeout(10 * 1000)
@@ -56,7 +58,9 @@ public class Request {
 
             try (CloseableHttpResponse response = client.execute(request)) {
                 String res = EntityUtils.toString(response.getEntity());
-                ChatWithNPCMod.LOGGER.info("[chat-with-npc] Response: \n" + res);
+                if (ChatWithNPCMod.debug) {
+                    ChatWithNPCMod.LOGGER.info("[chat-with-npc] Response: \n" + res);
+                }
                 return res;
             }
         }

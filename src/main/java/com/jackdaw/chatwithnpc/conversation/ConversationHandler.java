@@ -18,9 +18,9 @@ public class ConversationHandler {
     long updateTime = 0L;
     public AsyncTaskStack taskStack = new AsyncTaskStack();
 
-    public ConversationHandler(@NotNull NPCEntity npc) {
+    public ConversationHandler(@NotNull NPCEntity npc, boolean newAPI) {
         this.npc = npc;
-        startConversation(true);
+        startConversation(newAPI);
     }
 
     private void sendWaitMessage() {
@@ -37,7 +37,7 @@ public class ConversationHandler {
             return;
         }
         setTalking(true);
-        Thread t = new Thread(() -> {
+        taskStack.addTask(() -> {
             try {
                 String response;
                 response = tryResponse(requestJson, 3);
@@ -50,7 +50,6 @@ public class ConversationHandler {
                 ChatWithNPCMod.LOGGER.error(e.getMessage());
             }
         });
-        t.start();
     }
 
     private @NotNull String tryResponse(String requestJson, int times) throws Exception {
@@ -202,6 +201,8 @@ public class ConversationHandler {
 
     public void discard() {
         taskStack.shutdown();
-//        getLongTermMemory();
+        if (!ChatWithNPCMod.newAPI) {
+            getLongTermMemory();
+        }
     }
 }

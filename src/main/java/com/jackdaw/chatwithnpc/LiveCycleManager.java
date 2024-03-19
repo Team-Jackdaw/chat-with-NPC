@@ -18,13 +18,17 @@ public class LiveCycleManager {
     }
 
     public static void update() {
-        ChatWithNPCMod.LOGGER.info("[chat-with-npc] Updating conversations and environments.");
+        if (ChatWithNPCMod.debug) {
+            ChatWithNPCMod.LOGGER.info("[chat-with-npc] Updating conversations and environments.");
+        }
         ConversationManager.endOutOfTimeConversations();
         GroupManager.endOutOfTimeGroup();
     }
 
     public static void saveAll() {
-        ChatWithNPCMod.LOGGER.info("[chat-with-npc] Saving all conversations, NPC entities, and environments.");
+        if (ChatWithNPCMod.debug) {
+            ChatWithNPCMod.LOGGER.info("[chat-with-npc] Saving all conversations, NPC entities, and environments.");
+        }
         try {
             ConversationManager.endAllConversations();
             GroupManager.endAllEnvironments();

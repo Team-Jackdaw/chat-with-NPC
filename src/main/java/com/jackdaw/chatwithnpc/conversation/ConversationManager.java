@@ -29,14 +29,14 @@ public class ConversationManager {
      *
      * @param entity The Entity to start a conversation with
      */
-    public static void startConversation(Entity entity, boolean isOP) {
+    public static void startConversation(Entity entity, boolean isOP, boolean newAPI) {
         NPCEntityManager.registerNPCEntity(entity, isOP);
         NPCEntity npc = NPCEntityManager.getNPCEntity(entity.getUuid());
         if (npc == null) return;
         if (isConversing(npc)) {
             return;
         }
-        ConversationHandler conversationHandler = new ConversationHandler(npc);
+        ConversationHandler conversationHandler = new ConversationHandler(npc, newAPI);
         conversationMap.put(npc.getUUID(), conversationHandler);
     }
 
