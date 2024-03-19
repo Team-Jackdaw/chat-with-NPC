@@ -96,6 +96,9 @@ public class CommandSet {
                         .then(literal("setBackground")
                                 .then(argument("prompt", StringArgumentType.greedyString())
                                         .executes(CommandSet::setNPCPrompt)))
+                        .then(literal("isNeedMemory")
+                                .then(argument("isNeedMemory", BoolArgumentType.bool())
+                                        .executes(CommandSet::setNeedMemory)))
                         .then(literal("clearMemory")
                                 .executes(CommandSet::clearNPCMemory))
                         .executes(CommandSet::npcStatus))
@@ -382,11 +385,25 @@ public class CommandSet {
         return 1;
     }
 
+    private static int setNeedMemory(@NotNull CommandContext<ServerCommandSource> context) {
+        ServerPlayerEntity player = context.getSource().getPlayer();
+        ConversationHandler conversation = ConversationManager.getConversation(player);
+        if (player != null && conversation != null) {
+            boolean isNeedMemory = context.getArgument("isNeedMemory", Boolean.class);
+            conversation.getNpc().setNeedMemory(isNeedMemory);
+            player.sendMessage(Text.of("[chat-with-npc] Need memory set."), true);
+            return 1;
+        }
+        if (player != null) {
+            player.sendMessage(Text.of("[chat-with-npc] You are not in a conversation."), true);
+        }
+        return 0;
+    }
+
     private static int clearNPCMemory(@NotNull CommandContext<ServerCommandSource> context) {
         ServerPlayerEntity player = context.getSource().getPlayer();
-        if (player != null && ConversationManager.getConversation(player) != null) {
-            ConversationHandler conversation = ConversationManager.getConversation(player);
-            if (conversation == null) return 0;
+        ConversationHandler conversation = ConversationManager.getConversation(player);
+        if (player != null && conversation != null) {
             conversation.clearMessageRecord();
             conversation.getNpc().deleteLongTermMemory(Long.MAX_VALUE);
             player.sendMessage(Text.of("[chat-with-npc] Memory clear."), true);
@@ -400,10 +417,9 @@ public class CommandSet {
 
     private static int setNPCPrompt(@NotNull CommandContext<ServerCommandSource> context) {
         ServerPlayerEntity player = context.getSource().getPlayer();
-        String prompt = context.getArgument("prompt", String.class);
-        if (player != null && ConversationManager.getConversation(player) != null) {
-            ConversationHandler conversation = ConversationManager.getConversation(player);
-            if (conversation == null) return 0;
+        ConversationHandler conversation = ConversationManager.getConversation(player);
+        if (player != null && conversation!= null) {
+            String prompt = context.getArgument("prompt", String.class);
             conversation.getNpc().setBasicPrompt(prompt);
             player.sendMessage(Text.of("[chat-with-npc] Background set."), true);
             return 1;
@@ -416,10 +432,9 @@ public class CommandSet {
 
     private static int setNPCGroup(@NotNull CommandContext<ServerCommandSource> context) {
         ServerPlayerEntity player = context.getSource().getPlayer();
-        String group = context.getArgument("group", String.class);
-        if (player != null && ConversationManager.getConversation(player) != null) {
-            ConversationHandler conversation = ConversationManager.getConversation(player);
-            if (conversation == null) return 0;
+        ConversationHandler conversation = ConversationManager.getConversation(player);
+        if (player != null && conversation != null) {
+            String group = context.getArgument("group", String.class);
             conversation.getNpc().setGroup(group);
             player.sendMessage(Text.of("[chat-with-npc] Group set."), true);
             return 1;
@@ -432,10 +447,9 @@ public class CommandSet {
 
     private static int setNPCCareer(@NotNull CommandContext<ServerCommandSource> context) {
         ServerPlayerEntity player = context.getSource().getPlayer();
-        String career = context.getArgument("career", String.class);
-        if (player != null && ConversationManager.getConversation(player) != null) {
-            ConversationHandler conversation = ConversationManager.getConversation(player);
-            if (conversation == null) return 0;
+        ConversationHandler conversation = ConversationManager.getConversation(player);
+        if (player != null && conversation != null) {
+            String career = context.getArgument("career", String.class);
             conversation.getNpc().setCareer(career);
             player.sendMessage(Text.of("[chat-with-npc] Career set."), true);
             return 1;

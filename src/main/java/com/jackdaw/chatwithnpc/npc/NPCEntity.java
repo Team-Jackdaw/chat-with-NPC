@@ -30,6 +30,7 @@ public abstract class NPCEntity {
     protected String career = "unemployed";
     protected String basicPrompt = "You are an NPC.";
     protected String group = "Global";
+    protected boolean needMemory = true;
     protected ArrayList<Map<Long, String>> longTermMemory = new ArrayList<>();
     protected TextBubbleEntity textBubble;
 
@@ -229,6 +230,22 @@ public abstract class NPCEntity {
                 longTermMemory.removeIf(m -> m.keySet().stream().anyMatch(t -> t == time));
             }
         }
+    }
+
+    /**
+     * 设置NPC是否需要记忆，该记忆应该是NPC的特征之一。
+     * @return NPC是否需要记忆
+     */
+    public boolean isNeedMemory() {
+        return needMemory;
+    }
+
+    /**
+     * 设置NPC是否需要记忆，该记忆应该是NPC的特征之一。
+     * @param needMemory NPC是否需要记忆
+     */
+    public void setNeedMemory(boolean needMemory) {
+        this.needMemory = needMemory;
     }
 
     /**
