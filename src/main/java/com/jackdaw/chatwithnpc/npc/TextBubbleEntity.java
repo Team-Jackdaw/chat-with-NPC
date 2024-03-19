@@ -8,15 +8,13 @@ import net.minecraft.text.Text;
 import org.jetbrains.annotations.NotNull;
 
 
-
-
 public class TextBubbleEntity extends TextDisplayEntity {
 
     private final Entity speaker;
     private final double textSizeY = 0.55D;
-    private long lastUpdateTime = 0L;
     private final long displayTimeOut = 10000L;
-    
+    private long lastUpdateTime = 0L;
+
     public TextBubbleEntity(@NotNull Entity speaker) {
         super(EntityType.TEXT_DISPLAY, speaker.world);
         this.speaker = speaker;

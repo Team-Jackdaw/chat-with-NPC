@@ -20,33 +20,35 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ConversationManager {
 
+    public static final ConcurrentHashMap<UUID, ConversationHandler> conversationMap = new ConcurrentHashMap<>();
     // The time in milliseconds that a conversation is considered out of time
     private static final long outOfTime = ChatWithNPCMod.outOfTime;
-    public static final ConcurrentHashMap<UUID, ConversationHandler> conversationMap = new ConcurrentHashMap<>();
 
     /**
      * Start a conversation for Player with an NPC
+     *
      * @param entity The Entity to start a conversation with
      */
-    public static void startConversation(Entity entity, boolean isOP) {
+    public static void startConversation(Entity entity, boolean isOP, boolean newAPI) {
         NPCEntityManager.registerNPCEntity(entity, isOP);
         NPCEntity npc = NPCEntityManager.getNPCEntity(entity.getUuid());
         if (npc == null) return;
         if (isConversing(npc)) {
             return;
         }
-        ConversationHandler conversationHandler = new ConversationHandler(npc);
+        ConversationHandler conversationHandler = new ConversationHandler(npc, newAPI);
         conversationMap.put(npc.getUUID(), conversationHandler);
     }
 
     public static void endConversation(UUID uuid) {
-        conversationMap.get(uuid).getLongTermMemory();
+        conversationMap.get(uuid).discard();
         NPCEntityManager.removeNPCEntity(uuid);
         conversationMap.remove(uuid);
     }
 
     /**
      * Get the conversation with a specific UUID
+     *
      * @param uuid The UUID of the conversation
      * @return The conversation with the UUID
      */
@@ -56,6 +58,7 @@ public class ConversationManager {
 
     /**
      * Get the closest conversation to a player
+     *
      * @param player The player to check
      * @return The closest conversation to the player
      */
@@ -71,6 +74,7 @@ public class ConversationManager {
 
     /**
      * Check if an NPC is chatting
+     *
      * @param npcEntity The NPC to check
      * @return True if the NPC is chatting, false otherwise
      */
@@ -100,6 +104,7 @@ public class ConversationManager {
 
     /**
      * Check if there is a Conversation nearby
+     *
      * @param player The player to check
      * @return True if there is a Conversation nearby, false otherwise
      */
@@ -110,6 +115,7 @@ public class ConversationManager {
 
     /**
      * Get all conversations within a certain range of a player
+     *
      * @param player The player to check
      * @return A list of Conversations within the range of the player
      */
@@ -121,8 +127,9 @@ public class ConversationManager {
 
     /**
      * Get all Entities within a certain range of a player
+     *
      * @param player The player to check
-     * @param range The range to check
+     * @param range  The range to check
      * @return A list of Entities within the range of the player
      */
     public static List<Entity> getEntitiesInRange(@NotNull PlayerEntity player, double range) {

@@ -2,11 +2,13 @@
 
 ## 1. NPC 的基本命令
 
-- `/npchat npc` - 离你最近的已激活 NPC 的状态。
-- `/npchat npc setCareer <career>` - 为离你最近的 NPC 设置职业。
-- `/npchat npc setGroup <group>` - 为离你最近的 NPC 设置组。
-- `/npchat npc setBackground <prompt>` - 为离你最近的 NPC 设置他的背景故事。
-- `/npchat npc clearMemory` - 清除离你最近的 NPC 的所有记忆，包括长期记忆和当前会话记录。
+- `/npchat npc` - 最近的 NPC 的状态。
+- `/npchat npc setCareer <career>` - 为最近的 NPC 设置 `职业`。
+- `/npchat npc setGroup <group>` - 为最近的 NPC 设置 `组`。
+- `/npchat npc setInstructions <instructions>` - 为最近的 NPC 设置 `基础设定`。
+- `/npchat npc isNeedMemory <isNeedMemory>` - 设置最近的 NPC 是否记录记忆。
+- `/npchat npc clearMemory` - 清除最近的 NPC 的记忆。
+- `/npchat npc update` - 上传最近的 NPC 的当前信息到 OpenAi。
 
 ## 2. 注册 NPC 的步骤
 
@@ -18,12 +20,13 @@
 
 3. **设置职业**：您可以使用命令 `/npchat npc setCareer <career>` 为 NPC 设置 `职业`。
 4. **设置组**：您可以使用命令 `/npchat npc setGroup <group>` 为 NPC 设置 `组`。要注册新组，请阅读 [RegisterGroup](RegisterGroup_zh.md)。
-5. **设置背景**：您可以使用命令 `/npchat npc setBackground <prompt>` 为 NPC 设置 `BasicPrompt`。
-6. **清除记忆**：您可以使用命令 `/npchat npc clearMemory` 你也许希望清除 NPC 的所有记忆。
+5. **设置背景**：您可以使用命令 `/npchat npc setInstructions <instructions>` 为 NPC 设置 `基础设定`。
+6. **更新设置到 OpenAI**：您可以使用命令 `/npchat npc update` 将 NPC 的当前信息上传到 OpenAI。
+7. **清除记忆**：您可以使用命令 `/npchat npc clearMemory` 你也许希望清除 NPC 的所有记忆。
 
     >![set NPC](images/newnpc.png)
 
-7. **重新载入插件并保存数据**: 你也许需要使用 `/npchat reload` 立即重新载入插件并保存这个新的NPC数据（注意，这同时也会卸载其他所有会话）。
+8. **重新载入插件并保存数据**: 你也许需要使用 `/npchat reload` 立即重新载入插件并保存这个新的NPC数据（注意，这同时也会卸载其他所有会话）。
 
 这时你完成了一个 NPC 的注册。
 
@@ -39,6 +42,24 @@
 1. `name`: `Aldred`
 2. `career`: `Archbishop`
 3. `group`: `SkeyCity`
-4. `background`:
+4. `isNeedMemory`: `true`
+5. `background`:
     >Born in a small village, you rose from monk to Archbishop of ScotEmpire through wisdom and compassion. You reformed church practices, making them relatable to the populace, and bridged the gap between religious and secular realms, promoting peace and unity throughout the empire.
+   
+## 5. 配置文件
 
+NPC 的配置文件存储在插件目录下的 `npc` 文件夹中。文件名为 `<UUID>.json`。文件内容如下：
+
+```json
+{
+  "name": "Alvin",
+  "threadID": "thrd_XXXX",
+  "assistantID": "asst_XXXX",
+  "careers": "officer",
+  "localGroup": "SkeyCity",
+  "isNeedMemory": true,
+  "background": "Born in a small village, you rose from monk to Archbishop of ScotEmpire through wisdom and compassion. You reformed church practices, making them relatable to the populace, and bridged the gap between religious and secular realms, promoting peace and unity throughout the empire."
+}
+```
+
+_请注意_：请在加载对话之前修改文件。

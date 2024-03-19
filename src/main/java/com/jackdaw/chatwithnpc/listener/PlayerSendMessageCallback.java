@@ -20,7 +20,7 @@ public interface PlayerSendMessageCallback {
                 for (PlayerSendMessageCallback listener : listeners) {
                     ActionResult result = listener.interact(player, message);
 
-                    if(result != ActionResult.PASS) {
+                    if (result != ActionResult.PASS) {
                         return result;
                     }
                 }

@@ -1,6 +1,47 @@
 # 设定
 
-## 1. 介绍
+## 1. 配置文件
+
+插件的配置文件存储在插件目录下的`chat-with-npc`文件夹中，文件名为`config.json`。文件的内容如下：
+
+```json
+{
+  "lastVersion": "v2.4",
+  "enabled": true,
+  "range": 10.0,
+  "forgetTime": 86400000,
+  "language": "Chinese",
+  "apiKey": "sk-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+  "model": "gpt-3.5-turbo",
+  "apiURL": "api.openai.com",
+  "isBubble": true,
+  "isChatBar": true,
+  "maxTokens": 512
+}
+```
+
+您可以设置以下参数：
+
+- `range`：玩家可以看到和与NPC交谈的距离。
+- `forgetTime`：遗忘`longTermMemory`的时间。
+- `language`：NPC用来与玩家交谈的语言。
+- `model`：OpenAI的模型。
+- `apiURL`：您可以使用代理访问OpenAI API。（适合在中国大陆地区使用本mod的服务器）
+- `maxTokens`：每次对话使用的最大令牌数。
+- `isBubble`：是否在NPC上方显示气泡。
+- `isChatBar`：是否在玩家的聊天栏中显示NPC的聊天。
+
+## 2. 在OpenAI平台中管理您的助手
+
+一旦您创建了一个新的NPC，您将在OpenAI平台中看到助手如下：
+
+![Assistant](images/assistant.png)
+
+您可以访问OpenAI平台来管理、使用和测试您的NPC，[OpenAI平台助手](https://platform.openai.com/assistants)。
+
+**重要：您还必须在插件目录下的NPC配置文件中设置所有内容。否则你会失去所有设定。**
+
+## 3. 介绍
 
 本文档是关于插件一些基础设定的说明，这些基础设定可以很好的帮助用户使用本插件，或者在许可证范围内进行二次开发。该插件有以下部分：
 
@@ -13,7 +54,7 @@
 
 - 本插件所有时间均以**毫秒**为单位， 由`Long`类型记录。
 
-## 2. Conversation管理器
+## 4. Conversation管理器
 
 Conversation管理器是插件的核心部分，它负责管理所有的对话。Conversation的主要设定有：
 
@@ -25,7 +66,7 @@ Conversation管理器是插件的核心部分，它负责管理所有的对话�
 - 也就是说`NPCEntity`的生命周期由`ConversationManager`管理，并依附于`ConversationHandler`（暂时）。
 - `ConversationHandler`的生命周期由插件生命周期管理器管理。
 
-## 3. Group管理器
+## 5. Group管理器
 
 Group管理器负责管理所有的Group，Group的主要设定有：
 
@@ -40,12 +81,12 @@ Group管理器负责管理所有的Group，Group的主要设定有：
 - `Group`的`permanentPrompt`是一个**永久**事件合集，OP使用指令添加一个永久事件后，该事件将会一直存在直到OP使用指令删除该事件。
 - `Group`的`parentGroup`是一个父Group，一般情况下，所有`Group`最终将会指向`Global`。
 
-## 4. NPCEntity管理器
+## 6. NPCEntity管理器
 
 NPCEntity管理器负责管理所有的NPCEntity，NPCEntity的主要设定有：
 
 - `NPCEntityManager`储存所有的`NPCEntity`，并提供激活、提取、删除NPCEntity的方法。
-- `NPCEntity`包含一个`TextBubbleEntity`，以及一些设定`Career`, `basicPrompt`, `Group`, `longTermMemory`。
+- `NPCEntity`包含一个`TextBubbleEntity`，以及一些设定`Career`, `instructions`, `Group`, `longTermMemory`。
 - `NPCEntity`在`ConversationHandler`被激活时激活，被卸载时卸载，生命周期由`ConversationManager`管理。
 
 其他设定：
@@ -54,7 +95,7 @@ NPCEntity管理器负责管理所有的NPCEntity，NPCEntity的主要设定有�
 - `NPCEntity`的`TextBubbleEntity`是一个文本气泡，由`NPCEntity`管理，它会在NPC被激活时被加载，被卸载时卸载。
 - `TextBubbleEntity`会显示在NPC的上方**0.55格**处，当NPC回复玩家时，气泡会正常显示**10秒钟**，然后变成透明，但不会被卸载（待修改）。
 
-## 5. 生命周期管理器
+## 7. 生命周期管理器
 
 生命周期管理器负责管理所有`ConversationHandler`和`Group`的生命周期，它的主要设定有：
 

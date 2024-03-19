@@ -1,17 +1,39 @@
 package com.jackdaw.chatwithnpc.conversation.prompt;
 
-public class Prompt {
+import com.google.gson.Gson;
+import com.jackdaw.chatwithnpc.auxiliary.configuration.SettingManager;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
-    private final String systemMessage;
-    Prompt(String systemMessage) {
-        this.systemMessage = systemMessage;
+import java.util.ArrayList;
+import java.util.Map;
+
+public final class Prompt {
+    private final ArrayList<Map<String, String>> messages = new ArrayList<>();
+
+    Prompt(ArrayList<Map<String, String>> messages) {
+        this.messages.addAll(messages);
     }
 
-    public String getInitialPrompt() {
-        return systemMessage;
-    }
-
-    public static Builder builder() {
+    @Contract(" -> new")
+    public static @NotNull Builder builder() {
         return new Builder();
+    }
+
+    public String toRequestJson() {
+        Gson gson = new Gson();
+        return gson.toJson(new Request(this.messages));
+    }
+
+    private final static class Request {
+        private final ArrayList<Map<String, String>> messages = new ArrayList<>();
+        private final int max_tokens;
+        private final String model;
+
+        Request(ArrayList<Map<String, String>> messages) {
+            this.max_tokens = SettingManager.maxTokens;
+            this.model = SettingManager.model;
+            this.messages.addAll(messages);
+        }
     }
 }

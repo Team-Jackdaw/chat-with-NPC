@@ -1,71 +1,116 @@
 package com.jackdaw.chatwithnpc.conversation.prompt;
 
 import com.jackdaw.chatwithnpc.auxiliary.configuration.SettingManager;
+import com.jackdaw.chatwithnpc.conversation.ConversationHandler;
+import com.jackdaw.chatwithnpc.conversation.Record;
 import com.jackdaw.chatwithnpc.group.Group;
 import com.jackdaw.chatwithnpc.group.GroupManager;
 import com.jackdaw.chatwithnpc.npc.NPCEntity;
-import com.jackdaw.chatwithnpc.npc.NPCEntityManager;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 public class Builder {
-    String npcName = "NPC";
-    String npcGroup = "Global";
-    String npcType = "Minecraft:villager";
-    String npcCareer = "unemployed";
-    String npcBasicPrompt = "You are an NPC.";
-    ArrayList<Map<Long, String>> longTermMemory = new ArrayList<>();
 
-    public Builder setNpc(UUID npcUUID) {
-        NPCEntity npc = NPCEntityManager.getNPCEntity(npcUUID);
-        setNpc(npc);
+    final ArrayList<Map<String, String>> messages = new ArrayList<>();
+
+    @Contract(pure = true)
+    static @NotNull String role2String(Record.Role role) {
+        if (role == Record.Role.NPC) return "assistant";
+        if (role == Record.Role.PLAYER) return "user";
+        return "system";
+    }
+
+    public Builder addMessage(@NotNull Record.Role role, @NotNull String content) {
+        this.messages.add(Map.of("role", role2String(role), "content", content));
         return this;
     }
 
-    public Builder setNpc(@NotNull NPCEntity npc) {
-        this.npcName = npc.getName();
-        this.npcGroup = npc.getGroup();
-        this.npcType = npc.getType();
-        this.npcCareer = npc.getCareer();
-        this.npcBasicPrompt = npc.getBasicPrompt();
-        this.longTermMemory = npc.getLongTermMemory();
-        return this;
+    public Builder fromNPC(@NotNull NPCEntity npc) {
+        ArrayList<Map<Long, String>> longTermMemory = npc.getLongTermMemory();
+        return addInitialMessage(npc.getName(), npc.getType(), npc.getCareer(), npc.getInstructions())
+                .addGroupMessages(npc.getGroup())
+                .addLongTermMemoryMessages(longTermMemory);
     }
 
-    public Prompt build() {
-        String systemMessage = buildSystemMessage();
-        return new Prompt(systemMessage);
+    public Builder fromConversation(@NotNull ConversationHandler conversation) {
+        Record messageRecord = conversation.getMessageRecord();
+        if (messageRecord == null || messageRecord.isEmpty()) {
+            return fromNPC(conversation.getNpc()).addInitialConversationMessage(conversation.getNpc().getName());
+        } else {
+            return fromNPC(conversation.getNpc()).addMessageRecordMessages(messageRecord);
+        }
     }
 
-    String buildSystemMessage() {
-        String npcbasicPrompt = "You are an NPC with type `" + npcType + "` and named `" + npcName + "`. ";
+    public Builder addInitialMessage(String npcName, String npcType, String npcCareer, String npcBasicPrompt) {
+        String basicInfo = "You are an NPC with type `" + npcType + "` and named `" + npcName + "`. ";
         String npcCareerPrompt = "You career is `" + npcCareer + "`. ";
-        ArrayList<String> groupPrompt = new ArrayList<>();
-        for (Group group : GroupManager.getParentGroups(npcGroup)) {
+        String languagePrompt = "You can only use `" + SettingManager.language + "` language to communicate. ";
+        this.messages.add(Map.of("role", "system", "content", basicInfo + npcCareerPrompt + npcBasicPrompt + languagePrompt));
+        return this;
+    }
+
+    public Builder addGroupMessages(String npcGroup) {
+        List<String> groups = GroupManager.getParentGroups(npcGroup).stream().map(Group::getName).toList();
+        for (String aGroup : groups) {
+            Group group = GroupManager.getGroup(aGroup);
             // connect the group.permanentPrompt to the groupPrompt with ",";
             StringBuilder prompt = new StringBuilder();
             if (group.getName().equals("Global")) {
                 prompt.append("The overall environment is ");
             } else {
-                prompt.append("You living in(/belongs to/are member of) `").append(group.getName()).append("` where is ");
+                prompt.append("You live in(/belongs to/are member of) `").append(group.getName()).append("` where is ");
             }
             prompt.append(String.join(", ", group.getPermanentPrompt()));
             if (!group.getTempEvent().isEmpty()) {
                 prompt.append(" and happening ");
                 for (Map<Long, String> event : group.getTempEvent()) {
                     prompt.append(event.values().iterator().next());
-                    if (group.getTempEvent().indexOf(event) != group.getTempEvent().size() - 1){
+                    if (group.getTempEvent().indexOf(event) != group.getTempEvent().size() - 1) {
                         prompt.append(", ");
                     }
                 }
             }
             prompt.append(". ");
-            groupPrompt.add(prompt.toString());
+            this.messages.add(Map.of("role", "system", "content", prompt.toString()));
         }
-        String languagePrompt = "Please use `" + SettingManager.language + "` language to communicate.";
-        return npcbasicPrompt + npcCareerPrompt + this.npcBasicPrompt + String.join("", groupPrompt) + languagePrompt;
+        return this;
     }
+
+    public Builder addLongTermMemoryMessages(ArrayList<Map<Long, String>> longTermMemory) {
+        if (longTermMemory == null || longTermMemory.isEmpty()) return this;
+        for (Map<Long, String> memory : longTermMemory) {
+            for (Map.Entry<Long, String> entry : memory.entrySet()) {
+                this.messages.add(Map.of("role", "system", "content", "This is a summary of one of the previous conversations: " + entry.getValue()));
+            }
+        }
+        return this;
+    }
+
+    public Builder addMessageRecordMessages(Record messageRecord) {
+        if (messageRecord == null || messageRecord.isEmpty()) {
+            return this;
+        }
+        for (Record.Message message : messageRecord.getTreeMap().values()) {
+            if (message.getEntityName() != null) {
+                this.messages.add(Map.of("role", role2String(message.getRole()), "content", message.getMessage(), "name", message.getEntityName()));
+            } else {
+                this.messages.add(Map.of("role", role2String(message.getRole()), "content", message.getMessage()));
+            }
+        }
+        return this;
+    }
+
+    public Builder addInitialConversationMessage(String npcName) {
+        this.messages.add(Map.of("role", "system", "content", "Please start the conversation as " + npcName + " with a greeting."));
+        return this;
+    }
+
+    public Prompt build() {
+        return new Prompt(this.messages);
+    }
+
 }
