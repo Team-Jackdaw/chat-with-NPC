@@ -161,7 +161,7 @@ public class ConversationHandler {
      * 通过模型，获取当前会话的长期记忆。并清空当前会话的消息记录。
      */
     public void getLongTermMemory() {
-        if (messageRecord.isEmpty() || SettingManager.apiKey.isEmpty() || !npc.isNeedMemory()) return;
+        if (messageRecord.isEmpty() || SettingManager.apiKey.isEmpty()) return;
         messageRecord.changeAllRole(Record.Role.PLAYER);
         String endingPrompt = "The Minecraft NPC '" + npc.getName() + "' is having conversation with players. The first message was sent by '" + npc.getName() + "'. Chat crosses over.";
         messageRecord.addMessage(System.currentTimeMillis(), Record.Role.SYSTEM, "Now the conversation is over. Summarize the above conversation in the tone you informed '" + npc.getName() + "'. (No more than 50 words)");
@@ -203,9 +203,19 @@ public class ConversationHandler {
     }
 
     public void discard() {
-        taskQueue.shutdown();
-        if (!ChatWithNPCMod.newAPI) {
+        if (!ChatWithNPCMod.newAPI && getNpc().isNeedMemory()) {
             getLongTermMemory();
         }
+        if (ChatWithNPCMod.newAPI){
+            if (!npc.isNeedMemory() && npc.hasThreadId()) {
+                try {
+                    Threads.discardThread(npc.getThreadId());
+                    npc.setThreadId(null);
+                } catch (Exception e) {
+                    ChatWithNPCMod.LOGGER.error(e.getMessage());
+                }
+            }
+        }
+        taskQueue.shutdown();
     }
 }

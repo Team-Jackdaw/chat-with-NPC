@@ -18,9 +18,6 @@ public class LiveCycleManager {
     }
 
     public static void update() {
-        if (ChatWithNPCMod.debug) {
-            ChatWithNPCMod.LOGGER.info("[chat-with-npc] Updating conversations and environments.");
-        }
         ConversationManager.endOutOfTimeConversations();
         GroupManager.endOutOfTimeGroup();
     }

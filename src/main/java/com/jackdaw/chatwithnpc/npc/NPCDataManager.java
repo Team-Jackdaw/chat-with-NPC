@@ -86,9 +86,8 @@ public class NPCDataManager {
         private final String threadID;
         private final String careers;
         private final String localGroup;
-        private final String basicPrompt;
         private final boolean needMemory;
-        private final String instruction;
+        private final String instructions;
         private final ArrayList<Map<Long, String>> longTermMemory;
 
         private NPCData(NPCEntity npc) {
@@ -97,8 +96,7 @@ public class NPCDataManager {
             this.threadID = npc.getThreadId();
             this.careers = npc.getCareer();
             this.localGroup = npc.getGroup();
-            this.basicPrompt = npc.getBasicPrompt();
-            this.instruction = npc.getInstructions();
+            this.instructions = npc.getInstructions();
             this.needMemory = npc.isNeedMemory();
             this.longTermMemory = new ArrayList<>(npc.getLongTermMemory());
         }
@@ -108,8 +106,7 @@ public class NPCDataManager {
             npc.setThreadId(threadID);
             npc.setCareer(careers);
             npc.setGroup(localGroup);
-            npc.setBasicPrompt(basicPrompt);
-            npc.setInstructions(instruction);
+            npc.setInstructions(instructions);
             npc.setNeedMemory(needMemory);
             npc.setLongTermMemory(longTermMemory);
         }

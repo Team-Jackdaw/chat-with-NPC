@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.jackdaw.chatwithnpc.ChatWithNPCMod;
 import com.jackdaw.chatwithnpc.auxiliary.configuration.SettingManager;
 import com.jackdaw.chatwithnpc.npc.NPCEntity;
-import com.jackdaw.chatwithnpc.openaiapi.prompt.GroupPrompt;
 import com.jackdaw.chatwithnpc.openaiapi.prompt.NPCPrompt;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,8 +31,7 @@ public class Assistant {
         Map<String, String> createAssistantRequest = Map.of(
                 "name", npc.getName(),
                 "model", SettingManager.model,
-                "instructions", NPCPrompt.instructions(npc),
-                "description", NPCPrompt.description(npc)
+                "instructions", NPCPrompt.instructions(npc)
         );
         String res = Request.sendRequest(AssistantClass.toJson(createAssistantRequest), "assistants", Header.buildBeta(), Request.Action.POST);
         String id = AssistantClass.fromJson(res).id;
@@ -49,8 +47,7 @@ public class Assistant {
         Map<String, String> modifyAssistantRequest = Map.of(
                 "name", npc.getName(),
                 "model", SettingManager.model,
-                "instructions", NPCPrompt.instructions(npc),
-                "description", NPCPrompt.description(npc)
+                "instructions", NPCPrompt.instructions(npc)
         );
         String res = Request.sendRequest(AssistantClass.toJson(modifyAssistantRequest), "assistants/" + npc.getAssistantId(), Header.buildBeta(), Request.Action.POST);
         String id = AssistantClass.fromJson(res).id;

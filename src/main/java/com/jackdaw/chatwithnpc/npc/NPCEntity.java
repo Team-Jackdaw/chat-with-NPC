@@ -30,8 +30,7 @@ public abstract class NPCEntity {
     protected String assistantId;
     protected String ThreadId;
     protected String career = "unemployed";
-    protected String basicPrompt = "You are an NPC.";
-    protected String instructions = "";
+    protected String instructions = "You are an NPC.";
     protected String group = "Global";
     protected boolean needMemory = true;
     protected ArrayList<Map<Long, String>> longTermMemory = new ArrayList<>();
@@ -86,24 +85,6 @@ public abstract class NPCEntity {
      */
     public void setCareer(String career) {
         this.career = career;
-    }
-
-    /**
-     * 获取NPC的基本提示信息，该信息应该作为该NPC的基本信息之一。
-     *
-     * @return NPC的基本提示信息
-     */
-    public String getBasicPrompt() {
-        return this.basicPrompt;
-    }
-
-    /**
-     * 设置NPC的基本提示信息，该信息应该作为该NPC的基本信息之一。
-     *
-     * @param basicPrompt NPC的基本提示信息
-     */
-    public void setBasicPrompt(String basicPrompt) {
-        this.basicPrompt = basicPrompt;
     }
 
     /**

@@ -31,7 +31,7 @@ public class Builder {
 
     public Builder fromNPC(@NotNull NPCEntity npc) {
         ArrayList<Map<Long, String>> longTermMemory = npc.getLongTermMemory();
-        return addInitialMessage(npc.getName(), npc.getType(), npc.getCareer(), npc.getBasicPrompt() + npc.getInstructions())
+        return addInitialMessage(npc.getName(), npc.getType(), npc.getCareer(), npc.getInstructions())
                 .addGroupMessages(npc.getGroup())
                 .addLongTermMemoryMessages(longTermMemory);
     }
