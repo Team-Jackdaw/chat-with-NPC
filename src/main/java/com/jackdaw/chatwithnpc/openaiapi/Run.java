@@ -49,6 +49,11 @@ public class Run {
             this.status = run.status;
         }
 
+        /**
+         * Callback function to send the response to the player
+         * @param conversation The conversation handler
+         * @throws Exception If the response is null
+         */
         private void callback(@NotNull ConversationHandler conversation) throws Exception {
             String response = Threads.getLastMessage(thread_id);
             conversation.getNpc().replyMessage(response, SettingManager.range);
@@ -78,10 +83,10 @@ public class Run {
         });
         try {
             future.get(10, TimeUnit.SECONDS); // Wait for the run to complete or timeout
+            run.callback(conversation);
         } catch (TimeoutException e) {
             future.cancel(true); // Cancel the task if it's not completed within the timeout
         }
-        run.callback(conversation);
     }
 
 

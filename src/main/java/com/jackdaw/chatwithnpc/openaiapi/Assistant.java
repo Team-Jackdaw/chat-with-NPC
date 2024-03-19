@@ -33,7 +33,7 @@ public class Assistant {
                 "name", npc.getName(),
                 "model", SettingManager.model,
                 "instructions", NPCPrompt.instructions(npc),
-                "description", NPCPrompt.description(npc) + GroupPrompt.getGroupsPrompt(npc.getGroup())
+                "description", NPCPrompt.description(npc)
         );
         String res = Request.sendRequest(AssistantClass.toJson(createAssistantRequest), "assistants", Header.buildBeta(), Request.Action.POST);
         String id = AssistantClass.fromJson(res).id;
@@ -50,7 +50,7 @@ public class Assistant {
                 "name", npc.getName(),
                 "model", SettingManager.model,
                 "instructions", NPCPrompt.instructions(npc),
-                "description", NPCPrompt.description(npc) + GroupPrompt.getGroupsPrompt(npc.getGroup())
+                "description", NPCPrompt.description(npc)
         );
         String res = Request.sendRequest(AssistantClass.toJson(modifyAssistantRequest), "assistants/" + npc.getAssistantId(), Header.buildBeta(), Request.Action.POST);
         String id = AssistantClass.fromJson(res).id;

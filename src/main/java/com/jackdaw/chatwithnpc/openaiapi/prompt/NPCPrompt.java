@@ -8,7 +8,7 @@ public class NPCPrompt {
 
     public static @NotNull String description(@NotNull NPCEntity npc) {
         return  "You are an NPC with type `" + npc.getType() + "` and named `" + npc.getName() + "`. " +
-                "You career is `" + npc.getCareer() + "`. " + npc.getBasicPrompt();
+                "You career is `" + npc.getCareer() + "`. " + npc.getBasicPrompt() + GroupPrompt.getGroupsPrompt(npc.getGroup());
     }
 
     public static @NotNull String instructions(@NotNull NPCEntity npc) {
