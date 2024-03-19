@@ -5,7 +5,7 @@ import com.jackdaw.chatwithnpc.auxiliary.configuration.SettingManager;
 import com.jackdaw.chatwithnpc.conversation.prompt.Prompt;
 import com.jackdaw.chatwithnpc.npc.NPCEntity;
 import com.jackdaw.chatwithnpc.openaiapi.Assistant;
-import com.jackdaw.chatwithnpc.openaiapi.AsyncTaskStack;
+import com.jackdaw.chatwithnpc.async.AsyncTaskQueue;
 import com.jackdaw.chatwithnpc.openaiapi.Run;
 import com.jackdaw.chatwithnpc.openaiapi.Threads;
 import org.jetbrains.annotations.NotNull;
@@ -16,7 +16,7 @@ public class ConversationHandler {
     final NPCEntity npc;
     protected boolean isTalking = false;
     long updateTime = 0L;
-    public AsyncTaskStack taskStack = new AsyncTaskStack();
+    public AsyncTaskQueue taskQueue = new AsyncTaskQueue();
 
     public ConversationHandler(@NotNull NPCEntity npc, boolean newAPI) {
         this.npc = npc;
@@ -37,7 +37,7 @@ public class ConversationHandler {
             return;
         }
         setTalking(true);
-        taskStack.addTask(() -> {
+        boolean isOK = taskQueue.addTask(() -> {
             try {
                 String response;
                 response = tryResponse(requestJson, 3);
@@ -50,6 +50,7 @@ public class ConversationHandler {
                 ChatWithNPCMod.LOGGER.error(e.getMessage());
             }
         });
+        if (!isOK) setTalking(false);
     }
 
     private @NotNull String tryResponse(String requestJson, int times) throws Exception {
@@ -80,7 +81,7 @@ public class ConversationHandler {
         }
         setTalking(true);
         sendWaitMessage();
-        taskStack.addTask(() -> {
+        boolean isOK =  taskQueue.addTask(() -> {
             try {
                 if (!npc.hasAssistant()) {
                     Assistant.createAssistant(npc);
@@ -93,10 +94,11 @@ public class ConversationHandler {
                 setTalking(false);
             } catch (Exception e) {
                 ChatWithNPCMod.LOGGER.error(e.getMessage());
-                taskStack.clear();
+                taskQueue.clear();
                 setTalking(false);
             }
         });
+        if (!isOK) setTalking(false);
         updateTime = System.currentTimeMillis();
     }
 
@@ -117,7 +119,7 @@ public class ConversationHandler {
         }
         setTalking(true);
         sendWaitMessage();
-        taskStack.addTask(() -> {
+        boolean isOk = taskQueue.addTask(() -> {
             try {
                 if (!npc.hasAssistant()) Assistant.createAssistant(npc);
                 if(!npc.hasThreadId()) Threads.createThread(this);
@@ -126,10 +128,11 @@ public class ConversationHandler {
                 setTalking(false);
             } catch (Exception e) {
                 ChatWithNPCMod.LOGGER.error(e.getMessage());
-                taskStack.clear();
+                taskQueue.clear();
                 setTalking(false);
             }
         });
+        if (!isOk) setTalking(false);
         updateTime = System.currentTimeMillis();
     }
 
@@ -200,7 +203,7 @@ public class ConversationHandler {
     }
 
     public void discard() {
-        taskStack.shutdown();
+        taskQueue.shutdown();
         if (!ChatWithNPCMod.newAPI) {
             getLongTermMemory();
         }

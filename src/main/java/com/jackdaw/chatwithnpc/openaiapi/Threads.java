@@ -9,19 +9,21 @@ import java.util.List;
 import java.util.Map;
 
 public class Threads {
-    private String id;
+    private static class ThreadsClass {
+        private String id;
 
-    private static String toJson(Map<String, String> map) {
-        return new Gson().toJson(map);
-    }
+        private static String toJson (Map < String, String > map){
+            return new Gson().toJson(map);
+        }
 
-    private static Threads fromJson(String json) {
-        return new Gson().fromJson(json, Threads.class);
+        private static ThreadsClass fromJson (String json){
+            return new Gson().fromJson(json, ThreadsClass.class);
+        }
     }
 
     public static void createThread(@NotNull ConversationHandler conversationHandler) throws Exception {
         String res = Request.sendRequest("", "threads", Header.buildBeta(), Request.Action.POST);
-        String id = fromJson(res).id;
+        String id = ThreadsClass.fromJson(res).id;
         if (id == null) {
             ChatWithNPCMod.LOGGER.error("[chat-with-npc] API error: " + res);
             throw new Exception("Thread id is null");
@@ -31,7 +33,7 @@ public class Threads {
 
     public static void addMessage(String threadId, String message) throws Exception {
         Map<String, String> content = Map.of("role", "user", "content", message);
-        String res = Request.sendRequest(toJson(content), "threads/" + threadId + "/messages", Header.buildBeta(), Request.Action.POST);
+        String res = Request.sendRequest(ThreadsClass.toJson(content), "threads/" + threadId + "/messages", Header.buildBeta(), Request.Action.POST);
         MessageList.Message message1 = new Gson().fromJson(res, MessageList.Message.class);
         if (message1.content == null) {
             ChatWithNPCMod.LOGGER.error("[chat-with-npc] API error: " + res);
@@ -45,7 +47,7 @@ public class Threads {
 
     static String getLastMessage(String threadId) throws Exception {
         Map<String, String> filter = Map.of("limit", "1", "order", "desc");
-        String res = Request.sendRequest(toJson(filter), "threads/" + threadId + "/messages", Header.buildBeta(), Request.Action.GET);
+        String res = Request.sendRequest(ThreadsClass.toJson(filter), "threads/" + threadId + "/messages", Header.buildBeta(), Request.Action.GET);
         MessageList messageList = new Gson().fromJson(res, MessageList.class);
         if (messageList.data == null) {
             ChatWithNPCMod.LOGGER.error("[chat-with-npc] API error: " + res);

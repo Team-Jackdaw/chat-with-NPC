@@ -12,18 +12,20 @@ import java.util.Map;
 
 public class Assistant {
 
-    private String id;
-    private String name;
-    private String instructions;
-    private String description;
-    private String model;
+    private static class AssistantClass{
+        private String id;
+        private String name;
+        private String instructions;
+        private String description;
+        private String model;
 
-    private static String toJson(Map<String, String> map) {
+        private static String toJson (Map < String, String > map){
         return new Gson().toJson(map);
     }
 
-    private static Assistant fromJson(String json) {
-        return new Gson().fromJson(json, Assistant.class);
+        private static AssistantClass fromJson (String json){
+        return new Gson().fromJson(json, AssistantClass.class);
+    }
     }
 
     public static void createAssistant(@NotNull NPCEntity npc) throws Exception {
@@ -33,8 +35,8 @@ public class Assistant {
                 "instructions", NPCPrompt.instructions(npc),
                 "description", NPCPrompt.description(npc) + GroupPrompt.getGroupsPrompt(npc.getGroup())
         );
-        String res = Request.sendRequest(toJson(createAssistantRequest), "assistants", Header.buildBeta(), Request.Action.POST);
-        String id = fromJson(res).id;
+        String res = Request.sendRequest(AssistantClass.toJson(createAssistantRequest), "assistants", Header.buildBeta(), Request.Action.POST);
+        String id = AssistantClass.fromJson(res).id;
         if (id == null) {
             ChatWithNPCMod.LOGGER.error("[chat-with-npc] API error: " + res);
             throw new Exception("Assistant id is null");
@@ -50,8 +52,8 @@ public class Assistant {
                 "instructions", NPCPrompt.instructions(npc),
                 "description", NPCPrompt.description(npc) + GroupPrompt.getGroupsPrompt(npc.getGroup())
         );
-        String res = Request.sendRequest(toJson(modifyAssistantRequest), "assistants/" + npc.getAssistantId(), Header.buildBeta(), Request.Action.POST);
-        String id = fromJson(res).id;
+        String res = Request.sendRequest(AssistantClass.toJson(modifyAssistantRequest), "assistants/" + npc.getAssistantId(), Header.buildBeta(), Request.Action.POST);
+        String id = AssistantClass.fromJson(res).id;
         if (id == null) {
             ChatWithNPCMod.LOGGER.error("[chat-with-npc] API error: " + res);
             throw new Exception("Assistant id is null");

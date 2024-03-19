@@ -97,9 +97,9 @@ public class CommandSet {
                                 .then(argument("group", StringArgumentType.word())
                                         .suggests(groupSuggestionProvider)
                                         .executes(CommandSet::setNPCGroup)))
-                        .then(literal("setBasicPrompt")
-                                .then(argument("prompt", StringArgumentType.greedyString())
-                                        .executes(CommandSet::setNPCPrompt)))
+                        .then(literal("setDescription")
+                                .then(argument("description", StringArgumentType.greedyString())
+                                        .executes(CommandSet::setNPCDescription)))
                         .then(literal("setInstructions")
                                 .then(argument("instructions", StringArgumentType.greedyString())
                                         .executes(CommandSet::setNPCInstructions)))
@@ -157,7 +157,9 @@ public class CommandSet {
                 .append("\n/npchat npc - NPC commands")
                 .append("\n/npchat npc setCareer <career> - Set the career for the closest NPC.")
                 .append("\n/npchat npc setGroup <group> - Set the group for the closest NPC.")
-                .append("\n/npchat npc setBackground <prompt> - Set the background for the closest NPC.")
+                .append("\n/npchat npc setDescription <description> - Set the background for the closest NPC.")
+                .append("\n/npchat npc setInstructions <instructions> - Set the instructions for the closest NPC.")
+                .append("\n/npchat npc update - Update the information of closest NPC to OpenAI.")
                 .append("\n/npchat npc clearMemory - Clear the memory for the closest NPC.")
                 .append("\n --------------------------------")
                 .append("\n/npchat group <group> - Group commands")
@@ -171,27 +173,6 @@ public class CommandSet {
                 .append("\nYou can start a conversation to mobs by shift-clicking on them!")
                 .append("\nOnce you are in a conversation, you can reply to the NPC by typing in the chat.");
         context.getSource().sendFeedback(helpText, false);
-        return 1;
-    }
-
-    private static int npcUpdate(@NotNull CommandContext<ServerCommandSource> context) {
-        ServerPlayerEntity player = context.getSource().getPlayer();
-        ConversationHandler conversation = ConversationManager.getConversation(player);
-        if (player != null && conversation != null) {
-            conversation = ConversationManager.getConversation(player);
-            if (conversation == null) return 0;
-            NPCEntity npc = conversation.getNpc();
-            npc.getDataManager().sync();
-            if (npc.hasAssistant()) {
-                conversation.taskStack.addTask(() -> {
-                    try {
-                        Assistant.modifyAssistant(npc);
-                    } catch (Exception e) {
-                        ChatWithNPCMod.LOGGER.error(e.getMessage());
-                    }
-                });
-            }
-        }
         return 1;
     }
 
@@ -422,7 +403,7 @@ public class CommandSet {
             NPCEntity npc = conversation.getNpc();
             npc.deleteLongTermMemory(Long.MAX_VALUE);
             if (npc.getThreadId() != null){
-                conversation.taskStack.addTask(() -> {
+                boolean isOK = conversation.taskQueue.addTask(() -> {
                     try {
                         Threads.discardThread(npc.getThreadId());
                         npc.setThreadId(null);
@@ -431,6 +412,7 @@ public class CommandSet {
                         throw new RuntimeException(e);
                     }
                 });
+                if (!isOK) return 0;
             }
             player.sendMessage(Text.of("[chat-with-npc] Memory clear."), true);
             return 1;
@@ -441,9 +423,9 @@ public class CommandSet {
         return 0;
     }
 
-    private static int setNPCPrompt(@NotNull CommandContext<ServerCommandSource> context) {
+    private static int setNPCDescription(@NotNull CommandContext<ServerCommandSource> context) {
         ServerPlayerEntity player = context.getSource().getPlayer();
-        String prompt = context.getArgument("prompt", String.class);
+        String prompt = context.getArgument("description", String.class);
         ConversationHandler conversation = ConversationManager.getConversation(player);
         if (player != null && conversation != null) {
             conversation = ConversationManager.getConversation(player);
@@ -500,5 +482,27 @@ public class CommandSet {
             player.sendMessage(Text.of("[chat-with-npc] You are not in a conversation."), true);
         }
         return 0;
+    }
+
+    private static int npcUpdate(@NotNull CommandContext<ServerCommandSource> context) {
+        ServerPlayerEntity player = context.getSource().getPlayer();
+        ConversationHandler conversation = ConversationManager.getConversation(player);
+        if (player != null && conversation != null) {
+            conversation = ConversationManager.getConversation(player);
+            if (conversation == null) return 0;
+            NPCEntity npc = conversation.getNpc();
+            npc.getDataManager().sync();
+            if (ChatWithNPCMod.newAPI && npc.hasAssistant()) {
+                boolean isOK = conversation.taskQueue.addTask(() -> {
+                    try {
+                        Assistant.modifyAssistant(npc);
+                    } catch (Exception e) {
+                        ChatWithNPCMod.LOGGER.error(e.getMessage());
+                    }
+                });
+                if (!isOK) return 0;
+            }
+        }
+        return 1;
     }
 }
