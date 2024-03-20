@@ -31,8 +31,6 @@ public class ChatWithNPCMod implements ModInitializer {
     // The time in milliseconds that check for out of time static data
     public static final long updateInterval = 30000L;
 
-    public static final boolean newAPI = true;
-
     public static final boolean debug = false;
 
     @Override
@@ -60,7 +58,7 @@ public class ChatWithNPCMod implements ModInitializer {
             // The entity must have a custom name to be an NPC
             if (entity.getCustomName() == null) return ActionResult.PASS;
             // register the NPC entity and start a conversation
-            ConversationManager.startConversation(entity, player.hasPermissionLevel(4), newAPI);
+            ConversationManager.startConversation(entity, player.hasPermissionLevel(4));
             return ActionResult.FAIL;
         });
         // Register the player chat listener
@@ -74,7 +72,7 @@ public class ChatWithNPCMod implements ModInitializer {
                 player.sendMessage(Text.of("[chat-with-npc] The NPC is talking, please wait"), false);
                 return ActionResult.PASS;
             }
-            conversationHandler.replyToEntity(message, player.getName().getString(), newAPI);
+            conversationHandler.replyToEntity(message);
             return ActionResult.PASS;
         });
         // Start the live cycle manager

@@ -407,10 +407,9 @@ public class CommandSet {
         ServerPlayerEntity player = context.getSource().getPlayer();
         ConversationHandler conversation = ConversationManager.getConversation(player);
         if (player != null && conversation != null) {
-            conversation.clearMessageRecord();
             NPCEntity npc = conversation.getNpc();
             npc.deleteLongTermMemory(Long.MAX_VALUE);
-            if (ChatWithNPCMod.newAPI || npc.getThreadId() != null){
+            if (npc.getThreadId() != null){
                 boolean isOK = conversation.taskQueue.addTask(() -> {
                     try {
                         Threads.discardThread(npc.getThreadId());
@@ -481,7 +480,7 @@ public class CommandSet {
         ConversationHandler conversation = ConversationManager.getConversation(player);
         if (player != null && conversation != null) {
             NPCEntity npc = conversation.getNpc();
-            if (ChatWithNPCMod.newAPI && npc.hasAssistant()) {
+            if (npc.hasAssistant()) {
                 boolean isOK = conversation.taskQueue.addTask(() -> {
                     try {
                         Assistant.modifyAssistant(npc);
