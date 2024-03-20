@@ -29,10 +29,10 @@ NPC的对话可以被所有人看到（在他们头顶的**聊天气泡**中）�
 ## 3. 功能
 
 1. 每个`NPC`都有自己的`Instructions`，并且可以属于一个`Group`。
-2. 每个`NPC`可以记录他的对话内容以生成`LongTermMemory`，这将影响他的后续对话并将逐渐被遗忘。
+2. 每个`NPC`可以自动管理他们的上下文，包括他们的记忆，如果记忆过长，那么早前的记忆会被自动压缩。
 3. 每个`Group`都有一些`PermanentPrompt`来描述它们，并且还可以记录一些`TempEvent`，这将在一段时间后结束。
 4. 每个`Group`都可以记录一个`ParentGroup`，直到该组的父组是`Global`，`Global`不能有父组。
-5. 每个`NPC`的对话将结合他自己的`BasicPrompt`，他的`LongTermMemory`，这次对话的`MeeageRecord`，他的`Group`及其所有`ParentGroup`的`PermanentPrompt`的内容，以及`TempEvent`的内容。
+5. 每个`NPC`的对话将结合他自己的`BasicPrompt`，这次对话的上下文（如果设置了记住记忆，那么将包含所有上下文），他的`Group`及其所有`ParentGroup`的`PermanentPrompt`的内容，以及`TempEvent`的内容。
 
 ## 4. 要求
 - Minecraft Server 1.19.4 或更高版本

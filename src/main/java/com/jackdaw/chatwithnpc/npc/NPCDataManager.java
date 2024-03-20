@@ -2,14 +2,13 @@ package com.jackdaw.chatwithnpc.npc;
 
 import com.google.gson.Gson;
 import com.jackdaw.chatwithnpc.ChatWithNPCMod;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Map;
 
 /**
  * A serializer used to read or write the data from the files.
@@ -24,15 +23,12 @@ public class NPCDataManager {
     private final File theFile;
     private final NPCEntity npc;
 
-    public NPCDataManager(NPCEntity npc) {
+    NPCDataManager(@NotNull NPCEntity npc) {
         this.npc = npc;
         mkdir();
         this.theFile = new File(ChatWithNPCMod.workingDirectory.toFile(), "npc/" + npc.getUUID().toString() + ".json");
     }
 
-    /**
-     * Create the directory.
-     */
     private static void mkdir() {
         Path workingDirectory = ChatWithNPCMod.workingDirectory.resolve("npc");
         if (!Files.exists(workingDirectory)) {
@@ -46,10 +42,17 @@ public class NPCDataManager {
         }
     }
 
+    /**
+     * Check if the file is existed.
+     * @return true if the file is existed, otherwise false.
+     */
     public boolean isExist() {
         return theFile.exists();
     }
 
+    /**
+     * Synchronize the data from the file to the NPC.
+     */
     public void sync() {
         if (!isExist()) {
             save();
@@ -64,6 +67,9 @@ public class NPCDataManager {
         }
     }
 
+    /**
+     * Save the data from the NPC to the file.
+     */
     public void save() {
         try {
             if (!isExist()) {
@@ -88,7 +94,6 @@ public class NPCDataManager {
         private final String localGroup;
         private final boolean needMemory;
         private final String instructions;
-        private final ArrayList<Map<Long, String>> longTermMemory;
 
         private NPCData(NPCEntity npc) {
             this.name = npc.getName();
@@ -98,7 +103,6 @@ public class NPCDataManager {
             this.localGroup = npc.getGroup();
             this.instructions = npc.getInstructions();
             this.needMemory = npc.isNeedMemory();
-            this.longTermMemory = new ArrayList<>(npc.getLongTermMemory());
         }
 
         private void set(NPCEntity npc) {
@@ -108,7 +112,6 @@ public class NPCDataManager {
             npc.setGroup(localGroup);
             npc.setInstructions(instructions);
             npc.setNeedMemory(needMemory);
-            npc.setLongTermMemory(longTermMemory);
         }
 
         private String toJson() {

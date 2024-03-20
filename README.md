@@ -39,14 +39,13 @@ If you are administrator, see the [Installation](#5-installation) for more infor
 ## 3. Features
 
 1. Each `NPC` has his own `Instructions`, and he can belong to a `Group`.
-2. Each `NPC` can record the content of his conversation to generate a `LongTermMemory`, which will affect his
-   subsequent conversations and will be gradually forgotten.
+2. Each `NPC` can will manager their context of the conversation automatically by OpenAI.
 3. Each `Group` has some `PermanentPrompt` to describe them, and can also record some `TempEvent`, which will end after
    a period of time.
 4. Each `Group` can record a `ParentGroup` until the group's parent group is `Global`, `Global` cannot have a parent
    group.
-5. Each `NPC`'s conversation will combine his own `BasicPrompt`, his `LongTermMemory`, the `MeeageRecord` of this
-   conversation, the `PermanentPrompt` of his `Group` and all its `ParentGroup`, and the content of `TempEvent`.
+5. Each `NPC`'s conversation will combine his own `Instructions`, the context of this
+   conversation (or all the conversation if needMemory is true), the `PermanentPrompt` of his `Group` and all its `ParentGroup`, and the content of `TempEvent`.
 
 ## 4. Requirements
 

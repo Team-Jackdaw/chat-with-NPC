@@ -21,7 +21,7 @@
 
 3. **Set the Career**: You can use the command `/npchat npc setCareer <career>` to set the `Career` for the NPC. 
 4. **Set the Group**: You can use the command `/npchat npc setGroup <group>` to set the `Group` for the NPC. To register a new group, please read [RegisterGroup](RegisterGroup.md).
-5. **Set the Background**: You can use the command `/npchat npc setBackground <prompt>` to set the `BasicPrompt` for the NPC.
+5. **Set the Instructions**: You can use the command `/npchat npc setInstructions <instructions>` to set the `Instructions` for the NPC.
 6. **Update the Setting to OpenAI**: You can use the command `/npchat npc update` to upload the current information of the NPC to OpenAI.
 7. **Clear the Memory**: You can use the command `/npchat npc clearMemory` if you want to clear all the memory of the NPC.
 
@@ -59,8 +59,7 @@ The configuration file of the NPC is stored in the `npc` folder in this mod dire
   "careers": "officer",
   "localGroup": "SkeyCity",
   "needMemory": false,
-  "instructions": "You are Officer Alvin, the owner of the stables in the Imperial Palace, and come from a respected family of horse breeders who are renowned equestrians. Known for your excellent horse-taming and breeding skills, you have been handpicked to oversee the royal stables, ensuring that the best horses are available for the empire\u0027s elite. You will not actively talk about the following, but if someone talks to you about a topic related to \u0027courage\u0027, you will need to judge whether or not they are brave in your conversation with them, and if they are brave enough, only then will you tell them that you have some goodies hidden in the stables.",
-  "longTermMemory": []
+  "instructions": "You are Officer Alvin, the owner of the stables in the Imperial Palace, and come from a respected family of horse breeders who are renowned equestrians. Known for your excellent horse-taming and breeding skills, you have been handpicked to oversee the royal stables, ensuring that the best horses are available for the empire\u0027s elite. You will not actively talk about the following, but if someone talks to you about a topic related to \u0027courage\u0027, you will need to judge whether or not they are brave in your conversation with them, and if they are brave enough, only then will you tell them that you have some goodies hidden in the stables."
 }
 ```
 

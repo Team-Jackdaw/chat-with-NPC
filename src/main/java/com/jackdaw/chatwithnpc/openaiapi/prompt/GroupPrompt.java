@@ -8,6 +8,12 @@ import java.util.List;
 import java.util.Map;
 
 public class GroupPrompt {
+    /**
+     * Get the prompt of the group
+     *
+     * @param group the group name
+     * @return the prompt of the group
+     */
     public static @NotNull String getGroupsPrompt(String group) {
         StringBuilder groupsPrompt = new StringBuilder();
         List<Group> groups = GroupManager.getParentGroups(group);

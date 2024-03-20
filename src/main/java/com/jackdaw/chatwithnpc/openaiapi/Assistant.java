@@ -11,22 +11,11 @@ import java.util.Map;
 
 public class Assistant {
 
-    private static class AssistantClass{
-        private String id;
-        private String name;
-        private String instructions;
-        private String description;
-        private String model;
-
-        private static String toJson (Map < String, String > map){
-        return new Gson().toJson(map);
-    }
-
-        private static AssistantClass fromJson (String json){
-        return new Gson().fromJson(json, AssistantClass.class);
-    }
-    }
-
+    /**
+     * Create an assistant for the NPC from the OpenAI API
+     * @param npc The NPC to create the assistant for
+     * @throws Exception If the assistant id is null
+     */
     public static void createAssistant(@NotNull NPCEntity npc) throws Exception {
         Map<String, String> createAssistantRequest = Map.of(
                 "name", npc.getName(),
@@ -42,6 +31,11 @@ public class Assistant {
         npc.setAssistantId(id);
     }
 
+    /**
+     * Modify the assistant for the NPC from the OpenAI API
+     * @param npc The NPC to modify the assistant for
+     * @throws Exception If the assistant id is null
+     */
     public static void modifyAssistant(@NotNull NPCEntity npc) throws Exception {
         if (npc.getAssistantId() == null) return;
         Map<String, String> modifyAssistantRequest = Map.of(
@@ -54,6 +48,22 @@ public class Assistant {
         if (id == null) {
             ChatWithNPCMod.LOGGER.error("[chat-with-npc] API error: " + res);
             throw new Exception("Assistant id is null");
+        }
+    }
+
+    private static class AssistantClass {
+        private String id;
+        private String name;
+        private String instructions;
+        private String description;
+        private String model;
+
+        private static String toJson(Map<String, String> map) {
+            return new Gson().toJson(map);
+        }
+
+        private static AssistantClass fromJson(String json) {
+            return new Gson().fromJson(json, AssistantClass.class);
         }
     }
 }

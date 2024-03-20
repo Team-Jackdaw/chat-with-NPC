@@ -58,8 +58,7 @@ NPC 的配置文件存储在插件目录下的 `npc` 文件夹中。文件名为
   "careers": "officer",
   "localGroup": "SkeyCity",
   "isNeedMemory": true,
-  "instructions": "Born in a small village, you rose from monk to Archbishop of ScotEmpire through wisdom and compassion. You reformed church practices, making them relatable to the populace, and bridged the gap between religious and secular realms, promoting peace and unity throughout the empire.",
-  "longTermMemory": []
+  "instructions": "Born in a small village, you rose from monk to Archbishop of ScotEmpire through wisdom and compassion. You reformed church practices, making them relatable to the populace, and bridged the gap between religious and secular realms, promoting peace and unity throughout the empire."
 }
 ```
 

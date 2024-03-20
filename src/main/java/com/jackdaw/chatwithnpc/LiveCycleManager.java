@@ -14,21 +14,34 @@ public class LiveCycleManager {
 
     private static final AsyncTaskQueue reloadService = new AsyncTaskQueue();
 
+    /**
+     * Start the live cycle manager
+     * @param updateInterval the interval in milliseconds to update the live cycle manager
+     */
     public static void start(long updateInterval) {
         // Check for out of time static data
         executorService = Executors.newSingleThreadScheduledExecutor();
         executorService.scheduleAtFixedRate(LiveCycleManager::update, 0, updateInterval, TimeUnit.MILLISECONDS);
     }
 
+    /**
+     * Update the live cycle manager
+     */
     public static void update() {
         ConversationManager.endOutOfTimeConversations();
         GroupManager.endOutOfTimeGroup();
     }
 
+    /**
+     * Save all conversations, NPC entities, and environments
+     */
     public static void asyncSaveAll() {
         reloadService.addTask(LiveCycleManager::saveAll);
     }
 
+    /**
+     * Save all conversations, NPC entities, and environments
+     */
     public static void saveAll() {
         if (ChatWithNPCMod.debug) {
             ChatWithNPCMod.LOGGER.info("[chat-with-npc] Saving all conversations, NPC entities, and environments.");
@@ -37,6 +50,9 @@ public class LiveCycleManager {
         GroupManager.endAllEnvironments();
     }
 
+    /**
+     * Shutdown the live cycle manager
+     */
     public static void shutdown() {
         executorService.shutdown();
         reloadService.shutdown();

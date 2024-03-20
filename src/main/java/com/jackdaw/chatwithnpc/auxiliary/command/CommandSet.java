@@ -29,14 +29,14 @@ import static net.minecraft.server.command.CommandManager.literal;
 
 public class CommandSet {
 
-    static SuggestionProvider<ServerCommandSource> groupSuggestionProvider = (context, builder) -> {
+    private static final SuggestionProvider<ServerCommandSource> groupSuggestionProvider = (context, builder) -> {
         for (String group : GroupManager.getGroupList()) {
             builder.suggest(group);
         }
         return builder.buildFuture();
     };
 
-    static boolean hasOPPermission(@NotNull ServerCommandSource source) {
+    private static boolean hasOPPermission(@NotNull ServerCommandSource source) {
         return source.hasPermissionLevel(4);
     }
 
@@ -64,10 +64,6 @@ public class CommandSet {
                         .requires(CommandSet::hasOPPermission)
                         .then(argument("range", StringArgumentType.word())
                                 .executes(CommandSet::setRange)))
-                .then(literal("setForgetTime")
-                        .requires(CommandSet::hasOPPermission)
-                        .then(argument("time", StringArgumentType.word())
-                                .executes(CommandSet::setForgetTime)))
                 .then(literal("setLanguage")
                         .requires(CommandSet::hasOPPermission)
                         .then(argument("language", StringArgumentType.word())
@@ -176,7 +172,7 @@ public class CommandSet {
         return 1;
     }
 
-    public static int status(@NotNull CommandContext<ServerCommandSource> context) {
+    private static int status(@NotNull CommandContext<ServerCommandSource> context) {
         Text yes = Text.literal("Yes").formatted(Formatting.GREEN);
         Text no = Text.literal("No").formatted(Formatting.RED);
         if (!context.getSource().hasPermissionLevel(4)) {
@@ -203,7 +199,6 @@ public class CommandSet {
                     .append("\nChat Bar: ").append(SettingManager.isChatBar ? yes : no)
                     .append("\nModel: ").append(SettingManager.model)
                     .append("\nRange: ").append(String.valueOf(SettingManager.range))
-                    .append("\nForget Time: ").append(String.valueOf(SettingManager.forgetTime))
                     .append("\nLanguage: ").append(SettingManager.language)
                     .append("\nMax Tokens: ").append(String.valueOf(SettingManager.maxTokens))
                     .append("\nAPI URL: ").append(SettingManager.apiURL)
@@ -328,13 +323,6 @@ public class CommandSet {
         return 1;
     }
 
-    private static int setForgetTime(@NotNull CommandContext<ServerCommandSource> context) {
-        SettingManager.forgetTime = Long.parseLong(context.getArgument("time", String.class));
-        SettingManager.save();
-        context.getSource().sendFeedback(Text.of("[chat-with-npc] Forget time set"), true);
-        return 1;
-    }
-
     private static int setRange(@NotNull CommandContext<ServerCommandSource> context) {
         SettingManager.range = Double.parseDouble(context.getArgument("range", String.class));
         SettingManager.save();
@@ -408,7 +396,6 @@ public class CommandSet {
         ConversationHandler conversation = ConversationManager.getConversation(player);
         if (player != null && conversation != null) {
             NPCEntity npc = conversation.getNpc();
-            npc.deleteLongTermMemory(Long.MAX_VALUE);
             if (npc.getThreadId() != null){
                 boolean isOK = conversation.taskQueue.addTask(() -> {
                     try {

@@ -14,13 +14,11 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Map;
 
 public class Request {
-    public enum Action {
-        GET,
-        POST,
-        DELETE
-    }
     private static String url = "https://api.openai.com/v1/";
 
+    /**
+     * Update the url setting of the OpenAI API
+     */
     public static void updateSetting() {
         url = "https://" + SettingManager.apiURL + "/v1/";
     }
@@ -80,6 +78,24 @@ public class Request {
             request.setHeader(entry.getKey(), entry.getValue());
         }
         return request;
+    }
+
+    /**
+     * The action of the request
+     */
+    public enum Action {
+        /**
+         * Get request
+         */
+        GET,
+        /**
+         * Post request
+         */
+        POST,
+        /**
+         * Delete request
+         */
+        DELETE
     }
 }
 

@@ -9,24 +9,41 @@ import com.jackdaw.chatwithnpc.openaiapi.Run;
 import com.jackdaw.chatwithnpc.openaiapi.Threads;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * <b>Conversation of an NPC</b>
+ * <p>
+ * The conversation will record the conversation of a NPC.
+ * <p>
+ * It is used to execute the conversation with OpenAI asynchronously.
+ *
+ * @version 1.0
+ */
 public class ConversationHandler {
 
-    final NPCEntity npc;
+    protected final NPCEntity npc;
     protected boolean isTalking = false;
-    long updateTime = 0L;
+    protected long updateTime = 0L;
     public AsyncTaskQueue taskQueue = new AsyncTaskQueue();
 
-    public ConversationHandler(@NotNull NPCEntity npc) {
+    /**
+     * Construct a new Conversation for an NPC. This will start a conversation with the NPC asynchronously.
+     * @param npc The NPC to start a conversation with.
+     */
+    ConversationHandler(@NotNull NPCEntity npc) {
         this.npc = npc;
         startConversation();
     }
 
-    private void sendWaitMessage() {
-        npc.replyMessage("...", SettingManager.range);
-    }
-
+    /**
+     * Get the NPC that this conversation is handling.
+     * @return The NPC that this conversation is handling.
+     */
     public NPCEntity getNpc() {
         return npc;
+    }
+
+    private void sendWaitMessage() {
+        npc.replyMessage("...", SettingManager.range);
     }
 
     private void startConversation() {
@@ -53,6 +70,10 @@ public class ConversationHandler {
         updateTime = System.currentTimeMillis();
     }
 
+    /**
+     * Reply to the NPC with a message. Then the NPC will reply to the player something. This method is asynchronous.
+     * @param message The message sent to the NPC.
+     */
     public void replyToEntity(String message) {
         setTalking(true);
         sendWaitMessage();
@@ -73,33 +94,44 @@ public class ConversationHandler {
         updateTime = System.currentTimeMillis();
     }
 
+    /**
+     * Get the time when the conversation was last updated.
+     * @return The time when the conversation was last updated.
+     */
     public long getUpdateTime() {
         return updateTime;
     }
 
+    /**
+     * Get the time when the conversation was last updated in a human-readable format.
+     * @return The time when the conversation was last updated in a human-readable format.
+     */
     public String getUpdateTimeString() {
         // converge Long to real time
         return new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date(updateTime));
     }
 
     /**
-     * 获取NPC的对话状态
+     * Get the NPC's current conversation.
      *
-     * @return NPC的对话状态
+     * @return The NPC's current conversation.
      */
     public boolean isTalking() {
         return isTalking;
     }
 
     /**
-     * 设置NPC的对话状态
+     * Set the NPC's current conversation.
      *
-     * @param isTalking NPC的对话状态
+     * @param isTalking The NPC's current conversation.
      */
     public void setTalking(boolean isTalking) {
         this.isTalking = isTalking;
     }
 
+    /**
+     * Discard the conversation. This will stop the conversation with the NPC. If the NPC is not needed to remember the conversation, all the messages in this conversation will be deleted.
+     */
     public void discard() {
         if (!npc.isNeedMemory() && npc.hasThreadId()) {
             try {

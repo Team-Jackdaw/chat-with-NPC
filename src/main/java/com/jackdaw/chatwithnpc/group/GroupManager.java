@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * This class is used to manage the group of the game.
+ * This class is used to manage the groups of the game.
  */
 public class GroupManager {
     public static final ConcurrentHashMap<String, Group> GroupMap = new ConcurrentHashMap<>();
@@ -21,7 +21,7 @@ public class GroupManager {
 
 
     /**
-     * Initialize a group if the group is not conversing.
+     * Initialize a group if the group is not loaded.
      *
      * @param name The name of the group
      */
@@ -35,13 +35,22 @@ public class GroupManager {
         GroupMap.put(name, group);
     }
 
-    public static void removeGroup(String name) {
+    /**
+     * Discard a group from the group map.
+     * @param name The name of the group
+     */
+    public static void discardGroup(String name) {
         Group current = GroupMap.get(name);
         current.autoDeleteTempEvent();
         current.getDataManager().save();
         GroupMap.remove(name);
     }
 
+    /**
+     * Get the group by the name.
+     * @param name The name of the group
+     * @return The group
+     */
     public static @NotNull Group getGroup(String name) {
         if (!isLoaded(name)) {
             loadGroup(name);
@@ -51,6 +60,9 @@ public class GroupManager {
         return group;
     }
 
+    /**
+     * Discard the groups that have not been load for a long time.
+     */
     public static void endOutOfTimeGroup() {
         if (GroupMap.isEmpty()) return;
         GroupMap.forEach((name, environment) -> {
@@ -59,18 +71,21 @@ public class GroupManager {
             }
             if (environment.getLastLoadTime() + outOfTime < System.currentTimeMillis()) {
                 environment.getDataManager().save();
-                removeGroup(name);
+                discardGroup(name);
             }
         });
     }
 
+    /**
+     * Discard all the groups.
+     */
     public static void endAllEnvironments() {
         if (GroupMap.isEmpty()) return;
-        GroupMap.forEach((name, environment) -> removeGroup(name));
+        GroupMap.forEach((name, environment) -> discardGroup(name));
     }
 
     /**
-     * Get the parent groups of the group. Include the group itself.
+     * Get all the parent groups of the group. Include the group itself.
      *
      * @param currentGroup the parent group of the group.
      * @return parentGroups the parent groups of the group.
@@ -86,7 +101,11 @@ public class GroupManager {
         return parentGroups;
     }
 
-    public static ArrayList<String> getGroupList() {
+    /**
+     * Get the list of the groups from the files.
+     * @return The list of the groups.
+     */
+    public static @NotNull ArrayList<String> getGroupList() {
         File workingDirectory = ChatWithNPCMod.workingDirectory.resolve("group").toFile();
         File[] files = workingDirectory.listFiles();
         ArrayList<String> groupList = new ArrayList<>();

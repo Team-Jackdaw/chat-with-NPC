@@ -15,19 +15,17 @@ import java.nio.file.Files;
  * Configure the setting if a specific module is enabled or disabled.
  *
  * @author WDRshadow
- * @version v2.4
+ * @version v2.5
  */
 public class SettingManager {
     private static final Logger logger = ChatWithNPCMod.LOGGER;
     private static final File configFile = ChatWithNPCMod.workingDirectory.resolve("config.json").toFile();
 
     // use for confirming the setting version is the same with the plugin
-    private static final String lastVersion = "v2.4";
+    private static final String lastVersion = "v2.5";
 
     public static boolean enabled = true;
     public static double range = 10.0;
-    // default 7 days
-    public static long forgetTime = 604800000;
     public static String language = "Chinese";
     public static String apiKey = "";
     public static String model = "gpt-3.5-turbo";
@@ -72,10 +70,9 @@ public class SettingManager {
     }
 
     private static final class Config {
-        private String lastVersion = "v2.4";
+        private String lastVersion = "v2.5";
         private boolean enabled = true;
         private double range = 10.0;
-        private long forgetTime = 604800000;
         private String language = "Chinese";
         private String apiKey = "";
         private String model = "gpt-3.5-turbo";
@@ -88,7 +85,6 @@ public class SettingManager {
             Config config = new Config();
             config.enabled = SettingManager.enabled;
             config.range = SettingManager.range;
-            config.forgetTime = SettingManager.forgetTime;
             config.language = SettingManager.language;
             config.apiKey = SettingManager.apiKey;
             config.model = SettingManager.model;
@@ -108,7 +104,6 @@ public class SettingManager {
             }
             SettingManager.enabled = enabled;
             SettingManager.range = range;
-            SettingManager.forgetTime = forgetTime;
             SettingManager.language = language;
             SettingManager.apiKey = apiKey;
             SettingManager.model = model;

@@ -9,18 +9,11 @@ import java.util.List;
 import java.util.Map;
 
 public class Threads {
-    private static class ThreadsClass {
-        private String id;
-
-        private static String toJson (Map < String, String > map){
-            return new Gson().toJson(map);
-        }
-
-        private static ThreadsClass fromJson (String json){
-            return new Gson().fromJson(json, ThreadsClass.class);
-        }
-    }
-
+    /**
+     * Create a new thread and set the thread id to the npc
+     * @param conversationHandler The conversation handler
+     * @throws Exception If the thread id is null
+     */
     public static void createThread(@NotNull ConversationHandler conversationHandler) throws Exception {
         String res = Request.sendRequest("", "threads", Header.buildBeta(), Request.Action.POST);
         String id = ThreadsClass.fromJson(res).id;
@@ -31,6 +24,12 @@ public class Threads {
         conversationHandler.getNpc().setThreadId(id);
     }
 
+    /**
+     * Add a message to the thread
+     * @param threadId The thread id
+     * @param message The message
+     * @throws Exception If the message is not sent
+     */
     public static void addMessage(String threadId, String message) throws Exception {
         Map<String, String> content = Map.of("role", "user", "content", message);
         String res = Request.sendRequest(ThreadsClass.toJson(content), "threads/" + threadId + "/messages", Header.buildBeta(), Request.Action.POST);
@@ -41,10 +40,21 @@ public class Threads {
         }
     }
 
+    /**
+     * Discard the thread id from the npc
+     * @param threadId The thread id
+     * @throws Exception If is there any error
+     */
     public static void discardThread(String threadId) throws Exception {
         Request.sendRequest("", "threads/" + threadId, Header.buildBeta(), Request.Action.DELETE);
     }
 
+    /**
+     * Get the last message from the thread
+     * @param threadId The thread id
+     * @return The last message
+     * @throws Exception If the message is not received
+     */
     static String getLastMessage(String threadId) throws Exception {
         Map<String, String> filter = Map.of("limit", "1", "order", "desc");
         String res = Request.sendRequest(ThreadsClass.toJson(filter), "threads/" + threadId + "/messages", Header.buildBeta(), Request.Action.GET);
@@ -54,6 +64,18 @@ public class Threads {
             throw new Exception("Message not received");
         }
         return messageList.data.get(0).content.get(0).text.value;
+    }
+
+    private static class ThreadsClass {
+        private String id;
+
+        private static String toJson(Map<String, String> map) {
+            return new Gson().toJson(map);
+        }
+
+        private static ThreadsClass fromJson(String json) {
+            return new Gson().fromJson(json, ThreadsClass.class);
+        }
     }
 
     static class MessageList {

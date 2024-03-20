@@ -7,18 +7,18 @@ import net.minecraft.text.Text;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 /**
- * 这是一个用于定义与 NPC 交互的类。
- * 该类应记录 NPC 的基本信息，如名称、职业、basicPrompt 和 localGroup 等，这些都是 NPC 的特征。
- * 同时该类应记录 NPC 的对话状态，如最后一次消息时间、消息记录和是否正在与玩家对话等。
- * 该类应提供接收玩家信息、回复玩家信息和执行动作等方法。
+ * <b>NPC Entity Class</b>
  * <p>
- * <b>请注意：该类应该设置一个生命周期以降低重复读取和内存占用<b/>
+ * This is a class used to define the interaction with NPC.
+ * This class should record the basic information of NPC, such as name, career, basicPrompt, and localGroup, etc., which are all characteristics of NPC.
+ * At the same time, this class should record the dialogue state of NPC, such as the last message time, message record, and whether it is in dialogue with the player, etc.
+ * This class should provide methods for receiving player information, replying to player information, and executing actions, etc.
+ * <p>
+ * <b>Please note: this class should set a life cycle to reduce repeated reading and memory usage<b/>
  *
  * @version 1.0
  */
@@ -33,7 +33,6 @@ public abstract class NPCEntity {
     protected String instructions = "You are an NPC.";
     protected String group = "Global";
     protected boolean needMemory = true;
-    protected ArrayList<Map<Long, String>> longTermMemory = new ArrayList<>();
     protected TextBubbleEntity textBubble;
 
     /**
@@ -52,91 +51,99 @@ public abstract class NPCEntity {
     }
 
     /**
-     * 获取NPC的名字，该名字应该作为该NPC在本插件中的唯一标识，并将作为储存的文件名。
+     * Do an action of the NPC.
      *
-     * @return NPC的名字
+     * @param action The action of the NPC
+     * @param player To player
+     */
+    public abstract void doAction(Actions action, PlayerEntity player);
+
+    /**
+     * Get the name of the NPC, which should be the unique identifier of the NPC in this plugin and will be used as the file name for storage.
+     *
+     * @return The name of the NPC
      */
     public String getName() {
         return this.name;
     }
 
     /**
-     * 获取NPC的类型，该类型应该作为该NPC的特征之一。
+     * Get the type of the NPC, which should be one of the characteristics of the NPC.
      *
-     * @return NPC的类型
+     * @return The type of the NPC
      */
     public String getType() {
         return this.entity.getType().toString();
     }
 
     /**
-     * 获取NPC的职业，该职业应该作为该NPC的特征之一。
+     * Get the career of the NPC, which should be one of the characteristics of the NPC.
      *
-     * @return NPC的职业
+     * @return The career of the NPC
      */
     public String getCareer() {
         return this.career;
     }
 
     /**
-     * 设置NPC的职业，该职业应该作为该NPC的特征之一。
+     * Set the career of the NPC, which should be one of the characteristics of the NPC.
      *
-     * @param career NPC的职业
+     * @param career The career of the NPC
      */
     public void setCareer(String career) {
         this.career = career;
     }
 
     /**
-     * 获取对NPC的指示，该信息应该作为该NPC的基本信息之一。
+     * Get the basic instructions of the NPC, which should be one of the characteristics of the NPC.
      *
-     * @return 对NPC的指示
+     * @return The instructions of the NPC
      */
     public String getInstructions() {
         return this.instructions;
     }
 
     /**
-     * 设置对NPC的指示，该信息应该作为该NPC的基本信息之一。
+     * Set the basic instructions of the NPC, which should be one of the characteristics of the NPC.
      *
-     * @param instructions 对NPC的指示
+     * @param instructions The instructions of the NPC
      */
     public void setInstructions(String instructions) {
         this.instructions = instructions;
     }
 
     /**
-     * 获取NPC的本地群组，该群组应该作为该NPC的特征之一，即该NPC的所在位置相关信息。
+     * Get the local group of the NPC, which should be one of the characteristics of the NPC.
      *
-     * @return NPC的本地群组
+     * @return The local group of the NPC
      */
     public String getGroup() {
         return group;
     }
 
     /**
-     * 设置NPC的本地群组，该群组应该作为该NPC的特征之一，即该NPC的所在位置相关信息。
+     * Set the local group of the NPC, which should be one of the characteristics of the NPC.
      *
-     * @param group NPC的本地群组
+     * @param group The local group of the NPC
      */
     public void setGroup(String group) {
         this.group = group;
     }
 
     /**
-     * 获取NPC的数据管理器，该管理器应该用于管理NPC的数据。
+     * Get the NPC data manager, which should be used to manage the NPC's data.
      *
-     * @return NPC的数据管理器
+     * @return The NPC data manager
      */
     public NPCDataManager getDataManager() {
         return new NPCDataManager(this);
     }
 
     /**
-     * 接收玩家的消息，该消息应该是NPC对玩家的交互。
+     * Reply the message to the players nearby the NPC.
      *
-     * @param message NPC的信息
-     * @param range   玩家的范围
+     * @param message The message of the NPC
+     * @param range  The range of the NPC
      */
     public void replyMessage(String message, double range) {
         if (SettingManager.isBubble) textBubble.update(message);
@@ -145,10 +152,10 @@ public abstract class NPCEntity {
     }
 
     /**
-     * 获取附近的玩家，该玩家应该是NPC的交互对象。
+     * Find the nearby players.
      *
-     * @param range 玩家的范围
-     * @return 附近的玩家
+     * @param range The range of the NPC
+     * @return The nearby players
      */
     public List<PlayerEntity> findNearbyPlayers(double range) {
         World world = entity.world;
@@ -156,160 +163,92 @@ public abstract class NPCEntity {
     }
 
     /**
-     * 执行动作，该动作应该是NPC对玩家的交互。
+     * Get the UUID of the NPC, which should be the unique identifier of the NPC in the game.
      *
-     * @param action 动作
-     * @param player 玩家的实体
-     */
-    public abstract void doAction(Actions action, PlayerEntity player);
-
-    /**
-     * 获取NPC的UUID，该UUID应该作为该NPC的唯一标识。
-     *
-     * @return NPC的UUID
+     * @return The UUID of the NPC
      */
     public UUID getUUID() {
         return uuid;
     }
 
     /**
-     * 获取NPC的实体，该实体应该是该NPC的实体。
+     * Get the entity of the NPC, which should be the entity of the NPC in the game.
      *
-     * @return NPC的实体
+     * @return The entity of the NPC
      */
     public Entity getEntity() {
         return entity;
     }
 
     /**
-     * 添加NPC的长期记忆，该记忆应该是NPC的特征之一。
-     *
-     * @param memoryTime 记忆时间
-     * @param memory     记忆
-     */
-    public void addLongTermMemory(long memoryTime, String memory) {
-        Map<Long, String> newMemory = Map.of(memoryTime, memory);
-        longTermMemory.add(newMemory);
-    }
-
-    /**
-     * 获取NPC的长期记忆，该记忆应该是NPC的特征之一。
-     *
-     * @return NPC的长期记忆
-     */
-    public ArrayList<Map<Long, String>> getLongTermMemory() {
-        return longTermMemory;
-    }
-
-    /**
-     * 设置NPC的长期记忆，该记忆应该是NPC的特征之一。
-     *
-     * @param longTermMemory NPC的长期记忆
-     */
-    public void setLongTermMemory(ArrayList<Map<Long, String>> longTermMemory) {
-        this.longTermMemory = longTermMemory;
-    }
-
-    /**
-     * 删除某个时间以前的记忆。
-     *
-     * @param forgetTime 遗忘时间
-     */
-    public void deleteLongTermMemory(long forgetTime) {
-        longTermMemory.removeIf(memory -> memory.keySet().stream().anyMatch(time -> time < forgetTime));
-    }
-
-    /**
-     * 根据随机函数遗忘一些记忆。
-     */
-    public void randomForget() {
-        if (longTermMemory.size() < 20) return;
-        for (Map<Long, String> memory : longTermMemory) {
-            long time = memory.keySet().iterator().next();
-            long duration = System.currentTimeMillis() - time;
-            double probability = Math.min(1, duration / SettingManager.forgetTime);
-            if (Math.random() < probability) {
-                longTermMemory.removeIf(m -> m.keySet().stream().anyMatch(t -> t == time));
-            }
-        }
-    }
-
-    /**
-     * 设置NPC是否需要记忆，该记忆应该是NPC的特征之一。
-     * @return NPC是否需要记忆
+     * Check if the NPC needs memory.
+     * @return If the NPC needs memory
      */
     public boolean isNeedMemory() {
         return needMemory;
     }
 
     /**
-     * 设置NPC是否需要记忆，该记忆应该是NPC的特征之一。
-     * @param needMemory NPC是否需要记忆
+     * Set if the NPC needs memory.
+     * @param needMemory If the NPC needs memory
      */
     public void setNeedMemory(boolean needMemory) {
         this.needMemory = needMemory;
     }
 
     /**
-     * 保存NPC的数据。
-     */
-    public void discard() {
-        this.randomForget();
-        this.getDataManager().save();
-        this.textBubble.discard();
-    }
-
-    /**
-     * 查看是否已经注册了助手。
-     *
-     * @return 是否已经注册了助手
+     * Check if the NPC has an assistant.
+     * @return If the NPC has an assistant
      */
     public boolean hasAssistant() {
         return this.assistantId != null;
     }
 
     /**
-     * 获取NPC的助手ID。
-     *
-     * @return NPC的助手ID
+     * Get the NPC's assistant ID.
+     * @return The NPC's assistant ID
      */
     public String getAssistantId() {
         return this.assistantId;
     }
 
     /**
-     * 设置NPC的助手ID。
-     *
-     * @param id 助手ID
+     * Set the NPC's assistant ID.
+     * @param id The NPC's assistant ID
      */
     public void setAssistantId(String id) {
         this.assistantId = id;
     }
 
     /**
-     * 获取当前会话的线程ID。
-     *
-     * @return 当前会话的线程ID
+     * Get the NPC's thread ID.
+     * @return The NPC's thread ID
      */
     public String getThreadId() {
         return ThreadId;
     }
 
     /**
-     * 设置当前会话的线程ID。
-     *
-     * @param threadId 当前会话的线程ID
+     * Set the NPC's thread ID.
+     * @param threadId The NPC's thread ID
      */
     public void setThreadId(String threadId) {
         ThreadId = threadId;
     }
 
     /**
-     * 查看是否已经注册了线程。
-     *
-     * @return 是否已经注册了线程
+     * Check if the NPC has a thread ID.
+     * @return If the NPC has a thread ID
      */
     public boolean hasThreadId() {
         return ThreadId != null;
+    }
+
+    /**
+     * Discard the NPC. If the NPC is not needed to remember the conversation, all the messages in this conversation will be deleted.
+     */
+    public void discard() {
+        this.getDataManager().save();
+        this.textBubble.discard();
     }
 }

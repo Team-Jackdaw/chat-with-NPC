@@ -16,7 +16,11 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * This class is used to manage conversations between players and NPCs.
  * <p>
- * <b>Every player can only have one conversation at a time.</b>
+ * - It is used to start, end, and get conversations.
+ * <p>
+ * - It also checks if a player is near a conversation.
+ * <p>
+ * - Every NPC has a unique conversation.
  */
 public class ConversationManager {
 
@@ -25,25 +29,27 @@ public class ConversationManager {
     private static final long outOfTime = ChatWithNPCMod.outOfTime;
 
     /**
-     * Start a conversation for Player with an NPC
+     * Start a conversation for an NPC
      *
      * @param entity The Entity to start a conversation with
      */
-    public static void startConversation(Entity entity, boolean isOP) {
+    public static void startConversation(@NotNull Entity entity, boolean isOP) {
+        if (isConversing(entity.getUuid())) return;
         NPCEntityManager.registerNPCEntity(entity, isOP);
         NPCEntity npc = NPCEntityManager.getNPCEntity(entity.getUuid());
         if (npc == null) return;
-        if (isConversing(npc)) {
-            return;
-        }
         ConversationHandler conversationHandler = new ConversationHandler(npc);
         conversationMap.put(npc.getUUID(), conversationHandler);
     }
 
-    public static void endConversation(UUID uuid) {
-        conversationMap.get(uuid).discard();
-        NPCEntityManager.removeNPCEntity(uuid);
-        conversationMap.remove(uuid);
+    /**
+     * Check if an NPC is in a conversation
+     *
+     * @param npcUUID The NPC to check
+     * @return True if the NPC is chatting, false otherwise
+     */
+    public static boolean isConversing(@NotNull UUID npcUUID) {
+        return conversationMap.containsKey(npcUUID);
     }
 
     /**
@@ -57,7 +63,7 @@ public class ConversationManager {
     }
 
     /**
-     * Get the closest conversation to a player
+     * Get the closest conversation around a player
      *
      * @param player The player to check
      * @return The closest conversation to the player
@@ -70,36 +76,6 @@ public class ConversationManager {
             double distance2 = conversation2.getNpc().getEntity().getPos().distanceTo(player.getPos());
             return Double.compare(distance1, distance2);
         }).toList().get(0);
-    }
-
-    /**
-     * Check if an NPC is chatting
-     *
-     * @param npcEntity The NPC to check
-     * @return True if the NPC is chatting, false otherwise
-     */
-    public static boolean isConversing(@NotNull NPCEntity npcEntity) {
-        return conversationMap.containsKey(npcEntity.getUUID());
-    }
-
-    /**
-     * End all conversations that are out of time
-     */
-    public static void endOutOfTimeConversations() {
-        if (conversationMap.isEmpty()) return;
-        conversationMap.forEach((uuid, conversationHandler) -> {
-            if (conversationHandler.getUpdateTime() + outOfTime < System.currentTimeMillis()) {
-                endConversation(uuid);
-            }
-        });
-    }
-
-    /**
-     * End all conversations
-     */
-    public static void endAllConversations() {
-        if (conversationMap.isEmpty()) return;
-        conversationMap.forEach((uuid, conversationHandler) -> endConversation(uuid));
     }
 
     /**
@@ -124,15 +100,37 @@ public class ConversationManager {
         return conversationMap.keySet().stream().filter(entities::contains).map(conversationMap::get).toList();
     }
 
+    private static List<Entity> getEntitiesInRange(@NotNull PlayerEntity player, double range) {
+        return player.world.getEntitiesByClass(Entity.class, player.getBoundingBox().expand(range), entity -> entity.getCustomName() != null);
+    }
 
     /**
-     * Get all Entities within a certain range of a player
-     *
-     * @param player The player to check
-     * @param range  The range to check
-     * @return A list of Entities within the range of the player
+     * End a conversation with a specific UUID. This will also remove the NPCEntity the UUID represented from NPCEntityManager.
+     * @param uuid The UUID of the conversation
      */
-    public static List<Entity> getEntitiesInRange(@NotNull PlayerEntity player, double range) {
-        return player.world.getEntitiesByClass(Entity.class, player.getBoundingBox().expand(range), entity -> entity.getCustomName() != null);
+    public static void endConversation(UUID uuid) {
+        conversationMap.get(uuid).discard();
+        NPCEntityManager.removeNPCEntity(uuid);
+        conversationMap.remove(uuid);
+    }
+
+    /**
+     * End all conversations that are out of time
+     */
+    public static void endOutOfTimeConversations() {
+        if (conversationMap.isEmpty()) return;
+        conversationMap.forEach((uuid, conversationHandler) -> {
+            if (conversationHandler.getUpdateTime() + outOfTime < System.currentTimeMillis()) {
+                endConversation(uuid);
+            }
+        });
+    }
+
+    /**
+     * End all conversations
+     */
+    public static void endAllConversations() {
+        if (conversationMap.isEmpty()) return;
+        conversationMap.forEach((uuid, conversationHandler) -> endConversation(uuid));
     }
 }
