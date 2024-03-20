@@ -70,7 +70,6 @@ If you are administrator, see the [Installation](#5-installation) for more infor
 - `/npchat setKey <key>` - Set OpenAI API key
 - `/npchat setModel <model>` - Set AI model
 - `/npchat setRange <range>` - Set the range of the conversation
-- `/npchat setForgetTime <time>` - Set the time to forget the memory (in milliseconds)
 - `/npchat setLanguage <language>` - Set the response language
 - `/npchat setMaxTokens <maxTokens>` - Set the max tokens of a conversation
 - `/npchat setURL <url>` - Set the OpenAI API proxy URL

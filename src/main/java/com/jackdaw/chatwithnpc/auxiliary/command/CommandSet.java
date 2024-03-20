@@ -5,6 +5,7 @@ import com.jackdaw.chatwithnpc.LiveCycleManager;
 import com.jackdaw.chatwithnpc.auxiliary.configuration.SettingManager;
 import com.jackdaw.chatwithnpc.conversation.ConversationHandler;
 import com.jackdaw.chatwithnpc.conversation.ConversationManager;
+import com.jackdaw.chatwithnpc.openaiapi.functioncalling.FunctionManager;
 import com.jackdaw.chatwithnpc.group.Group;
 import com.jackdaw.chatwithnpc.group.GroupManager;
 import com.jackdaw.chatwithnpc.npc.NPCEntity;
@@ -32,6 +33,13 @@ public class CommandSet {
     private static final SuggestionProvider<ServerCommandSource> groupSuggestionProvider = (context, builder) -> {
         for (String group : GroupManager.getGroupList()) {
             builder.suggest(group);
+        }
+        return builder.buildFuture();
+    };
+
+    private static final SuggestionProvider<ServerCommandSource> functionsSuggestionProvider = (context, builder) -> {
+        for (String function : FunctionManager.getFileList()) {
+            builder.suggest(function);
         }
         return builder.buildFuture();
     };
@@ -96,6 +104,14 @@ public class CommandSet {
                         .then(literal("setInstructions")
                                 .then(argument("instructions", StringArgumentType.greedyString())
                                         .executes(CommandSet::setNPCInstructions)))
+                        .then(literal("addFunction")
+                                .then(argument("function", StringArgumentType.word())
+                                        .suggests(functionsSuggestionProvider)
+                                        .executes(CommandSet::addNPCFunction)))
+                        .then(literal("deleteFunction")
+                                .then(argument("function", StringArgumentType.word())
+                                        .suggests(functionsSuggestionProvider)
+                                        .executes(CommandSet::deleteNPCFunction)))
                         .then(literal("isNeedMemory")
                                 .then(argument("isNeedMemory", BoolArgumentType.bool())
                                         .executes(CommandSet::setNeedMemory)))
@@ -155,6 +171,8 @@ public class CommandSet {
                 .append("\n/npchat npc setGroup <group> - Set the group for the closest NPC.")
                 .append("\n/npchat npc setInstructions <instructions> - Set the instructions for the closest NPC.")
                 .append("\n/npchat npc isNeedMemory <isNeedMemory> - Set the need memory for the closest NPC.")
+                .append("\n/npchat npc addFunction <function> - Add a function to the closest NPC.")
+                .append("\n/npchat npc deleteFunction <function> - Delete a function from the closest NPC.")
                 .append("\n/npchat npc update - Update the current information of closest NPC to OpenAI.")
                 .append("\n/npchat npc clearMemory - Clear the memory for the closest NPC.")
                 .append("\n --------------------------------")
@@ -226,6 +244,7 @@ public class CommandSet {
                 .append("\nCareer: ").append(Text.literal(npc.getCareer()).formatted(Formatting.AQUA))
                 .append("\nInstructions: ").append(Text.literal(npc.getInstructions()).formatted(Formatting.BLUE))
                 .append("\nNeed memory: ").append(npc.isNeedMemory() ? yes : no)
+                .append("\nFunctions: ").append(Text.literal(String.join(", ", npc.getFunctions())).formatted(Formatting.DARK_PURPLE))
                 // converge Long to real time
                 .append("\nLast Message Time: ").append(Text.literal(String.valueOf(conversation.getUpdateTimeString())).formatted(Formatting.GRAY))
                 .append("\nUse ").append(Text.literal("/npchat help").formatted(Formatting.GRAY)).append(" for help");
@@ -454,6 +473,36 @@ public class CommandSet {
             String career = context.getArgument("career", String.class);
             conversation.getNpc().setCareer(career);
             player.sendMessage(Text.of("[chat-with-npc] Career set."), true);
+            return 1;
+        }
+        if (player != null) {
+            player.sendMessage(Text.of("[chat-with-npc] You are not in a conversation."), true);
+        }
+        return 0;
+    }
+
+    private static int addNPCFunction(@NotNull CommandContext<ServerCommandSource> context) {
+        ServerPlayerEntity player = context.getSource().getPlayer();
+        ConversationHandler conversation = ConversationManager.getConversation(player);
+        if (player != null && conversation != null) {
+            String function = context.getArgument("function", String.class);
+            conversation.getNpc().addFunction(function);
+            player.sendMessage(Text.of("[chat-with-npc] Function added."), true);
+            return 1;
+        }
+        if (player != null) {
+            player.sendMessage(Text.of("[chat-with-npc] You are not in a conversation."), true);
+        }
+        return 0;
+    }
+
+    private static int deleteNPCFunction(@NotNull CommandContext<ServerCommandSource> context) {
+        ServerPlayerEntity player = context.getSource().getPlayer();
+        ConversationHandler conversation = ConversationManager.getConversation(player);
+        if (player != null && conversation != null) {
+            String function = context.getArgument("function", String.class);
+            conversation.getNpc().removeFunction(function);
+            player.sendMessage(Text.of("[chat-with-npc] Function removed."), true);
             return 1;
         }
         if (player != null) {

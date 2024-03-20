@@ -7,6 +7,7 @@ import net.minecraft.text.Text;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -20,7 +21,7 @@ import java.util.UUID;
  * <p>
  * <b>Please note: this class should set a life cycle to reduce repeated reading and memory usage<b/>
  *
- * @version 1.0
+ * @version 1.1
  */
 public abstract class NPCEntity {
 
@@ -33,6 +34,8 @@ public abstract class NPCEntity {
     protected String instructions = "You are an NPC.";
     protected String group = "Global";
     protected boolean needMemory = true;
+
+    protected ArrayList<String> functions = new ArrayList<>();
     protected TextBubbleEntity textBubble;
 
     /**
@@ -242,6 +245,38 @@ public abstract class NPCEntity {
      */
     public boolean hasThreadId() {
         return ThreadId != null;
+    }
+
+    /**
+     * Add a function to the NPC.
+     * @param function The function to add
+     */
+    public void addFunction(String function) {
+        functions.add(function);
+    }
+
+    /**
+     * Remove a function from the NPC.
+     * @param function The function to remove
+     */
+    public void removeFunction(String function) {
+        functions.remove(function);
+    }
+
+    /**
+     * Get the functions of the NPC.
+     * @return The functions of the NPC
+     */
+    public ArrayList<String> getFunctions() {
+        return functions;
+    }
+
+    /**
+     * Set the functions of the NPC.
+     * @param functions The functions of the NPC
+     */
+    public void setFunctions(ArrayList<String> functions) {
+        this.functions = functions;
     }
 
     /**

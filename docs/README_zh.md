@@ -53,7 +53,6 @@ NPC的对话可以被所有人看到（在他们头顶的**聊天气泡**中）�
 - `/npchat setKey <key>` - 设置OpenAI API密钥
 - `/npchat setModel <model>` - 设置AI模型
 - `/npchat setRange <range>` - 设置对话范围
-- `/npchat setForgetTime <time>` - 设置遗忘记忆的时间 (以毫秒为单位)
 - `/npchat setLanguage <language>` - 设置响应语言
 - `/npchat setMaxTokens <maxTokens>` - 设置对话的最大标记
 - `/npchat setURL <url>` - 设置OpenAI API代理URL

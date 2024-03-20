@@ -4,8 +4,10 @@ import com.google.gson.Gson;
 import com.jackdaw.chatwithnpc.ChatWithNPCMod;
 import com.jackdaw.chatwithnpc.auxiliary.configuration.SettingManager;
 import com.jackdaw.chatwithnpc.conversation.ConversationHandler;
+import com.jackdaw.chatwithnpc.openaiapi.functioncalling.FunctionManager;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -30,7 +32,7 @@ public class Run {
         }
         // Wait for the run to complete or timeout
         CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
-            while (!run.isCompleted()) {
+            while (!run.isCompleted() && !run.isRequiredAction()) {
                 try {
                     run.updateStatus();
                     java.lang.Thread.sleep(100);
@@ -41,7 +43,11 @@ public class Run {
         });
         try {
             future.get(10, TimeUnit.SECONDS); // Wait for the run to complete or timeout
-            run.callback(conversation);
+            if (run.isRequiredAction()) {
+                run.callFunctions(conversation);
+                future.get(10, TimeUnit.SECONDS);
+            }
+            if (run.isCompleted()) run.callback(conversation);
         } catch (TimeoutException e) {
             future.cancel(true); // Cancel the task if it's not completed within the timeout
         }
@@ -53,7 +59,9 @@ public class Run {
         private String assistant_id;
         private String status;
 
-        private static String toJson(Map<String, String> map) {
+        private RequiredAction required_action;
+
+        private static String toJson(Map map) {
             return new Gson().toJson(map);
         }
 
@@ -63,6 +71,10 @@ public class Run {
 
         public boolean isCompleted() {
             return this.status.equals("completed");
+        }
+
+        public boolean isRequiredAction() {
+            return this.status.equals("requires_action");
         }
 
         private void updateStatus() throws Exception {
@@ -83,16 +95,31 @@ public class Run {
             this.status = run.status;
         }
 
-        /**
-         * Callback function to send the response to the player
-         *
-         * @param conversation The conversation handler
-         * @throws Exception If the response is null
-         */
+        private void callFunctions(ConversationHandler conversation) throws Exception {
+            ArrayList<Map> outputs = new ArrayList<>();
+            for(FunctionManager.ToolCall toolCall : required_action.tool_calls) {
+                if (toolCall.type.equals("function")) {
+                    Map<String, String> res = FunctionManager.callFunction(conversation, toolCall.function.name, new Gson().fromJson(toolCall.function.arguments, Map.class));
+                    outputs.add(Map.of(
+                            "tool_call_id", toolCall.id,
+                            "output", res
+                    ));
+                }
+            }
+            Map res = Map.of("tool_outputs", outputs);
+            String response = toJson(res);
+            Request.sendRequest(response, "threads/" + thread_id + "/runs/" + id + "/submit_tool_outputs", Header.buildBeta(), Request.Action.POST);
+        }
+
         private void callback(@NotNull ConversationHandler conversation) throws Exception {
             String response = Threads.getLastMessage(thread_id);
             conversation.getNpc().replyMessage(response, SettingManager.range);
         }
+    }
+
+    private static class RequiredAction {
+        private String type;
+        private FunctionManager.ToolCall[] tool_calls;
     }
 
 

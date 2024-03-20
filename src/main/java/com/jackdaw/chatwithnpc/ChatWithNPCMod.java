@@ -5,6 +5,7 @@ import com.jackdaw.chatwithnpc.auxiliary.configuration.SettingManager;
 import com.jackdaw.chatwithnpc.conversation.ConversationHandler;
 import com.jackdaw.chatwithnpc.conversation.ConversationManager;
 import com.jackdaw.chatwithnpc.listener.PlayerSendMessageCallback;
+import com.jackdaw.chatwithnpc.openaiapi.functioncalling.FunctionManager;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -31,7 +32,7 @@ public class ChatWithNPCMod implements ModInitializer {
     // The time in milliseconds that check for out of time static data
     public static final long updateInterval = 30000L;
 
-    public static final boolean debug = false;
+    public static final boolean debug = true;
 
     @Override
     public void onInitialize() {
@@ -47,6 +48,8 @@ public class ChatWithNPCMod implements ModInitializer {
         }
         // Load the configuration
         SettingManager.sync();
+        // Load the functions
+        FunctionManager.sync();
         // Register the command
         CommandRegistrationCallback.EVENT.register(CommandSet::setupCommand);
         // Register the conversation
