@@ -101,4 +101,4 @@ NPCEntity管理器负责管理所有的NPCEntity，NPCEntity的主要设定有�
 
 - 自插件被加载后，生命周期管理器将会被异步加载，**每30秒**检查一次所有的`ConversationHandler`和`Group`，并且将会卸载那些**超过5分钟**没有被使用的实例。
 - 服务器关闭时，生命周期管理器会关闭所有的`ConversationHandler`和`Group`，并关闭生命周期管理器线程。
-- 通过指令`/npc reload`可以异步卸载所有的`ConversationHandler`和`Group`。
+- 通过指令`/npc saveAll`可以异步卸载所有的`ConversationHandler`和`Group`。

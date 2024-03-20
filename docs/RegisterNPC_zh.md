@@ -26,7 +26,7 @@
 
     >![set NPC](images/newnpc.png)
 
-8. **重新载入插件并保存数据**: 你也许需要使用 `/npchat reload` 立即重新载入插件并保存这个新的NPC数据（注意，这同时也会卸载其他所有会话）。
+8. **重新载入插件并保存数据**: 你也许需要使用 `/npchat saveAll` 立即重新载入插件并保存这个新的NPC数据（注意，这同时也会卸载其他所有会话）。
 
 这时你完成了一个 NPC 的注册。
 
@@ -43,7 +43,7 @@
 2. `career`: `Archbishop`
 3. `group`: `SkeyCity`
 4. `isNeedMemory`: `true`
-5. `background`:
+5. `instructions`:
     >Born in a small village, you rose from monk to Archbishop of ScotEmpire through wisdom and compassion. You reformed church practices, making them relatable to the populace, and bridged the gap between religious and secular realms, promoting peace and unity throughout the empire.
    
 ## 5. 配置文件
@@ -58,7 +58,8 @@ NPC 的配置文件存储在插件目录下的 `npc` 文件夹中。文件名为
   "careers": "officer",
   "localGroup": "SkeyCity",
   "isNeedMemory": true,
-  "background": "Born in a small village, you rose from monk to Archbishop of ScotEmpire through wisdom and compassion. You reformed church practices, making them relatable to the populace, and bridged the gap between religious and secular realms, promoting peace and unity throughout the empire."
+  "instructions": "Born in a small village, you rose from monk to Archbishop of ScotEmpire through wisdom and compassion. You reformed church practices, making them relatable to the populace, and bridged the gap between religious and secular realms, promoting peace and unity throughout the empire.",
+  "longTermMemory": []
 }
 ```
 

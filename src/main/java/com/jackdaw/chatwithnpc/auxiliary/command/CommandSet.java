@@ -259,15 +259,8 @@ public class CommandSet {
     }
 
     private static int saveAll(@NotNull CommandContext<ServerCommandSource> context) {
-        Thread t = new Thread(() -> {
-            try {
-                LiveCycleManager.saveAll();
-                SettingManager.sync();
-                context.getSource().sendFeedback(Text.of("[chat-with-npc] Reloaded"), true);
-            } catch (Exception ignore) {
-            }
-        });
-        t.start();
+        LiveCycleManager.asyncSaveAll();
+        context.getSource().sendFeedback(Text.of("[chat-with-npc] Reloaded"), true);
         return 1;
     }
 

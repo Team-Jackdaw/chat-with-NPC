@@ -100,4 +100,4 @@ The lifecycle manager is responsible for managing the lifecycle of all `Conversa
 
 - `ConversationHandler` and `Group` are managed by the lifecycle manager, and the lifecycle manager provides methods to activate, extract, and delete `ConversationHandler` and `Group`.
 - The lifecycle manager will automatically delete the `ConversationHandler` and `Group` that have not been activated for a long time, and the time is set by the `forgetTime` of `NPCEntity` and `Group`.
-- All `ConversationHandlers` and `Groups` can be unloaded asynchronously with the command `/npc reload`.
+- All `ConversationHandlers` and `Groups` can be unloaded asynchronously with the command `/npc saveAll`.

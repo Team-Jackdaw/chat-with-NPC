@@ -25,7 +25,7 @@
     > ![set Group](images/newgroup.png)
 
 5. **Add Group to an NPC**: Use the command `/npchat npc setGroup <group>` to add this group to an NPC. And then they will know everything about this group.
-6. **Reload the Plugin and Save Data**: You may need to use `/npchat reload` to reload the plugin immediately and save this new NPC data (note that this will also unload all other conversations).
+6. **Reload the Plugin and Save Data**: You may need to use `/npchat saveAll` to reload the plugin immediately and save this new NPC data (note that this will also unload all other conversations).
 
 ## 3. Rules for Group Setting
 
