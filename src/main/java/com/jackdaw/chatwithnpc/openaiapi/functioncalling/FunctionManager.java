@@ -19,6 +19,10 @@ public class FunctionManager {
     private static final Path folder = ChatWithNPCMod.workingDirectory.resolve("functions");
     private static final Map<String, CustomFunction> functionRegistry = new HashMap<>();
 
+    static {
+        registerFunction("give_diamond", new GiveDiamondFunction());
+    }
+
     /**
      * Register a function that can be used by the NPC. It will be called by the OpenAI Assistant.
      * @param name The name of the function
@@ -29,17 +33,7 @@ public class FunctionManager {
     }
 
     public static @NotNull ArrayList<String> getFileList() {
-        File[] files = folder.toFile().listFiles();
-        ArrayList<String> functionList = new ArrayList<>();
-        if (files != null) {
-            for (File file : files) {
-                String name = file.getName();
-                if (name.endsWith(".json")) {
-                    functionList.add(name.substring(0, name.length() - 5));
-                }
-            }
-        }
-        return functionList;
+        return new ArrayList<>(functionRegistry.keySet());
     }
 
     /**
@@ -76,7 +70,7 @@ public class FunctionManager {
     }
 
     /**
-     * Register a function from a JSON string. It will be called by the OpenAI Assistant but with no response.
+     * Register a function from a JSON string. It will be called by the OpenAI Assistant but with no call on Minecraft.
      * <p>
      * The JSON string should be in the following format:
      * <pre>
@@ -102,7 +96,7 @@ public class FunctionManager {
      *         }
      *     }
      * </pre>
-     * This function will not be executed and will not have a response. Once it is called, it will add all the parameters including the function name to NPC's NBT data.
+     * This function will not be executed and will not have any action. Once it is called, it will only add the parameters including the function name to NPC's NBT data.
      * @param json The JSON string
      */
     public static void registerFromJson(String json) {
@@ -111,7 +105,7 @@ public class FunctionManager {
         for (Map.Entry<String, Map<String, String>> entry : tools.function.parameters.properties.entrySet()) {
             properties.put(entry.getKey(), entry.getValue().get("description"));
         }
-        CustomFunction function = new NoResponseFunction(tools.function.description, properties);
+        CustomFunction function = new NoCallableFunction(tools.function.description, properties);
         functionRegistry.put(tools.function.name, function);
     }
 

@@ -32,7 +32,7 @@ public class ChatWithNPCMod implements ModInitializer {
     // The time in milliseconds that check for out of time static data
     public static final long updateInterval = 30000L;
 
-    public static final boolean debug = true;
+    public static final boolean debug = false;
 
     @Override
     public void onInitialize() {

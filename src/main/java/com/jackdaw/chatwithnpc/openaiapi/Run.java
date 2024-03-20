@@ -5,6 +5,7 @@ import com.jackdaw.chatwithnpc.ChatWithNPCMod;
 import com.jackdaw.chatwithnpc.auxiliary.configuration.SettingManager;
 import com.jackdaw.chatwithnpc.conversation.ConversationHandler;
 import com.jackdaw.chatwithnpc.openaiapi.functioncalling.FunctionManager;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -31,26 +32,40 @@ public class Run {
             throw new Exception("Run status is null");
         }
         // Wait for the run to complete or timeout
-        CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
-            while (!run.isCompleted() && !run.isRequiredAction()) {
+        CompletableFuture<Void> future = wait(run);
+        try {
+            future.get(10, TimeUnit.SECONDS);
+            RunClass newRun = RunClass.fromJson(run.updateStatus());
+            if (newRun.isRequiresAction()) {
+                newRun.callFunctions(conversation);
+                newRun.updateStatus();
+                CompletableFuture<Void> newFuture = wait(newRun);
+                try {
+                    newFuture.get(10, TimeUnit.SECONDS);
+                } catch (TimeoutException e) {
+                    ChatWithNPCMod.LOGGER.info(e.getMessage());
+                    future.cancel(true);
+                }
+            }
+            if (newRun.isCompleted()) newRun.callback(conversation);
+        } catch (TimeoutException e) {
+            ChatWithNPCMod.LOGGER.info(e.getMessage());
+            future.cancel(true);
+        }
+    }
+
+    @Contract("_ -> new")
+    private static @NotNull CompletableFuture<Void> wait(RunClass run) {
+        return CompletableFuture.runAsync(() -> {
+            while (!run.isCompleted() && !run.isRequiresAction()) {
                 try {
                     run.updateStatus();
-                    java.lang.Thread.sleep(100);
+                    Thread.sleep(100);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             }
         });
-        try {
-            future.get(10, TimeUnit.SECONDS); // Wait for the run to complete or timeout
-            if (run.isRequiredAction()) {
-                run.callFunctions(conversation);
-                future.get(10, TimeUnit.SECONDS);
-            }
-            if (run.isCompleted()) run.callback(conversation);
-        } catch (TimeoutException e) {
-            future.cancel(true); // Cancel the task if it's not completed within the timeout
-        }
     }
 
     private static class RunClass {
@@ -58,7 +73,6 @@ public class Run {
         private String thread_id;
         private String assistant_id;
         private String status;
-
         private RequiredAction required_action;
 
         private static String toJson(Map map) {
@@ -73,11 +87,11 @@ public class Run {
             return this.status.equals("completed");
         }
 
-        public boolean isRequiredAction() {
+        public boolean isRequiresAction() {
             return this.status.equals("requires_action");
         }
 
-        private void updateStatus() throws Exception {
+        private String updateStatus() throws Exception {
             String res = Request.sendRequest(
                     null,
                     "threads/" + thread_id + "/runs/" + id,
@@ -93,16 +107,17 @@ public class Run {
                 throw new Exception("Run status is null");
             }
             this.status = run.status;
+            return res;
         }
 
         private void callFunctions(ConversationHandler conversation) throws Exception {
             ArrayList<Map> outputs = new ArrayList<>();
-            for(FunctionManager.ToolCall toolCall : required_action.tool_calls) {
+            for(FunctionManager.ToolCall toolCall : required_action.submit_tool_outputs.tool_calls) {
                 if (toolCall.type.equals("function")) {
                     Map<String, String> res = FunctionManager.callFunction(conversation, toolCall.function.name, new Gson().fromJson(toolCall.function.arguments, Map.class));
                     outputs.add(Map.of(
                             "tool_call_id", toolCall.id,
-                            "output", res
+                            "output", res.toString()
                     ));
                 }
             }
@@ -119,7 +134,11 @@ public class Run {
 
     private static class RequiredAction {
         private String type;
-        private FunctionManager.ToolCall[] tool_calls;
+        private SubmitToolOutputs submit_tool_outputs;
+
+        private static class SubmitToolOutputs {
+            private FunctionManager.ToolCall[] tool_calls;
+        }
     }
 
 
