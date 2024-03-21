@@ -42,7 +42,7 @@ import java.util.Map;
  */
 public abstract class CustomFunction {
     public String description;
-    public Map<String, String> properties;
+    public Map<String, Map> properties;
 
     /**
      * Execute the function. This method will be called by the OpenAI Assistant in a conversation.

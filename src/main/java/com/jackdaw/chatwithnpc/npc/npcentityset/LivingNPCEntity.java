@@ -1,5 +1,7 @@
-package com.jackdaw.chatwithnpc.npc;
+package com.jackdaw.chatwithnpc.npc.npcentityset;
 
+import com.jackdaw.chatwithnpc.ChatWithNPCMod;
+import com.jackdaw.chatwithnpc.npc.NPCEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.NoPenaltyTargeting;
 import net.minecraft.entity.mob.MobEntity;
@@ -29,12 +31,12 @@ public class LivingNPCEntity extends NPCEntity {
         switch (action) {
             case WALK_TO_PLAYER -> walkToPlayer(player);
             case ESCAPE -> escape();
-            case SHAKE_HEAD -> shakeHead();
             case FEEL_HAPPY -> feelHappy();
+            default -> {}
         }
     }
 
-    private void feelHappy() {
+    protected void feelHappy() {
         LivingEntity livingEntity = (LivingEntity) this.entity;
         ServerWorld world = (ServerWorld) livingEntity.world;
         ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
@@ -51,23 +53,23 @@ public class LivingNPCEntity extends NPCEntity {
         }, 5, TimeUnit.SECONDS);
     }
 
-    private void shakeHead() {
-        // no action
-    }
-
-    private void escape() {
-        MobEntity mobEntity = (MobEntity) this.entity;
-        Vec3d vec3d = NoPenaltyTargeting.find((PathAwareEntity) this.entity, 5, 4);
+    protected void escape() {
+        PathAwareEntity mobEntity = (PathAwareEntity) this.entity;
+        Vec3d vec3d = NoPenaltyTargeting.find(mobEntity, 5, 4);
+        if (ChatWithNPCMod.debug) ChatWithNPCMod.LOGGER.info("vec3d: " + vec3d);
         if (vec3d == null) return;
         double targetX = vec3d.x;
         double targetY = vec3d.y;
         double targetZ = vec3d.z;
-        mobEntity.getNavigation().startMovingTo(targetX, targetY, targetZ, mobEntity.getMovementSpeed() + 1);
+        boolean status = mobEntity.getNavigation().startMovingTo(targetX, targetY, targetZ, mobEntity.getMovementSpeed() + 1);
+        if (ChatWithNPCMod.debug) ChatWithNPCMod.LOGGER.info("status: " + status + "moving to target: " + targetX + " " + targetY + " " + targetZ + "with speed: " + mobEntity.getMovementSpeed() + "and distance: " + mobEntity.squaredDistanceTo(targetX, targetY, targetZ));
     }
 
-    private void walkToPlayer(PlayerEntity player) {
+    protected void walkToPlayer(PlayerEntity player) {
         MobEntity mobEntity = (MobEntity) this.entity;
-        mobEntity.getNavigation().startMovingTo(player, mobEntity.getMovementSpeed());
+        boolean status = mobEntity.getNavigation().startMovingTo(player, mobEntity.getMovementSpeed() + 1);
+        if (ChatWithNPCMod.debug) ChatWithNPCMod.LOGGER.info("status: " + status + "moving to player: " + player.getName() + "with speed: " + mobEntity.getMovementSpeed() + "and distance: " + mobEntity.squaredDistanceTo(player));
+        if (ChatWithNPCMod.debug) ChatWithNPCMod.LOGGER.info("player position: " + mobEntity.getNavigation().getTargetPos());
     }
 
 }

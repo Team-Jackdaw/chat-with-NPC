@@ -38,7 +38,7 @@ public class CommandSet {
     };
 
     private static final SuggestionProvider<ServerCommandSource> functionsSuggestionProvider = (context, builder) -> {
-        for (String function : FunctionManager.getFileList()) {
+        for (String function : FunctionManager.getRegistryList()) {
             builder.suggest(function);
         }
         return builder.buildFuture();

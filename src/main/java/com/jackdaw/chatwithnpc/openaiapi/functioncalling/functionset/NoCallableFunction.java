@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Map;
 
 public class NoCallableFunction extends CustomFunction {
-    public NoCallableFunction(String description, Map<String, String> properties) {
+    public NoCallableFunction(String description, Map<String, Map> properties) {
         this.description = description;
         this.properties = properties;
     }

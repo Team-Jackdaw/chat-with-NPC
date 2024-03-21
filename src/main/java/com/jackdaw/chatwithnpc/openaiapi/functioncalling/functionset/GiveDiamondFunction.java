@@ -11,9 +11,9 @@ import java.util.Map;
 public class GiveDiamondFunction extends CustomFunction {
 
     public GiveDiamondFunction() {
-        description = "This function is used to give player a diamond. If the player make a request to the NPC to give them some diamonds, this function will be called.";
+        description = "This function is used to give player a diamond. You can give player diamonds if you want.";
         properties = Map.of(
-                "number", "the number of diamonds to give to the player."
+                "number", Map.of("description", "the number of diamonds to give to the player.")
         );
     }
 

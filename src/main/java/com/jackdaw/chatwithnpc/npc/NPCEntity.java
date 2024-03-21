@@ -1,6 +1,7 @@
 package com.jackdaw.chatwithnpc.npc;
 
 import com.jackdaw.chatwithnpc.auxiliary.configuration.SettingManager;
+import com.jackdaw.chatwithnpc.npc.npcentityset.Actions;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;

@@ -70,15 +70,11 @@ public class FunctionManager {
      */
     public static void registerFromJson(String json) {
         Tools tools = Tools.fromJson(json);
-        HashMap<String, String> properties = new HashMap<>();
-        for (Map.Entry<String, Map<String, String>> entry : tools.function.parameters.properties.entrySet()) {
-            properties.put(entry.getKey(), entry.getValue().get("description"));
-        }
-        CustomFunction function = new NoCallableFunction(tools.function.description, properties);
+        CustomFunction function = new NoCallableFunction(tools.function.description, tools.function.parameters.properties);
         functionRegistry.put(tools.function.name, function);
     }
 
-    public static @NotNull ArrayList<String> getFileList() {
+    public static @NotNull ArrayList<String> getRegistryList() {
         return new ArrayList<>(functionRegistry.keySet());
     }
 
@@ -139,7 +135,7 @@ public class FunctionManager {
         return getFunctionJson(name, function.description, function.properties);
     }
 
-    private static String getFunctionJson(@NotNull String name, @NotNull String description, @NotNull Map<String, String> properties) {
+    private static String getFunctionJson(@NotNull String name, @NotNull String description, @NotNull Map<String, Map> properties) {
         Tools tools = new Tools();
         tools.type = "function";
         tools.function = new Tools.Function();
@@ -147,14 +143,8 @@ public class FunctionManager {
         tools.function.description = description;
         tools.function.parameters = new Tools.Function.Parameters();
         tools.function.parameters.type = "object";
-        tools.function.parameters.properties = new HashMap<>();
-        for (Map.Entry<String, String> entry : properties.entrySet()) {
-            tools.function.parameters.properties.put(entry.getKey(), Map.of(
-                "type", "string",
-                "description", entry.getValue()
-            ));
-        }
-        tools.function.parameters.required = properties.keySet().toArray(new String[0]);
+        tools.function.parameters.properties = properties;
+        tools.function.parameters.required = properties.keySet().toArray();
         return tools.toJson();
     }
 
@@ -169,8 +159,8 @@ public class FunctionManager {
 
             private static class Parameters {
                 private String type;
-                private Map<String, Map<String, String>> properties;
-                private String[] required;
+                private Map<String, Map> properties;
+                private Object[] required;
             }
         }
 

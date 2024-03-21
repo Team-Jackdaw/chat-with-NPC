@@ -2,35 +2,33 @@ package com.jackdaw.chatwithnpc.openaiapi.functioncalling.functionset;
 
 import com.jackdaw.chatwithnpc.ChatWithNPCMod;
 import com.jackdaw.chatwithnpc.conversation.ConversationHandler;
-import com.jackdaw.chatwithnpc.npc.Actions;
-import com.jackdaw.chatwithnpc.npc.NPCEntity;
+import com.jackdaw.chatwithnpc.npc.npcentityset.Actions;
 import com.jackdaw.chatwithnpc.openaiapi.functioncalling.CustomFunction;
-import net.minecraft.entity.player.PlayerEntity;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.Map;
 
 public class BasicFeelingFunction extends CustomFunction {
     public BasicFeelingFunction() {
-        description = "This function is used to express your feelings. The felling only includes `sad`, `happy`";
+        description = "This function is used to express your feelings. You can `shake head` if you feel bad or disagree with something, or `feel happy` if you feel happy or agree with something.";
         properties = Map.of(
-                "felling", "This is the your feeling. You can only select `SHAKE_HEAD` or `FEEL_HAPPY` as the value."
+                "feeling", Map.of(
+                        "description", "This is your feeling.",
+                        "enum", List.of("SHAKE_HEAD", "FEEL_HAPPY")
+                )
         );
     }
 
     @Override
     public Map<String, String> execute(@NotNull ConversationHandler conversation, @NotNull Map<String, String> args) {
-        String action = args.get("action");
+        String feeling = args.get("feeling");
         try {
-            Actions actionEnum = Actions.valueOf(action.toUpperCase());
-            NPCEntity npc = conversation.getNpc();
-            PlayerEntity player = npc.getEntity().getEntityWorld().getClosestPlayer(npc.getEntity(), 10);
-            if (player == null) throw new Exception("no player nearby");
-            npc.doAction(actionEnum, player);
+            conversation.getNpc().doAction(Actions.valueOf(feeling), null);
         } catch (Exception e) {
-            ChatWithNPCMod.LOGGER.error("Failed to execute the action: " + action + e);
-            return Map.of("status", "failed, because the action is not valid");
+            ChatWithNPCMod.LOGGER.error("Failed to execute the action: " + feeling + e);
+            return Map.of("status", "failed");
         }
-        return Map.of("status", "success, you `" + action + "`");
+        return Map.of("status", "success, you `" + feeling + "`");
     }
 }

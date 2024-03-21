@@ -1,5 +1,7 @@
 package com.jackdaw.chatwithnpc.npc;
 
+import com.jackdaw.chatwithnpc.npc.npcentityset.LivingNPCEntity;
+import com.jackdaw.chatwithnpc.npc.npcentityset.VillagerNPCEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.passive.VillagerEntity;
