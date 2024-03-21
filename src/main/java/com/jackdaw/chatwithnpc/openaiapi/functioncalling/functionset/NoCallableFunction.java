@@ -1,14 +1,15 @@
-package com.jackdaw.chatwithnpc.openaiapi.functioncalling;
+package com.jackdaw.chatwithnpc.openaiapi.functioncalling.functionset;
 
 import com.jackdaw.chatwithnpc.conversation.ConversationHandler;
+import com.jackdaw.chatwithnpc.openaiapi.functioncalling.CustomFunction;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NbtCompound;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
-public class NoCallableFunction extends CustomFunction{
-    NoCallableFunction(String description, Map<String, String> properties) {
+public class NoCallableFunction extends CustomFunction {
+    public NoCallableFunction(String description, Map<String, String> properties) {
         this.description = description;
         this.properties = properties;
     }

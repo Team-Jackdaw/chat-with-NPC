@@ -79,7 +79,7 @@ public class GroupManager {
     /**
      * Discard all the groups.
      */
-    public static void endAllEnvironments() {
+    public static void endAllGroup() {
         if (GroupMap.isEmpty()) return;
         GroupMap.forEach((name, environment) -> discardGroup(name));
     }

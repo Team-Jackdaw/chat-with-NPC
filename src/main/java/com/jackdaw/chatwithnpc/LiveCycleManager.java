@@ -1,8 +1,10 @@
 package com.jackdaw.chatwithnpc;
 
 import com.jackdaw.chatwithnpc.async.AsyncTaskQueue;
+import com.jackdaw.chatwithnpc.auxiliary.configuration.SettingManager;
 import com.jackdaw.chatwithnpc.conversation.ConversationManager;
 import com.jackdaw.chatwithnpc.group.GroupManager;
+import com.jackdaw.chatwithnpc.openaiapi.functioncalling.FunctionManager;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -36,7 +38,11 @@ public class LiveCycleManager {
      * Save all conversations, NPC entities, and environments
      */
     public static void asyncSaveAll() {
-        reloadService.addTask(LiveCycleManager::saveAll);
+        reloadService.addTask(() -> {
+            saveAll();
+            SettingManager.sync();
+            FunctionManager.sync();
+        });
     }
 
     /**
@@ -47,7 +53,7 @@ public class LiveCycleManager {
             ChatWithNPCMod.LOGGER.info("[chat-with-npc] Saving all conversations, NPC entities, and environments.");
         }
         ConversationManager.endAllConversations();
-        GroupManager.endAllEnvironments();
+        GroupManager.endAllGroup();
     }
 
     /**

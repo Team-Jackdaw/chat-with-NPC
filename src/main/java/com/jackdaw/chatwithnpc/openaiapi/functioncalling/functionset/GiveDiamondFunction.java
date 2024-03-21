@@ -1,6 +1,7 @@
-package com.jackdaw.chatwithnpc.openaiapi.functioncalling;
+package com.jackdaw.chatwithnpc.openaiapi.functioncalling.functionset;
 
 import com.jackdaw.chatwithnpc.conversation.ConversationHandler;
+import com.jackdaw.chatwithnpc.openaiapi.functioncalling.CustomFunction;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import org.jetbrains.annotations.NotNull;

@@ -61,6 +61,7 @@ If you are administrator, see the [Installation](#5-installation) for more infor
 3. For register the NPCs, please read [RegisterNPC](docs/RegisterNPC.md).
 4. For register the Groups, please read [RegisterGroup](docs/RegisterGroup.md).
 5. To know about the configuration of the mod, please read [Configuration](docs/Config.md).
+6. If you want to use some advanced features, please read [Advanced](docs/Advanced.md).
 
 ## 6. Commands
 
@@ -80,7 +81,7 @@ If you are administrator, see the [Installation](#5-installation) for more infor
 - [ ] Improve the chat bubble.
 - [ ] NPCs chat with each other and communicate their opinion of events.
 - [ ] NPCs have their opinion on every event in their `Group`.
-- [ ] NPCs performing actions based on the chat content.
+- [X] NPCs performing actions based on the chat content.
 
 ## 8. Build
 

@@ -3,6 +3,8 @@ package com.jackdaw.chatwithnpc.openaiapi.functioncalling;
 import com.google.gson.Gson;
 import com.jackdaw.chatwithnpc.ChatWithNPCMod;
 import com.jackdaw.chatwithnpc.conversation.ConversationHandler;
+import com.jackdaw.chatwithnpc.openaiapi.functioncalling.functionset.GiveDiamondFunction;
+import com.jackdaw.chatwithnpc.openaiapi.functioncalling.functionset.NoCallableFunction;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
@@ -30,43 +32,6 @@ public class FunctionManager {
      */
     public static void registerFunction(@NotNull String name, @NotNull CustomFunction function) {
         functionRegistry.put(name, function);
-    }
-
-    public static @NotNull ArrayList<String> getFileList() {
-        return new ArrayList<>(functionRegistry.keySet());
-    }
-
-    /**
-     * Get the list of the functions, and register them.
-     */
-    public static void sync() {
-        if (!Files.exists(folder)) {
-            try {
-                Files.createDirectories(folder);
-            } catch (IOException e) {
-                logger.error("[chat-with-npc] Failed to create the functions directory");
-                logger.error(e.getMessage());
-                throw new RuntimeException(e);
-            }
-        }
-        File workingDirectory = folder.toFile();
-        File[] files = workingDirectory.listFiles();
-        if (files != null) {
-            for (File file : files) {
-                String name = file.getName();
-                if (name.endsWith(".json")) {
-                    String json;
-                    try {
-                        json = Files.readString(file.toPath());
-                    } catch (IOException e) {
-                        logger.error("[chat-with-npc] Failed to read the function file: " + name);
-                        logger.error(e.getMessage());
-                        continue;
-                    }
-                    registerFromJson(json);
-                }
-            }
-        }
     }
 
     /**
@@ -107,6 +72,43 @@ public class FunctionManager {
         }
         CustomFunction function = new NoCallableFunction(tools.function.description, properties);
         functionRegistry.put(tools.function.name, function);
+    }
+
+    public static @NotNull ArrayList<String> getFileList() {
+        return new ArrayList<>(functionRegistry.keySet());
+    }
+
+    /**
+     * Get the list of the functions, and register them.
+     */
+    public static void sync() {
+        if (!Files.exists(folder)) {
+            try {
+                Files.createDirectories(folder);
+            } catch (IOException e) {
+                logger.error("[chat-with-npc] Failed to create the functions directory");
+                logger.error(e.getMessage());
+                throw new RuntimeException(e);
+            }
+        }
+        File workingDirectory = folder.toFile();
+        File[] files = workingDirectory.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                String name = file.getName();
+                if (name.endsWith(".json")) {
+                    String json;
+                    try {
+                        json = Files.readString(file.toPath());
+                    } catch (IOException e) {
+                        logger.error("[chat-with-npc] Failed to read the function file: " + name);
+                        logger.error(e.getMessage());
+                        continue;
+                    }
+                    registerFromJson(json);
+                }
+            }
+        }
     }
 
     /**
