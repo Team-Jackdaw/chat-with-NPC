@@ -3,6 +3,8 @@ package com.jackdaw.chatwithnpc.openaiapi.functioncalling;
 import com.google.gson.Gson;
 import com.jackdaw.chatwithnpc.ChatWithNPCMod;
 import com.jackdaw.chatwithnpc.conversation.ConversationHandler;
+import com.jackdaw.chatwithnpc.openaiapi.functioncalling.functionset.BasicActionFunction;
+import com.jackdaw.chatwithnpc.openaiapi.functioncalling.functionset.BasicFeelingFunction;
 import com.jackdaw.chatwithnpc.openaiapi.functioncalling.functionset.GiveDiamondFunction;
 import com.jackdaw.chatwithnpc.openaiapi.functioncalling.functionset.NoCallableFunction;
 import org.jetbrains.annotations.NotNull;
@@ -23,6 +25,8 @@ public class FunctionManager {
 
     static {
         registerFunction("give_diamond", new GiveDiamondFunction());
+        registerFunction("basic_action", new BasicActionFunction());
+        registerFunction("basic_feeling", new BasicFeelingFunction());
     }
 
     /**
