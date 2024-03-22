@@ -1,7 +1,7 @@
 package com.jackdaw.chatwithnpc.conversation;
 
 import com.jackdaw.chatwithnpc.ChatWithNPCMod;
-import com.jackdaw.chatwithnpc.auxiliary.configuration.SettingManager;
+import com.jackdaw.chatwithnpc.SettingManager;
 import com.jackdaw.chatwithnpc.npc.NPCEntity;
 import com.jackdaw.chatwithnpc.npc.NPCEntityManager;
 import net.minecraft.entity.Entity;

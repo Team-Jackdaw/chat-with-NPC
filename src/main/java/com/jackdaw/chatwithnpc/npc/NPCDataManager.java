@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 
 /**
  * A serializer used to read or write the data from the files.
@@ -94,6 +95,7 @@ public class NPCDataManager {
         private final String localGroup;
         private final boolean needMemory;
         private final String instructions;
+        private final ArrayList<String> functions;
 
         private NPCData(NPCEntity npc) {
             this.name = npc.getName();
@@ -103,6 +105,7 @@ public class NPCDataManager {
             this.localGroup = npc.getGroup();
             this.instructions = npc.getInstructions();
             this.needMemory = npc.isNeedMemory();
+            this.functions = npc.getFunctions();
         }
 
         private void set(NPCEntity npc) {
@@ -112,6 +115,7 @@ public class NPCDataManager {
             npc.setGroup(localGroup);
             npc.setInstructions(instructions);
             npc.setNeedMemory(needMemory);
+            npc.setFunctions(functions);
         }
 
         private String toJson() {

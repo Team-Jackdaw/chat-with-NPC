@@ -45,6 +45,7 @@ NPC的对话可以被所有人看到（在他们头顶的**聊天气泡**中）�
 3. 要注册NPC，请阅读[RegisterNPC](RegisterNPC_zh.md)。
 4. 要注册组，请阅读[RegisterGroup](RegisterGroup_zh.md)。
 5. 要了解有关mod的配置，请阅读[配置](Config_zh.md)。
+6. 要了解有关mod的高级功能，请阅读[高级功能](Advanced_zh.md)。
 
 ## 6. 命令
 - `/npchat` - 查看配置状态
@@ -53,7 +54,6 @@ NPC的对话可以被所有人看到（在他们头顶的**聊天气泡**中）�
 - `/npchat setKey <key>` - 设置OpenAI API密钥
 - `/npchat setModel <model>` - 设置AI模型
 - `/npchat setRange <range>` - 设置对话范围
-- `/npchat setForgetTime <time>` - 设置遗忘记忆的时间 (以毫秒为单位)
 - `/npchat setLanguage <language>` - 设置响应语言
 - `/npchat setMaxTokens <maxTokens>` - 设置对话的最大标记
 - `/npchat setURL <url>` - 设置OpenAI API代理URL
@@ -64,7 +64,7 @@ NPC的对话可以被所有人看到（在他们头顶的**聊天气泡**中）�
 - [ ] 改进聊天气泡。
 - [ ] NPC之间可以相互聊天，并交流观点。
 - [ ] NPC会对他们所属的`Group`中的事件有自己的看法。
-- [ ] NPC会对聊天内容作出动作反应。
+- [X] NPC会对聊天内容作出动作反应。
 
 ## 8. 构建
 

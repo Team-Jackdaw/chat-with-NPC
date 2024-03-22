@@ -1,7 +1,7 @@
 package com.jackdaw.chatwithnpc.openaiapi;
 
 import com.jackdaw.chatwithnpc.ChatWithNPCMod;
-import com.jackdaw.chatwithnpc.auxiliary.configuration.SettingManager;
+import com.jackdaw.chatwithnpc.SettingManager;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.*;
 import org.apache.http.entity.StringEntity;

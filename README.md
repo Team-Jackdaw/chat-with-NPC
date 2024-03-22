@@ -61,6 +61,7 @@ If you are administrator, see the [Installation](#5-installation) for more infor
 3. For register the NPCs, please read [RegisterNPC](docs/RegisterNPC.md).
 4. For register the Groups, please read [RegisterGroup](docs/RegisterGroup.md).
 5. To know about the configuration of the mod, please read [Configuration](docs/Config.md).
+6. If you want to use some advanced features, please read [Advanced](docs/Advanced.md).
 
 ## 6. Commands
 
@@ -70,7 +71,6 @@ If you are administrator, see the [Installation](#5-installation) for more infor
 - `/npchat setKey <key>` - Set OpenAI API key
 - `/npchat setModel <model>` - Set AI model
 - `/npchat setRange <range>` - Set the range of the conversation
-- `/npchat setForgetTime <time>` - Set the time to forget the memory (in milliseconds)
 - `/npchat setLanguage <language>` - Set the response language
 - `/npchat setMaxTokens <maxTokens>` - Set the max tokens of a conversation
 - `/npchat setURL <url>` - Set the OpenAI API proxy URL
@@ -81,7 +81,7 @@ If you are administrator, see the [Installation](#5-installation) for more infor
 - [ ] Improve the chat bubble.
 - [ ] NPCs chat with each other and communicate their opinion of events.
 - [ ] NPCs have their opinion on every event in their `Group`.
-- [ ] NPCs performing actions based on the chat content.
+- [X] NPCs performing actions based on the chat content.
 
 ## 8. Build
 

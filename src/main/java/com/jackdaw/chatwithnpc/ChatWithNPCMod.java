@@ -1,13 +1,13 @@
 package com.jackdaw.chatwithnpc;
 
-import com.jackdaw.chatwithnpc.auxiliary.command.CommandSet;
-import com.jackdaw.chatwithnpc.auxiliary.configuration.SettingManager;
 import com.jackdaw.chatwithnpc.conversation.ConversationHandler;
 import com.jackdaw.chatwithnpc.conversation.ConversationManager;
 import com.jackdaw.chatwithnpc.listener.PlayerSendMessageCallback;
+import com.jackdaw.chatwithnpc.openaiapi.functioncalling.FunctionManager;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
@@ -47,6 +47,8 @@ public class ChatWithNPCMod implements ModInitializer {
         }
         // Load the configuration
         SettingManager.sync();
+        // Load the functions
+        FunctionManager.sync();
         // Register the command
         CommandRegistrationCallback.EVENT.register(CommandSet::setupCommand);
         // Register the conversation
@@ -74,6 +76,13 @@ public class ChatWithNPCMod implements ModInitializer {
             }
             conversationHandler.replyToEntity(message);
             return ActionResult.PASS;
+        });
+        // Register the server tick listener to check the task queue that need to be executed in main thread
+        ServerTickEvents.END_SERVER_TICK.register(server -> {
+            if (!AsyncTask.isTaskQueueEmpty()) {
+                AsyncTask.TaskResult result = AsyncTask.pollTaskQueue();
+                result.execute();
+            }
         });
         // Start the live cycle manager
         LiveCycleManager.start(updateInterval);
