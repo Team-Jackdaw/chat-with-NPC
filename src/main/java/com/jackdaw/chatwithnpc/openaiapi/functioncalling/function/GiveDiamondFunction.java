@@ -1,4 +1,4 @@
-package com.jackdaw.chatwithnpc.openaiapi.functioncalling.functionset;
+package com.jackdaw.chatwithnpc.openaiapi.functioncalling.function;
 
 import com.jackdaw.chatwithnpc.conversation.ConversationHandler;
 import com.jackdaw.chatwithnpc.openaiapi.functioncalling.CustomFunction;
@@ -13,15 +13,18 @@ public class GiveDiamondFunction extends CustomFunction {
     public GiveDiamondFunction() {
         description = "This function is used to give player a diamond. You can give player diamonds if you want.";
         properties = Map.of(
-                "number", Map.of("description", "the number of diamonds to give to the player.")
+                "number", Map.of(
+                        "type", "string",
+                        "description", "the number of diamonds to give to the player."
+                )
         );
     }
 
     @Override
-    public Map<String, String> execute(@NotNull ConversationHandler conversation, @NotNull Map<String, String> args) {
+    public Map<String, String> execute(@NotNull ConversationHandler conversation, @NotNull Map args) {
         int number;
         try{
-            number = Integer.parseInt(args.get("number"));
+            number = Integer.parseInt((String) args.get("number"));
         } catch (NumberFormatException e) {
             number = 1;
         }

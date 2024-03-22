@@ -1,4 +1,4 @@
-package com.jackdaw.chatwithnpc.npc.npcentityset;
+package com.jackdaw.chatwithnpc.npc.npcentity;
 
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -18,11 +18,8 @@ public class VillagerNPCEntity extends LivingNPCEntity {
     @Override
     public void doAction(@NotNull Actions action, PlayerEntity player) {
         switch (action) {
-            case WALK_TO_PLAYER -> walkToPlayer(player);
-            case ESCAPE -> escape();
             case SHAKE_HEAD -> shakeHead();
-            case FEEL_HAPPY -> feelHappy();
-            default -> {}
+            default -> super.doAction(action, player);
         }
     }
 

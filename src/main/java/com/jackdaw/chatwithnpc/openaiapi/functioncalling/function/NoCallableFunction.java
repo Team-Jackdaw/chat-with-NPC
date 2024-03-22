@@ -1,4 +1,4 @@
-package com.jackdaw.chatwithnpc.openaiapi.functioncalling.functionset;
+package com.jackdaw.chatwithnpc.openaiapi.functioncalling.function;
 
 import com.jackdaw.chatwithnpc.conversation.ConversationHandler;
 import com.jackdaw.chatwithnpc.openaiapi.functioncalling.CustomFunction;
@@ -14,13 +14,14 @@ public class NoCallableFunction extends CustomFunction {
         this.properties = properties;
     }
 
-    public Map<String, String> execute(@NotNull ConversationHandler conversation, @NotNull Map<String, String> args) {
+    public Map<String, String> execute(@NotNull ConversationHandler conversation, @NotNull Map args) {
         Map<String, String> ok = Map.of("status", "success");
         if (args.isEmpty()) return ok;
         Entity entity = conversation.getNpc().getEntity();
         // add the args to the entity's NBT data
         NbtCompound nbt = entity.writeNbt(new NbtCompound());
-        for (Map.Entry<String, String> entry : args.entrySet()) {
+        Map<String, String> properties = (Map<String, String>) args;
+        for (Map.Entry<String, String> entry : properties.entrySet()) {
             nbt.putString(entry.getKey(), entry.getValue());
         }
         entity.readNbt(nbt);

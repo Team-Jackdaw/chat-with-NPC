@@ -24,12 +24,18 @@ import java.util.Map;
  *         public MyFunction() {
  *             description = "This function does something";
  *             properties = Map.of(
- *                 "param1", "This is the first parameter",
- *                 "param2", "This is the second parameter"
+ *                 "param1", Map.of(
+ *                      "description", "This is the first parameter",
+ *                      "type", "string"
+ *                 ),
+ *                 "param2", Map.of(
+ *                      "description", "This is the second parameter"
+ *                      "type", "string"
+ *                 )
  *             );
  *         }
  *
- *     public Map<String, String> execute(@NotNull ConversationHandler conversation, @NotNull Map<String, String> args) {
+ *     public Map< String, String > execute(@NotNull ConversationHandler conversation, @NotNull Map< String, String > args) {
  *         // Do something with the arguments
  *         }
  *     }
@@ -48,8 +54,8 @@ public abstract class CustomFunction {
      * Execute the function. This method will be called by the OpenAI Assistant in a conversation.
      * @param conversation The conversation handler
      * @param args The arguments
-     * @return The response
+     * @return The result you want to tell the OpenAI assistant
      */
-    public abstract Map<String, String> execute(@NotNull ConversationHandler conversation, @NotNull Map<String, String> args);
+    public abstract Map<String, String> execute(@NotNull ConversationHandler conversation, @NotNull Map args);
 }
 

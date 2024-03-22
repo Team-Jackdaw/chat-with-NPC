@@ -3,10 +3,10 @@ package com.jackdaw.chatwithnpc.openaiapi.functioncalling;
 import com.google.gson.Gson;
 import com.jackdaw.chatwithnpc.ChatWithNPCMod;
 import com.jackdaw.chatwithnpc.conversation.ConversationHandler;
-import com.jackdaw.chatwithnpc.openaiapi.functioncalling.functionset.BasicActionFunction;
-import com.jackdaw.chatwithnpc.openaiapi.functioncalling.functionset.BasicFeelingFunction;
-import com.jackdaw.chatwithnpc.openaiapi.functioncalling.functionset.GiveDiamondFunction;
-import com.jackdaw.chatwithnpc.openaiapi.functioncalling.functionset.NoCallableFunction;
+import com.jackdaw.chatwithnpc.openaiapi.functioncalling.function.BasicActionFunction;
+import com.jackdaw.chatwithnpc.openaiapi.functioncalling.function.BasicFeelingFunction;
+import com.jackdaw.chatwithnpc.openaiapi.functioncalling.function.GiveDiamondFunction;
+import com.jackdaw.chatwithnpc.openaiapi.functioncalling.function.NoCallableFunction;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
@@ -117,11 +117,12 @@ public class FunctionManager {
      * @param conversation The conversation handler
      * @param args The arguments
      */
-    public static Map<String, String> callFunction(@NotNull ConversationHandler conversation, @NotNull String name, @NotNull Map<String, String> args) {
+    public static Map<String, String> callFunction(@NotNull ConversationHandler conversation, @NotNull String name, @NotNull Map args) {
         CustomFunction function = functionRegistry.get(name);
         if (function == null) {
             throw new IllegalArgumentException("Function not found: " + name);
         }
+        if (ChatWithNPCMod.debug) ChatWithNPCMod.LOGGER.info("Calling function: " + name + " with args: " + args);
         return function.execute(conversation, args);
     }
 

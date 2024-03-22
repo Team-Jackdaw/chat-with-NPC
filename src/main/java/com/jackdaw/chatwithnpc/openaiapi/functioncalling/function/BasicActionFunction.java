@@ -1,8 +1,8 @@
-package com.jackdaw.chatwithnpc.openaiapi.functioncalling.functionset;
+package com.jackdaw.chatwithnpc.openaiapi.functioncalling.function;
 
 import com.jackdaw.chatwithnpc.ChatWithNPCMod;
 import com.jackdaw.chatwithnpc.conversation.ConversationHandler;
-import com.jackdaw.chatwithnpc.npc.npcentityset.Actions;
+import com.jackdaw.chatwithnpc.npc.npcentity.Actions;
 import com.jackdaw.chatwithnpc.npc.NPCEntity;
 import com.jackdaw.chatwithnpc.openaiapi.functioncalling.CustomFunction;
 import net.minecraft.entity.player.PlayerEntity;
@@ -23,8 +23,8 @@ public class BasicActionFunction extends CustomFunction {
     }
 
     @Override
-    public Map<String, String> execute(@NotNull ConversationHandler conversation, @NotNull Map<String, String> args) {
-        String action = args.get("action");
+    public Map<String, String> execute(@NotNull ConversationHandler conversation, @NotNull Map args) {
+        String action = (String) args.get("action");
         try {
             NPCEntity npc = conversation.getNpc();
             PlayerEntity player = npc.getEntity().getEntityWorld().getClosestPlayer(npc.getEntity(), 10);

@@ -2,7 +2,7 @@ package com.jackdaw.chatwithnpc.openaiapi;
 
 import com.google.gson.Gson;
 import com.jackdaw.chatwithnpc.ChatWithNPCMod;
-import com.jackdaw.chatwithnpc.auxiliary.configuration.SettingManager;
+import com.jackdaw.chatwithnpc.SettingManager;
 import com.jackdaw.chatwithnpc.openaiapi.functioncalling.FunctionManager;
 import com.jackdaw.chatwithnpc.npc.NPCEntity;
 import com.jackdaw.chatwithnpc.openaiapi.prompt.NPCPrompt;

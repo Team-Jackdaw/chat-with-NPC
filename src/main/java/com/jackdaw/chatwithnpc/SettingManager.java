@@ -1,7 +1,6 @@
-package com.jackdaw.chatwithnpc.auxiliary.configuration;
+package com.jackdaw.chatwithnpc;
 
 import com.google.gson.Gson;
-import com.jackdaw.chatwithnpc.ChatWithNPCMod;
 import org.slf4j.Logger;
 
 import java.io.File;

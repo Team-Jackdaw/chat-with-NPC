@@ -1,8 +1,5 @@
-package com.jackdaw.chatwithnpc.auxiliary.command;
+package com.jackdaw.chatwithnpc;
 
-import com.jackdaw.chatwithnpc.ChatWithNPCMod;
-import com.jackdaw.chatwithnpc.LiveCycleManager;
-import com.jackdaw.chatwithnpc.auxiliary.configuration.SettingManager;
 import com.jackdaw.chatwithnpc.conversation.ConversationHandler;
 import com.jackdaw.chatwithnpc.conversation.ConversationManager;
 import com.jackdaw.chatwithnpc.openaiapi.functioncalling.FunctionManager;
@@ -416,7 +413,7 @@ public class CommandSet {
         if (player != null && conversation != null) {
             NPCEntity npc = conversation.getNpc();
             if (npc.getThreadId() != null){
-                boolean isOK = conversation.taskQueue.addTask(() -> {
+                AsyncTask.call(() -> {
                     try {
                         Threads.discardThread(npc.getThreadId());
                         npc.setThreadId(null);
@@ -424,8 +421,8 @@ public class CommandSet {
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
+                    return AsyncTask.nothingToDo();
                 });
-                if (!isOK) return 0;
             }
             player.sendMessage(Text.of("[chat-with-npc] Memory clear."), true);
             return 1;
@@ -517,14 +514,14 @@ public class CommandSet {
         if (player != null && conversation != null) {
             NPCEntity npc = conversation.getNpc();
             if (npc.hasAssistant()) {
-                boolean isOK = conversation.taskQueue.addTask(() -> {
+                AsyncTask.call(() -> {
                     try {
                         Assistant.modifyAssistant(npc);
                     } catch (Exception e) {
                         ChatWithNPCMod.LOGGER.error(e.getMessage());
                     }
+                    return AsyncTask.nothingToDo();
                 });
-                if (!isOK) return 0;
             }
         }
         return 1;

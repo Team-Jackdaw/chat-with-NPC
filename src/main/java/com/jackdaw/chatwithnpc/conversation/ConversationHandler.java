@@ -1,10 +1,10 @@
 package com.jackdaw.chatwithnpc.conversation;
 
 import com.jackdaw.chatwithnpc.ChatWithNPCMod;
-import com.jackdaw.chatwithnpc.auxiliary.configuration.SettingManager;
+import com.jackdaw.chatwithnpc.SettingManager;
 import com.jackdaw.chatwithnpc.npc.NPCEntity;
 import com.jackdaw.chatwithnpc.openaiapi.Assistant;
-import com.jackdaw.chatwithnpc.async.AsyncTaskQueue;
+import com.jackdaw.chatwithnpc.AsyncTask;
 import com.jackdaw.chatwithnpc.openaiapi.Run;
 import com.jackdaw.chatwithnpc.openaiapi.Threads;
 import org.jetbrains.annotations.NotNull;
@@ -23,7 +23,6 @@ public class ConversationHandler {
     protected final NPCEntity npc;
     protected boolean isTalking = false;
     protected long updateTime = 0L;
-    public AsyncTaskQueue taskQueue = new AsyncTaskQueue();
 
     /**
      * Construct a new Conversation for an NPC. This will start a conversation with the NPC asynchronously.
@@ -47,27 +46,7 @@ public class ConversationHandler {
     }
 
     private void startConversation() {
-        setTalking(true);
-        sendWaitMessage();
-        boolean isOK =  taskQueue.addTask(() -> {
-            try {
-                if (!npc.hasAssistant()) {
-                    Assistant.createAssistant(npc);
-                } else {
-                    Assistant.modifyAssistant(npc);
-                }
-                if (!npc.hasThreadId()) Threads.createThread(this);
-                Threads.addMessage(npc.getThreadId(), "Hello!");
-                Run.run(this);
-                setTalking(false);
-            } catch (Exception e) {
-                ChatWithNPCMod.LOGGER.error(e.getMessage());
-                taskQueue.clear();
-                setTalking(false);
-            }
-        });
-        if (!isOK) setTalking(false);
-        updateTime = System.currentTimeMillis();
+        replyToEntity("Hello!");
     }
 
     /**
@@ -77,20 +56,21 @@ public class ConversationHandler {
     public void replyToEntity(String message) {
         setTalking(true);
         sendWaitMessage();
-        boolean isOk = taskQueue.addTask(() -> {
+        AsyncTask.call(() -> {
             try {
                 if (!npc.hasAssistant()) Assistant.createAssistant(npc);
+                else Assistant.modifyAssistant(npc);
                 if(!npc.hasThreadId()) Threads.createThread(this);
                 Threads.addMessage(npc.getThreadId(), message);
-                Run.run(this);
+                AsyncTask.TaskResult result = Run.run(this);
                 setTalking(false);
+                return result;
             } catch (Exception e) {
                 ChatWithNPCMod.LOGGER.error(e.getMessage());
-                taskQueue.clear();
                 setTalking(false);
             }
+            return AsyncTask.nothingToDo();
         });
-        if (!isOk) setTalking(false);
         updateTime = System.currentTimeMillis();
     }
 
@@ -141,6 +121,5 @@ public class ConversationHandler {
                 ChatWithNPCMod.LOGGER.error(e.getMessage());
             }
         }
-        taskQueue.shutdown();
     }
 }

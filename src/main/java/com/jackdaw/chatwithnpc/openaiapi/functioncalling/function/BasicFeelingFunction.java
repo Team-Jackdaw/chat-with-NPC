@@ -1,8 +1,8 @@
-package com.jackdaw.chatwithnpc.openaiapi.functioncalling.functionset;
+package com.jackdaw.chatwithnpc.openaiapi.functioncalling.function;
 
 import com.jackdaw.chatwithnpc.ChatWithNPCMod;
 import com.jackdaw.chatwithnpc.conversation.ConversationHandler;
-import com.jackdaw.chatwithnpc.npc.npcentityset.Actions;
+import com.jackdaw.chatwithnpc.npc.npcentity.Actions;
 import com.jackdaw.chatwithnpc.openaiapi.functioncalling.CustomFunction;
 import org.jetbrains.annotations.NotNull;
 
@@ -21,8 +21,8 @@ public class BasicFeelingFunction extends CustomFunction {
     }
 
     @Override
-    public Map<String, String> execute(@NotNull ConversationHandler conversation, @NotNull Map<String, String> args) {
-        String feeling = args.get("feeling");
+    public Map<String, String> execute(@NotNull ConversationHandler conversation, @NotNull Map args) {
+        String feeling = (String) args.get("feeling");
         try {
             conversation.getNpc().doAction(Actions.valueOf(feeling), null);
         } catch (Exception e) {

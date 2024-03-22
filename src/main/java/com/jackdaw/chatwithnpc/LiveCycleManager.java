@@ -1,7 +1,5 @@
 package com.jackdaw.chatwithnpc;
 
-import com.jackdaw.chatwithnpc.async.AsyncTaskQueue;
-import com.jackdaw.chatwithnpc.auxiliary.configuration.SettingManager;
 import com.jackdaw.chatwithnpc.conversation.ConversationManager;
 import com.jackdaw.chatwithnpc.group.GroupManager;
 import com.jackdaw.chatwithnpc.openaiapi.functioncalling.FunctionManager;
@@ -13,8 +11,6 @@ import java.util.concurrent.TimeUnit;
 public class LiveCycleManager {
 
     private static ScheduledExecutorService executorService;
-
-    private static final AsyncTaskQueue reloadService = new AsyncTaskQueue();
 
     /**
      * Start the live cycle manager
@@ -38,10 +34,11 @@ public class LiveCycleManager {
      * Save all conversations, NPC entities, and environments
      */
     public static void asyncSaveAll() {
-        reloadService.addTask(() -> {
+        AsyncTask.call(() -> {
             saveAll();
             SettingManager.sync();
             FunctionManager.sync();
+            return AsyncTask.nothingToDo();
         });
     }
 
@@ -61,6 +58,5 @@ public class LiveCycleManager {
      */
     public static void shutdown() {
         executorService.shutdown();
-        reloadService.shutdown();
     }
 }

@@ -1,6 +1,6 @@
 package com.jackdaw.chatwithnpc.openaiapi.prompt;
 
-import com.jackdaw.chatwithnpc.auxiliary.configuration.SettingManager;
+import com.jackdaw.chatwithnpc.SettingManager;
 import com.jackdaw.chatwithnpc.npc.NPCEntity;
 import org.jetbrains.annotations.NotNull;
 

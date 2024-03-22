@@ -1,6 +1,6 @@
 package com.jackdaw.chatwithnpc.openaiapi;
 
-import com.jackdaw.chatwithnpc.auxiliary.configuration.SettingManager;
+import com.jackdaw.chatwithnpc.SettingManager;
 import org.apache.http.HttpHeaders;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
