@@ -1,7 +1,6 @@
-package com.jackdaw.chatwithnpc.openaiapi.functioncalling.function;
+package com.jackdaw.chatwithnpc.openaiapi.function;
 
 import com.jackdaw.chatwithnpc.conversation.ConversationHandler;
-import com.jackdaw.chatwithnpc.openaiapi.functioncalling.CustomFunction;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NbtCompound;
 import org.jetbrains.annotations.NotNull;

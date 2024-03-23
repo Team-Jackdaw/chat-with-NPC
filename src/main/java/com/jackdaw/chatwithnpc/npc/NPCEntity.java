@@ -1,7 +1,6 @@
 package com.jackdaw.chatwithnpc.npc;
 
 import com.jackdaw.chatwithnpc.SettingManager;
-import com.jackdaw.chatwithnpc.npc.npcentity.Actions;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
@@ -24,7 +23,7 @@ import java.util.UUID;
  *
  * @version 1.1
  */
-public abstract class NPCEntity {
+public class NPCEntity {
 
     protected final String name;
     protected final Entity entity;
@@ -35,7 +34,7 @@ public abstract class NPCEntity {
     protected String instructions = "You are an NPC.";
     protected String group = "Global";
     protected boolean needMemory = true;
-
+    protected long updateTime = 0;
     protected ArrayList<String> functions = new ArrayList<>();
     protected TextBubbleEntity textBubble;
 
@@ -52,15 +51,8 @@ public abstract class NPCEntity {
         this.entity = entity;
         this.uuid = entity.getUuid();
         this.textBubble = new TextBubbleEntity(entity);
+        this.updateTime = System.currentTimeMillis();
     }
-
-    /**
-     * Do an action of the NPC.
-     *
-     * @param action The action of the NPC
-     * @param player To player
-     */
-    public abstract void doAction(Actions action, PlayerEntity player);
 
     /**
      * Get the name of the NPC, which should be the unique identifier of the NPC in this plugin and will be used as the file name for storage.
@@ -153,6 +145,7 @@ public abstract class NPCEntity {
         if (SettingManager.isBubble) textBubble.update(message);
         if (SettingManager.isChatBar)
             findNearbyPlayers(range).forEach(player -> player.sendMessage(Text.of("<" + name + "> " + message)));
+        this.updateTime = System.currentTimeMillis();
     }
 
     /**
@@ -286,5 +279,22 @@ public abstract class NPCEntity {
     public void discard() {
         this.getDataManager().save();
         this.textBubble.discard();
+    }
+
+    /**
+     * Get the update time of the NPC.
+     * @return The update time of the NPC
+     */
+    public long getUpdateTime() {
+        return updateTime;
+    }
+
+    /**
+     * Get the time when the conversation was last updated in a human-readable format.
+     * @return The time when the conversation was last updated in a human-readable format.
+     */
+    public String getUpdateTimeString() {
+        // converge Long to real time
+        return new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date(updateTime));
     }
 }

@@ -3,7 +3,9 @@ package com.jackdaw.chatwithnpc;
 import com.jackdaw.chatwithnpc.conversation.ConversationHandler;
 import com.jackdaw.chatwithnpc.conversation.ConversationManager;
 import com.jackdaw.chatwithnpc.listener.PlayerSendMessageCallback;
-import com.jackdaw.chatwithnpc.openaiapi.functioncalling.FunctionManager;
+import com.jackdaw.chatwithnpc.npc.NPCEntity;
+import com.jackdaw.chatwithnpc.npc.NPCEntityManager;
+import com.jackdaw.chatwithnpc.openaiapi.function.FunctionManager;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -60,7 +62,9 @@ public class ChatWithNPCMod implements ModInitializer {
             // The entity must have a custom name to be an NPC
             if (entity.getCustomName() == null) return ActionResult.PASS;
             // register the NPC entity and start a conversation
-            ConversationManager.startConversation(entity, player.hasPermissionLevel(4));
+            NPCEntityManager.registerNPCEntity(entity, player.hasPermissionLevel(4));
+            NPCEntity npc = NPCEntityManager.getNPCEntity(entity.getUuid());
+            if (npc != null) ConversationManager.startConversation(npc);
             return ActionResult.FAIL;
         });
         // Register the player chat listener
@@ -79,7 +83,7 @@ public class ChatWithNPCMod implements ModInitializer {
         });
         // Register the server tick listener to check the task queue that need to be executed in main thread
         ServerTickEvents.END_SERVER_TICK.register(server -> {
-            if (!AsyncTask.isTaskQueueEmpty()) {
+            while (!AsyncTask.isTaskQueueEmpty()) {
                 AsyncTask.TaskResult result = AsyncTask.pollTaskQueue();
                 result.execute();
             }

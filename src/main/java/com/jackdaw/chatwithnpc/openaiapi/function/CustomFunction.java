@@ -1,4 +1,4 @@
-package com.jackdaw.chatwithnpc.openaiapi.functioncalling;
+package com.jackdaw.chatwithnpc.openaiapi.function;
 
 import com.jackdaw.chatwithnpc.conversation.ConversationHandler;
 import org.jetbrains.annotations.NotNull;

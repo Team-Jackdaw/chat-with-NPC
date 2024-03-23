@@ -19,7 +19,7 @@ Function calls can be implemented in two ways:
 
 This method requires you to write some mod code on the server side to implement the functions you define. The advantage of this method is that it can implement very complex functions, but the disadvantage is that it requires you to have some mod development experience.
 
->We will open the mod API documentation later so that you can better develop secondary based on this mod API. At present, you can clone the source code of this mod, view the comments of the [`src/main/java/com/jackdaw/chatwithnpc/openaiapi/functioncalling/CustomFunction`](../src/main/java/com/jackdaw/chatwithnpc/openaiapi/functioncalling/CustomFunction.java) class, inherit this class, register the function, and compile this plugin to obtain the function.
+>We will open the mod API documentation later so that you can better develop secondary based on this mod API. At present, you can clone the source code of this mod, view the comments of the [`src/main/java/com/jackdaw/chatwithnpc/openaiapi/functioncalling/CustomFunction`](../src/main/java/com/jackdaw/chatwithnpc/openaiapi/function/CustomFunction.java) class, inherit this class, register the function, and compile this plugin to obtain the function.
 
 Here is a simple example:
 

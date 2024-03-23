@@ -1,12 +1,8 @@
-package com.jackdaw.chatwithnpc.openaiapi.functioncalling;
+package com.jackdaw.chatwithnpc.openaiapi.function;
 
 import com.google.gson.Gson;
 import com.jackdaw.chatwithnpc.ChatWithNPCMod;
 import com.jackdaw.chatwithnpc.conversation.ConversationHandler;
-import com.jackdaw.chatwithnpc.openaiapi.functioncalling.function.BasicActionFunction;
-import com.jackdaw.chatwithnpc.openaiapi.functioncalling.function.BasicFeelingFunction;
-import com.jackdaw.chatwithnpc.openaiapi.functioncalling.function.GiveDiamondFunction;
-import com.jackdaw.chatwithnpc.openaiapi.functioncalling.function.NoCallableFunction;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
@@ -22,12 +18,6 @@ public class FunctionManager {
     private static final Logger logger = ChatWithNPCMod.LOGGER;
     private static final Path folder = ChatWithNPCMod.workingDirectory.resolve("functions");
     private static final Map<String, CustomFunction> functionRegistry = new HashMap<>();
-
-    static {
-        registerFunction("give_diamond", new GiveDiamondFunction());
-        registerFunction("basic_action", new BasicActionFunction());
-        registerFunction("basic_feeling", new BasicFeelingFunction());
-    }
 
     /**
      * Register a function that can be used by the NPC. It will be called by the OpenAI Assistant.

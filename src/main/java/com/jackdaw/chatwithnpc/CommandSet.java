@@ -2,7 +2,7 @@ package com.jackdaw.chatwithnpc;
 
 import com.jackdaw.chatwithnpc.conversation.ConversationHandler;
 import com.jackdaw.chatwithnpc.conversation.ConversationManager;
-import com.jackdaw.chatwithnpc.openaiapi.functioncalling.FunctionManager;
+import com.jackdaw.chatwithnpc.openaiapi.function.FunctionManager;
 import com.jackdaw.chatwithnpc.group.Group;
 import com.jackdaw.chatwithnpc.group.GroupManager;
 import com.jackdaw.chatwithnpc.npc.NPCEntity;

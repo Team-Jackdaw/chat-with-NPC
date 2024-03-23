@@ -3,7 +3,6 @@ package com.jackdaw.chatwithnpc.conversation;
 import com.jackdaw.chatwithnpc.ChatWithNPCMod;
 import com.jackdaw.chatwithnpc.SettingManager;
 import com.jackdaw.chatwithnpc.npc.NPCEntity;
-import com.jackdaw.chatwithnpc.npc.NPCEntityManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import org.jetbrains.annotations.NotNull;
@@ -31,13 +30,10 @@ public class ConversationManager {
     /**
      * Start a conversation for an NPC
      *
-     * @param entity The Entity to start a conversation with
+     * @param npc The Entity to start a conversation with
      */
-    public static void startConversation(@NotNull Entity entity, boolean isOP) {
-        if (isConversing(entity.getUuid())) return;
-        NPCEntityManager.registerNPCEntity(entity, isOP);
-        NPCEntity npc = NPCEntityManager.getNPCEntity(entity.getUuid());
-        if (npc == null) return;
+    public static void startConversation(@NotNull NPCEntity npc) {
+        if (isConversing(npc.getUUID())) return;
         ConversationHandler conversationHandler = new ConversationHandler(npc);
         conversationMap.put(npc.getUUID(), conversationHandler);
     }
@@ -110,7 +106,6 @@ public class ConversationManager {
      */
     public static void endConversation(UUID uuid) {
         conversationMap.get(uuid).discard();
-        NPCEntityManager.removeNPCEntity(uuid);
         conversationMap.remove(uuid);
     }
 

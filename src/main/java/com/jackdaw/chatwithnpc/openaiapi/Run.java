@@ -5,7 +5,7 @@ import com.jackdaw.chatwithnpc.ChatWithNPCMod;
 import com.jackdaw.chatwithnpc.AsyncTask;
 import com.jackdaw.chatwithnpc.SettingManager;
 import com.jackdaw.chatwithnpc.conversation.ConversationHandler;
-import com.jackdaw.chatwithnpc.openaiapi.functioncalling.FunctionManager;
+import com.jackdaw.chatwithnpc.openaiapi.function.FunctionManager;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
