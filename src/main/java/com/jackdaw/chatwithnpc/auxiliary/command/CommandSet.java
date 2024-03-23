@@ -9,6 +9,7 @@ import com.jackdaw.chatwithnpc.group.GroupManager;
 import com.jackdaw.chatwithnpc.npc.NPCEntity;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.BoolArgumentType;
+import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
@@ -23,11 +24,21 @@ import org.jetbrains.annotations.NotNull;
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 public class CommandSet {
 
     static SuggestionProvider<ServerCommandSource> groupSuggestionProvider = (context, builder) -> {
         for (String group : GroupManager.getGroupList()) {
             builder.suggest(group);
+        }
+        return builder.buildFuture();
+    };
+
+    static SuggestionProvider<ServerCommandSource> bubbleColorProvider = (context, builder) -> {
+        for (SettingManager.TextBackgroundColor color : SettingManager.TextBackgroundColor.values()) {
+            builder.suggest(color.name());
         }
         return builder.buildFuture();
     };
@@ -80,6 +91,17 @@ public class CommandSet {
                         .requires(CommandSet::hasOPPermission)
                         .then(argument("isBubble", BoolArgumentType.bool())
                                 .executes(CommandSet::setBubble)))
+                .then(literal("setBubbleStyle")
+                        .requires(CommandSet::hasOPPermission)
+                        .then(literal("Color")
+                            .then(argument("color", StringArgumentType.word())
+                                .suggests(bubbleColorProvider)
+                                .executes(CommandSet::setBubbleColor))))
+                .then(literal("setBubbleStyle")
+                    .requires(CommandSet::hasOPPermission)
+                    .then(literal("timeLastingPerChar")
+                        .then(argument("time lasting per character in second", FloatArgumentType.floatArg(0.0f))
+                            .executes(CommandSet::setBubbleTimeLastingPerChar))))
                 .then(literal("setChatBar")
                         .requires(CommandSet::hasOPPermission)
                         .then(argument("isChatBar", BoolArgumentType.bool())
@@ -301,6 +323,21 @@ public class CommandSet {
         SettingManager.isBubble = context.getArgument("isBubble", Boolean.class);
         SettingManager.save();
         context.getSource().sendFeedback(Text.of("[chat-with-npc] Bubble set"), true);
+        return 1;
+    }
+
+    private static int setBubbleColor(@NotNull CommandContext<ServerCommandSource> context) {
+        SettingManager.bubbleColor = SettingManager.TextBackgroundColor.valueOf(context.getArgument("color", String.class));
+        SettingManager.save();
+        context.getSource().sendFeedback(Text.of("[chat-with-npc] Bubble color set"), true);
+        return 1;
+    }
+
+    private static int setBubbleTimeLastingPerChar(@NotNull CommandContext<ServerCommandSource> context) {
+        // unit in seconds to user side, while in milliseconds for inside implementation.
+        SettingManager.timeLastingPerChar = (long) (1000L * context.getArgument("time lasting per character in second", Float.class));
+        SettingManager.save();
+        context.getSource().sendFeedback(Text.of("[chat-with-npc] Bubble time lasting per character set"), true);
         return 1;
     }
 

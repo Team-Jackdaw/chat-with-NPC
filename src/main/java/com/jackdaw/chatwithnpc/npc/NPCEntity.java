@@ -137,7 +137,7 @@ public abstract class NPCEntity {
      * @param range   玩家的范围
      */
     public void replyMessage(String message, double range) {
-        if (SettingManager.isBubble) textBubble.update(message);
+        if (SettingManager.isBubble) textBubble.update(message, SettingManager.bubbleColor, SettingManager.timeLastingPerChar);
         if (SettingManager.isChatBar)
             findNearbyPlayers(range).forEach(player -> player.sendMessage(Text.of("<" + name + "> " + message)));
     }

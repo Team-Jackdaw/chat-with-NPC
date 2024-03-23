@@ -35,6 +35,8 @@ public class SettingManager {
     public static boolean isBubble = true;
     public static boolean isChatBar = false;
     public static int maxTokens = 512;
+    public static TextBackgroundColor bubbleColor = TextBackgroundColor.DEFAULT;
+    public static long timeLastingPerChar = 500L;
 
     /**
      * Load the setting from the config file.
@@ -83,6 +85,8 @@ public class SettingManager {
         private boolean isBubble = true;
         private boolean isChatBar = false;
         private int maxTokens = 512;
+        private String textBackgroundColor = TextBackgroundColor.DEFAULT.name();
+        private long timeLastingPerChar = 500L;
 
         private static String toJson() {
             Config config = new Config();
@@ -96,6 +100,8 @@ public class SettingManager {
             config.isBubble = SettingManager.isBubble;
             config.isChatBar = SettingManager.isChatBar;
             config.maxTokens = SettingManager.maxTokens;
+            config.textBackgroundColor = SettingManager.bubbleColor.name();
+            config.timeLastingPerChar = SettingManager.timeLastingPerChar;
             Gson gson = new Gson();
             return gson.toJson(config);
         }
@@ -116,7 +122,36 @@ public class SettingManager {
             SettingManager.isBubble = isBubble;
             SettingManager.isChatBar = isChatBar;
             SettingManager.maxTokens = maxTokens;
+            SettingManager.bubbleColor = TextBackgroundColor.valueOf(textBackgroundColor);
         }
 
+    }
+
+    public static enum TextBackgroundColor{
+
+        /**
+         * RGB can be represented by Integer.
+         * ARGB must represented by Long.
+         */
+        DEFAULT ("69C8FF", "E5160C0E"),
+        SAKURANIGHT ("FEACAD", "E51A153D"),
+        SAKURADAY ("f9316d", "E5fed9d5");
+    
+        private final String textRGB;
+        private final String backgroundARGB;
+    
+        TextBackgroundColor(String textRGB, String backgroundARGB){
+            this.textRGB = textRGB;
+            this.backgroundARGB = backgroundARGB;
+        }
+        
+        public int getTextRGBAsInt(){
+            return Integer.parseInt(textRGB, 16);
+        }
+    
+        public long getBackgroundARGBAsLong(){
+            return Long.parseLong(backgroundARGB, 16);
+        }
+    
     }
 }
