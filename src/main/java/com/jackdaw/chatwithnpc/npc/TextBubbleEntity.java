@@ -13,7 +13,7 @@ import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
 import com.jackdaw.chatwithnpc.ChatWithNPCMod;
-import com.jackdaw.chatwithnpc.auxiliary.configuration.SettingManager.TextBackgroundColor;
+import com.jackdaw.chatwithnpc.SettingManager.TextBackgroundColor;
 
 
 

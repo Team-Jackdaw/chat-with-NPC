@@ -117,6 +117,7 @@ public class SettingManager {
             SettingManager.isChatBar = isChatBar;
             SettingManager.maxTokens = maxTokens;
             SettingManager.bubbleColor = TextBackgroundColor.valueOf(textBackgroundColor);
+            SettingManager.timeLastingPerChar = timeLastingPerChar;
         }
 
     }
