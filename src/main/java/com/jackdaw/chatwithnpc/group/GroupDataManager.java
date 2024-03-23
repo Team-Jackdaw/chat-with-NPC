@@ -2,6 +2,7 @@ package com.jackdaw.chatwithnpc.group;
 
 import com.google.gson.Gson;
 import com.jackdaw.chatwithnpc.ChatWithNPCMod;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
 import java.io.File;
@@ -24,15 +25,16 @@ public class GroupDataManager {
     private final File theFile;
     private final Group group;
 
-    public GroupDataManager(Group group) {
+    /**
+     * Create a new GroupDataManager.
+     * @param group The group to be managed.
+     */
+    GroupDataManager(@NotNull Group group) {
         this.group = group;
         mkdir();
         this.theFile = new File(ChatWithNPCMod.workingDirectory.toFile(), "group/" + group.getName() + ".json");
     }
 
-    /**
-     * Create the directory.
-     */
     private static void mkdir() {
         Path workingDirectory = ChatWithNPCMod.workingDirectory.resolve("group");
         if (!Files.exists(workingDirectory)) {
@@ -46,10 +48,17 @@ public class GroupDataManager {
         }
     }
 
+    /**
+     * Check if the file is existed.
+     * @return true if the file is existed, otherwise false.
+     */
     public boolean isExist() {
         return theFile.exists();
     }
 
+    /**
+     * Read the data from the file and set the group's content.
+     */
     public void sync() {
         if (!isExist()) {
             save();
@@ -66,6 +75,9 @@ public class GroupDataManager {
         }
     }
 
+    /**
+     * Write the group's content to the file.
+     */
     public void save() {
         try {
             if (!isExist()) {
@@ -83,6 +95,9 @@ public class GroupDataManager {
         }
     }
 
+    /**
+     * Delete the data file. It would not delete the group's content.
+     */
     public void delete() {
         if (!isExist()) {
             logger.warn("[chat-with-npc] The data file doesn't exist.");

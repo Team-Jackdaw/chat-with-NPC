@@ -25,7 +25,7 @@
     > ![set Group](images/newgroup.png)
 
 5. **将群组添加到NPC**：使用命令 `/npchat npc setGroup <group>` 将该群组添加到某个NPC中。然后他们将了解有关该群组的一切。
-6. **重新载入插件并保存数据**: 你也许需要使用 `/npchat reload` 立即重新载入插件并保存这个新的NPC数据（注意，这同时也会卸载其他所有会话）。
+6. **重新载入插件并保存数据**: 你也许需要使用 `/npchat saveAll` 立即重新载入插件并保存这个新的NPC数据（注意，这同时也会卸载其他所有会话）。
 
 现在你已经完成了一个群组的注册。
 
@@ -43,3 +43,47 @@
 - `permanentPrompt`: `Majestic`, `ancient`, `opulent`, `grandiose`, `fortified`, `sprawling`, `ornate`, `regal`, `awe-inspiring`, `very save`
 - `tempEvent`: `enthronement ceremony`
 
+## 5. 配置文件
+
+群组的配置文件存储在插件目录下的 `group` 文件夹中。文件名为 `<groupName>.json`。文件内容如下：
+
+```json
+{
+  "name": "SkeyCity",
+  "parentGroup": "ScotEmpire",
+  "permanentPrompt": [
+    "Historic",
+    "capital of Scot Empire",
+    "classical",
+    "commercial",
+    "cultural",
+    "culturally-rich",
+    "economically-strong",
+    "expansive",
+    "fortified",
+    "historic",
+    "industrial",
+    "innovative",
+    "inspiring",
+    "large",
+    "majestic",
+    "modern",
+    "opulent",
+    "ornate",
+    "regal",
+    "sprawling",
+    "thriving",
+    "very safe"
+  ],
+  "tempEvent": [
+    "coronation ceremony",
+    "festival",
+    "grand opening",
+    "parade",
+    "reception",
+    "state dinner",
+    "trade fair"
+  ]
+}
+```
+_请注意_：在加载对话或群组之前，请修改文件。

@@ -25,7 +25,7 @@
     > ![set Group](images/newgroup.png)
 
 5. **Add Group to an NPC**: Use the command `/npchat npc setGroup <group>` to add this group to an NPC. And then they will know everything about this group.
-6. **Reload the Plugin and Save Data**: You may need to use `/npchat reload` to reload the plugin immediately and save this new NPC data (note that this will also unload all other conversations).
+6. **Reload the Plugin and Save Data**: You may need to use `/npchat saveAll` to reload the plugin immediately and save this new NPC data (note that this will also unload all other conversations).
 
 ## 3. Rules for Group Setting
 
@@ -41,3 +41,43 @@
 - `permanentPrompt`: `Majestic`, `ancient`, `opulent`, `grandiose`, `fortified`, `sprawling`, `ornate`, `regal`, `awe-inspiring`, `very save`
 - `tempEvent`: `enthronement ceremony`
 
+## 5. Configuration File
+
+The configuration file of the Group is stored in the `group` folder in this mod directory. The file name is the `<groupName>.json`. The content of the file is as follows:
+
+```json
+{
+  "name": "SkeyCity",
+  "parentGroup": "ScotEmpire",
+  "permanentPrompt": [
+    "Historic",
+    "capital of Scot Empire",
+    "classical",
+    "commercial",
+    "cultural",
+    "culturally-rich",
+    "economically-strong",
+    "expansive",
+    "glorious",
+    "innovative",
+    "magnificent",
+    "majestic",
+    "modern",
+    "political",
+    "powerful",
+    "prosperous",
+    "vast",
+    "vibrant"
+  ],
+  "tempEvent": [
+    {
+      "1711027280972": "the old King just dead"
+    },
+    {
+      "1711027308399": "New King Lee Reuben on the throne"
+    }
+  ]
+}
+```
+
+_Note_: Please modify the file before you load the conversation or group.

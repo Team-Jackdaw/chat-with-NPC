@@ -1,147 +1,125 @@
 package com.jackdaw.chatwithnpc.conversation;
 
 import com.jackdaw.chatwithnpc.ChatWithNPCMod;
-import com.jackdaw.chatwithnpc.auxiliary.configuration.SettingManager;
-import com.jackdaw.chatwithnpc.conversation.prompt.Prompt;
+import com.jackdaw.chatwithnpc.SettingManager;
 import com.jackdaw.chatwithnpc.npc.NPCEntity;
+import com.jackdaw.chatwithnpc.openaiapi.Assistant;
+import com.jackdaw.chatwithnpc.AsyncTask;
+import com.jackdaw.chatwithnpc.openaiapi.Run;
+import com.jackdaw.chatwithnpc.openaiapi.Threads;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * <b>Conversation of an NPC</b>
+ * <p>
+ * The conversation will record the conversation of a NPC.
+ * <p>
+ * It is used to execute the conversation with OpenAI asynchronously.
+ *
+ * @version 1.0
+ */
 public class ConversationHandler {
 
-    protected final Record messageRecord = new Record();
-    final NPCEntity npc;
+    protected final NPCEntity npc;
     protected boolean isTalking = false;
-    long updateTime = 0L;
+    protected long updateTime = 0L;
 
-    public ConversationHandler(NPCEntity npc) {
+    /**
+     * Construct a new Conversation for an NPC. This will start a conversation with the NPC asynchronously.
+     * @param npc The NPC to start a conversation with.
+     */
+    ConversationHandler(@NotNull NPCEntity npc) {
         this.npc = npc;
         startConversation();
+    }
+
+    /**
+     * Get the NPC that this conversation is handling.
+     * @return The NPC that this conversation is handling.
+     */
+    public NPCEntity getNpc() {
+        return npc;
     }
 
     private void sendWaitMessage() {
         npc.replyMessage("...", SettingManager.range);
     }
 
-    public NPCEntity getNpc() {
-        return npc;
-    }
-
-    public void getResponse(String requestJson) {
-        if (SettingManager.apiKey.isEmpty()) {
-            npc.replyMessage("[chat-with-npc] You have not set an API key! Get one from https://beta.openai.com/account/api-keys and set it with /npchat setkey", SettingManager.range);
-            return;
-        }
-        setTalking(true);
-        Thread t = new Thread(() -> {
-            try {
-                String response;
-                response = tryResponse(requestJson, 3);
-                npc.replyMessage(response, SettingManager.range);
-                addMessageRecord(System.currentTimeMillis(), Record.Role.NPC, response, npc.getName());
-                setTalking(false);
-            } catch (Exception e) {
-                setTalking(false);
-                npc.replyMessage("[chat-with-npc] Error getting response", SettingManager.range);
-                ChatWithNPCMod.LOGGER.error(e.getMessage());
-            }
-        });
-        t.start();
-    }
-
-    private @NotNull String tryResponse(String requestJson, int times) throws Exception {
-        Exception e = new Exception("Error getting response");
-        if (times <= 0) throw e;
-        String newResponse = OpenAIHandler.sendRequest(requestJson);
-        if (newResponse == null) throw e;
-        if (newResponse.equals(npc.getName())) {
-            return tryResponse(requestJson, times - 1);
-        } else {
-            return newResponse;
-        }
-    }
-
     private void startConversation() {
+        replyToEntity("Hello!");
+    }
+
+    /**
+     * Reply to the NPC with a message. Then the NPC will reply to the player something. This method is asynchronous.
+     * @param message The message sent to the NPC.
+     */
+    public void replyToEntity(String message) {
+        setTalking(true);
         sendWaitMessage();
-        getResponse(Prompt.builder()
-                .fromNPC(npc)
-                .build()
-                .toRequestJson());
+        AsyncTask.call(() -> {
+            try {
+                if (!npc.hasAssistant()) Assistant.createAssistant(npc);
+                else Assistant.modifyAssistant(npc);
+                if(!npc.hasThreadId()) Threads.createThread(this);
+                Threads.addMessage(npc.getThreadId(), message);
+                AsyncTask.TaskResult result = Run.run(this);
+                setTalking(false);
+                return result;
+            } catch (Exception e) {
+                ChatWithNPCMod.LOGGER.error(e.getMessage());
+                setTalking(false);
+            }
+            return AsyncTask.nothingToDo();
+        });
         updateTime = System.currentTimeMillis();
     }
 
-    public void replyToEntity(String message, String playerName) {
-        sendWaitMessage();
-        addMessageRecord(System.currentTimeMillis(), Record.Role.PLAYER, message, playerName);
-        getResponse(Prompt.builder()
-                .fromConversation(this)
-                .build()
-                .toRequestJson());
-        updateTime = System.currentTimeMillis();
-    }
-
+    /**
+     * Get the time when the conversation was last updated.
+     * @return The time when the conversation was last updated.
+     */
     public long getUpdateTime() {
         return updateTime;
     }
 
+    /**
+     * Get the time when the conversation was last updated in a human-readable format.
+     * @return The time when the conversation was last updated in a human-readable format.
+     */
     public String getUpdateTimeString() {
         // converge Long to real time
         return new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date(updateTime));
     }
 
     /**
-     * 添加一条消息记录，该记录应该包括了当前会话的最近一条消息。
+     * Get the NPC's current conversation.
      *
-     * @param time    消息时间
-     * @param role    消息发出者的身份
-     * @param message 消息内容
-     * @param name    消息发出者的名称
-     */
-    public void addMessageRecord(long time, Record.Role role, String message, String name) {
-        this.messageRecord.addMessage(time, role, message, name);
-    }
-
-    /**
-     * 通过模型，获取当前会话的长期记忆。并清空当前会话的消息记录。
-     */
-    public void getLongTermMemory() {
-        if (messageRecord.isEmpty() || SettingManager.apiKey.isEmpty() || !npc.isNeedMemory()) return;
-        messageRecord.changeAllRole(Record.Role.PLAYER);
-        String endingPrompt = "The Minecraft NPC '" + npc.getName() + "' is having conversation with players. The first message was sent by '" + npc.getName() + "'. Chat crosses over.";
-        messageRecord.addMessage(System.currentTimeMillis(), Record.Role.SYSTEM, "Now the conversation is over. Summarize the above conversation in the tone you informed '" + npc.getName() + "'. (No more than 50 words)");
-        try {
-            String memory = OpenAIHandler.sendRequest(Prompt.builder().addMessage(Record.Role.SYSTEM, endingPrompt).addMessageRecordMessages(messageRecord).build().toRequestJson());
-            if (memory == null) throw new Exception("Error getting response");
-            messageRecord.popMessage();
-            npc.addLongTermMemory(System.currentTimeMillis(), memory);
-        } catch (Exception e) {
-            ChatWithNPCMod.LOGGER.error(e.getMessage());
-        }
-        messageRecord.clear();
-    }
-
-    public void clearMessageRecord() {
-        messageRecord.clear();
-    }
-
-    /**
-     * 获取NPC的对话状态
-     *
-     * @return NPC的对话状态
+     * @return The NPC's current conversation.
      */
     public boolean isTalking() {
         return isTalking;
     }
 
     /**
-     * 设置NPC的对话状态
+     * Set the NPC's current conversation.
      *
-     * @param isTalking NPC的对话状态
+     * @param isTalking The NPC's current conversation.
      */
     public void setTalking(boolean isTalking) {
         this.isTalking = isTalking;
     }
 
-    public Record getMessageRecord() {
-        return messageRecord;
+    /**
+     * Discard the conversation. This will stop the conversation with the NPC. If the NPC is not needed to remember the conversation, all the messages in this conversation will be deleted.
+     */
+    public void discard() {
+        if (!npc.isNeedMemory() && npc.hasThreadId()) {
+            try {
+                Threads.discardThread(npc.getThreadId());
+                npc.setThreadId(null);
+            } catch (Exception e) {
+                ChatWithNPCMod.LOGGER.error(e.getMessage());
+            }
+        }
     }
 }
