@@ -35,7 +35,7 @@ public class CommandSet {
         return builder.buildFuture();
     };
 
-    static SuggestionProvider<ServerCommandSource> bubbleColorProvider = (context, builder) -> {
+    private static final SuggestionProvider<ServerCommandSource> bubbleColorProvider = (context, builder) -> {
         for (SettingManager.TextBackgroundColor color : SettingManager.TextBackgroundColor.values()) {
             builder.suggest(color.name());
         }
@@ -49,7 +49,7 @@ public class CommandSet {
     };
 
     private static boolean hasOPPermission(@NotNull ServerCommandSource source) {
-        return source.hasPermissionLevel(4);
+        return source.hasPermissionLevel(2);
     }
 
     public static void setupCommand(@NotNull CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess, CommandManager.RegistrationEnvironment environment) {
@@ -95,14 +95,14 @@ public class CommandSet {
                 .then(literal("setBubbleStyle")
                         .requires(CommandSet::hasOPPermission)
                         .then(literal("Color")
-                            .then(argument("color", StringArgumentType.word())
-                                .suggests(bubbleColorProvider)
-                                .executes(CommandSet::setBubbleColor))))
+                                .then(argument("color", StringArgumentType.word())
+                                        .suggests(bubbleColorProvider)
+                                        .executes(CommandSet::setBubbleColor))))
                 .then(literal("setBubbleStyle")
-                    .requires(CommandSet::hasOPPermission)
-                    .then(literal("timeLastingPerChar")
-                        .then(argument("time lasting per character in second", FloatArgumentType.floatArg(0.0f))
-                            .executes(CommandSet::setBubbleTimeLastingPerChar))))
+                        .requires(CommandSet::hasOPPermission)
+                        .then(literal("timeLastingPerChar")
+                                .then(argument("time lasting per character in second", FloatArgumentType.floatArg(0.0f))
+                                        .executes(CommandSet::setBubbleTimeLastingPerChar))))
                 .then(literal("setChatBar")
                         .requires(CommandSet::hasOPPermission)
                         .then(argument("isChatBar", BoolArgumentType.bool())
@@ -208,7 +208,7 @@ public class CommandSet {
     private static int status(@NotNull CommandContext<ServerCommandSource> context) {
         Text yes = Text.literal("Yes").formatted(Formatting.GREEN);
         Text no = Text.literal("No").formatted(Formatting.RED);
-        if (!context.getSource().hasPermissionLevel(4)) {
+        if (!context.getSource().hasPermissionLevel(2)) {
             Text helpText = Text.literal("")
                     .append(Text.literal("[chat-with-npc] ChatWithNPC").formatted(Formatting.UNDERLINE))
                     .append("").formatted(Formatting.RESET)
@@ -445,7 +445,7 @@ public class CommandSet {
         ConversationHandler conversation = ConversationManager.getConversation(player);
         if (player != null && conversation != null) {
             NPCEntity npc = conversation.getNpc();
-            if (npc.getThreadId() != null){
+            if (npc.getThreadId() != null) {
                 AsyncTask.call(() -> {
                     try {
                         Threads.discardThread(npc.getThreadId());

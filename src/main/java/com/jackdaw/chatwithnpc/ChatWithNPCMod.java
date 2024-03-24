@@ -62,6 +62,10 @@ public class ChatWithNPCMod implements ModInitializer {
             // The entity must have a custom name to be an NPC
             if (entity.getCustomName() == null) return ActionResult.PASS;
             // register the NPC entity and start a conversation
+            if (SettingManager.apiKey.isEmpty()) {
+                player.sendMessage(Text.of("[chat-with-npc] The API key is not set. Please use `/npchat setKey <Key>` to add your key."), false);
+                return ActionResult.FAIL;
+            }
             NPCEntityManager.registerNPCEntity(entity, player.hasPermissionLevel(4));
             NPCEntity npc = NPCEntityManager.getNPCEntity(entity.getUuid());
             if (npc != null) ConversationManager.startConversation(npc);
@@ -74,6 +78,10 @@ public class ChatWithNPCMod implements ModInitializer {
             // The player must be in a conversation
             ConversationHandler conversationHandler = ConversationManager.getConversation(player);
             if (conversationHandler == null) return ActionResult.PASS;
+            if (SettingManager.apiKey.isEmpty()) {
+                player.sendMessage(Text.of("[chat-with-npc] The API key is not set. Please use `/npchat setKey <Key>` to add your key."), false);
+                return ActionResult.FAIL;
+            }
             if (conversationHandler.isTalking()) {
                 player.sendMessage(Text.of("[chat-with-npc] The NPC is talking, please wait"), false);
                 return ActionResult.PASS;

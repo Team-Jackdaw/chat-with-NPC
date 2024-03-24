@@ -47,7 +47,7 @@ public class Assistant {
             ArrayList<String> functions = npc.getFunctions();
             ArrayList<Map> functionsJsonList = new ArrayList<>();
             for (String function: functions) {
-                functionsJsonList.add(new Gson().fromJson(FunctionManager.getFunctionJson(function), Map.class));
+                functionsJsonList.add(new Gson().fromJson(FunctionManager.getRequestJson(function), Map.class));
             }
             assistantRequest = Map.of(
                     "name", npc.getName(),

@@ -2,6 +2,7 @@ package com.jackdaw.chatwithnpc.openaiapi.function;
 
 import com.jackdaw.chatwithnpc.conversation.ConversationHandler;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 
@@ -33,9 +34,10 @@ import java.util.Map;
  *                      "type", "string"
  *                 )
  *             );
+ *             required = new String[] { "param1", "param2" };
  *         }
  *
- *     public Map< String, String > execute(@NotNull ConversationHandler conversation, @NotNull Map< String, String > args) {
+ *     public Map< String, String > execute(@NotNull ConversationHandler conversation, @NotNull Map args) {
  *         // Do something with the arguments
  *         }
  *     }
@@ -48,7 +50,9 @@ import java.util.Map;
  */
 public abstract class CustomFunction {
     public String description;
-    public Map<String, Map> properties;
+    public Map<String, Map<String, Object>> properties;
+    @Nullable
+    public String[] required;
 
     /**
      * Execute the function. This method will be called by the OpenAI Assistant in a conversation.
@@ -56,6 +60,6 @@ public abstract class CustomFunction {
      * @param args The arguments
      * @return The result you want to tell the OpenAI assistant
      */
-    public abstract Map<String, String> execute(@NotNull ConversationHandler conversation, @NotNull Map args);
+    public abstract Map<String, String> execute(@NotNull ConversationHandler conversation, @NotNull Map<String, Object> args);
 }
 

@@ -34,7 +34,7 @@ public class NPCEntity {
     protected String instructions = "You are an NPC.";
     protected String group = "Global";
     protected boolean needMemory = true;
-    protected long updateTime = 0;
+    protected long updateTime;
     protected ArrayList<String> functions = new ArrayList<>();
     protected TextBubbleEntity textBubble;
 
@@ -289,12 +289,4 @@ public class NPCEntity {
         return updateTime;
     }
 
-    /**
-     * Get the time when the conversation was last updated in a human-readable format.
-     * @return The time when the conversation was last updated in a human-readable format.
-     */
-    public String getUpdateTimeString() {
-        // converge Long to real time
-        return new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date(updateTime));
-    }
 }

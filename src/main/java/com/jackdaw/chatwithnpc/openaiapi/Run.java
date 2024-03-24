@@ -14,11 +14,11 @@ import java.util.ArrayList;
 import java.util.Map;
 
 public class Run {
-    public String id;
-    public String thread_id;
-    public String assistant_id;
-    public String status;
-    public RequiredAction required_action;
+    private String id;
+    private String thread_id;
+    private String assistant_id;
+    private String status;
+    private RequiredAction required_action;
 
     /**
      * Run the assistant for the NPC from the OpenAI API, and it will return the result.
@@ -50,8 +50,8 @@ public class Run {
         newRes = run.updateStatus();
         while (!run.isCompleted() && !run.isRequiresAction()) {
             if (System.currentTimeMillis() > expire) throw new Exception("Time out");
+            Thread.sleep(50);
             newRes = run.updateStatus();
-            Thread.sleep(100);
         }
         return fromJson(newRes);
     }
@@ -105,7 +105,7 @@ public class Run {
      */
     public void callFunctionsAndReply(ConversationHandler conversation){
         ArrayList<Map> outputs = new ArrayList<>();
-        for (FunctionManager.ToolCall toolCall : required_action.submit_tool_outputs.tool_calls) {
+        for (ToolCall toolCall : required_action.submit_tool_outputs.tool_calls) {
             if (toolCall.type.equals("function")) {
                 Map<String, String> res = FunctionManager.callFunction(conversation, toolCall.function.name, new Gson().fromJson(toolCall.function.arguments, Map.class));
                 outputs.add(Map.of(
@@ -124,7 +124,7 @@ public class Run {
             } catch (Exception e) {
                 ChatWithNPCMod.LOGGER.error("[chat-with-npc] Error while submitting tool outputs: " + e.getMessage());
             }
-            return AsyncTask.nothingToDo();
+            return RunResult.nothingToDo();
         });
     }
 
@@ -133,12 +133,24 @@ public class Run {
         conversation.getNpc().replyMessage(response, SettingManager.range);
     }
 
-    public static class RequiredAction {
-        public String type;
-        public SubmitToolOutputs submit_tool_outputs;
+    static class RequiredAction {
+        String type;
+        SubmitToolOutputs submit_tool_outputs;
 
-        public static class SubmitToolOutputs {
-            public FunctionManager.ToolCall[] tool_calls;
+        static class SubmitToolOutputs {
+            ToolCall[] tool_calls;
+        }
+    }
+
+    static class ToolCall {
+        String id;
+        String type;
+        Function function;
+
+        static class Function {
+            String name;
+            // The arguments should be a JSON string
+            String arguments;
         }
     }
 
@@ -182,7 +194,7 @@ public class Run {
          * @return A RunResult that does nothing.
          */
         @Contract(value = " -> new", pure = true)
-        public static @NotNull RunResult nothingToDo() {
+        static @NotNull RunResult nothingToDo() {
             return new RunResult(null, null);
         }
     }
