@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Map;
 
 /**
  * A serializer used to read or write the data from the files.
@@ -95,39 +94,26 @@ public class GroupDataManager {
         }
     }
 
-    /**
-     * Delete the data file. It would not delete the group's content.
-     */
-    public void delete() {
-        if (!isExist()) {
-            logger.warn("[chat-with-npc] The data file doesn't exist.");
-            return;
-        }
-        if (!theFile.delete()) {
-            logger.error("[chat-with-npc] Can't delete the data file.");
-        }
-    }
-
     private static final class GroupData {
         private final String name;
-
         private final String parentGroup;
-
-        private final ArrayList<String> permanentPrompt;
-
-        private final ArrayList<Map<Long, String>> tempEvent;
+        private final String instruction;
+        private final ArrayList<String> event;
+        private final ArrayList<String> memberList;
 
         private GroupData(Group group) {
             this.name = group.getName();
             this.parentGroup = group.getParentGroup();
-            permanentPrompt = new ArrayList<>(group.getPermanentPrompt());
-            tempEvent = new ArrayList<>(group.getTempEvent());
+            this.instruction = group.getInstruction();
+            this.event = group.getEvent();
+            this.memberList = group.getMemberList();
         }
 
         private void set(Group group) {
             group.setParentGroup(parentGroup);
-            group.setPermanentPrompt(permanentPrompt);
-            group.setTempEvent(tempEvent);
+            group.setInstruction(instruction);
+            group.setEvent(event);
+            group.setMemberList(memberList);
         }
     }
 }

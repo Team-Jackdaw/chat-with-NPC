@@ -289,4 +289,29 @@ public class NPCEntity {
         return updateTime;
     }
 
+    /**
+     * Set the update time of the NPC to the current time.
+     */
+    public void setUpdateTime() {
+        setUpdateTime(System.currentTimeMillis());
+    }
+
+    /**
+     * Set the update time of the NPC.
+     * @param updateTime The update time of the NPC
+     */
+    public void setUpdateTime(long updateTime) {
+        this.updateTime = updateTime;
+    }
+
+    /**
+     * Get the prompt of the NPC
+     *
+     * @return the prompt
+     */
+    public @NotNull String instructions() {
+        return "You are an NPC with type `" + getType() + "` and named `" + getName() + "`. " +
+                "You career is `" + getCareer() + "`. " + getInstructions();
+    }
+
 }

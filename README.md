@@ -6,18 +6,19 @@
 
 [Chinese Version](docs/README_zh.md)
 
-> The mod is still under development, and the current version is not stable. If you want to use the mod, please compile
+> The mod is still under development, and the current version is not stable. If you want to use the latest version,
+> please compile
 > the source code yourself, see [Build](#8-build). If you encounter any problems, please submit an issue.
 
 ## 1. Introduction
 
 **Chat With NPC** allows players to freely chat with NPCs, who will answer questions based on his setting (Basic Prompt)
 and the setting of their Groups (Nation, City, Town ,etc.). Suitable for RPG maps or puzzle maps. The NPCs would not
-change the game rule, i.e. the actions of the entity are not affected by the chat content (either in Adventure or
-Survival modes), that means it can be used even on Survival servers to make the game more interesting.
+change the game rule (if you don't use the advanced features). NPC can also perform some actions based on the chat
+content if you define it.
 
-In the future version, we will add innovative features such as NPCs performing actions based on chat content, NPCs
-chatting with each other, NPCs' viewpoints on events, etc., so that NPCs in the same Group can interact with each other.
+In the future version, we will add innovative features such as NPCs chatting with each other, NPCs' viewpoints on
+events, etc., so that NPCs in the same Group can interact with each other.
 
 ## 2. How to use
 
@@ -45,7 +46,9 @@ If you are administrator, see the [Installation](#5-installation) for more infor
 4. Each `Group` can record a `ParentGroup` until the group's parent group is `Global`, `Global` cannot have a parent
    group.
 5. Each `NPC`'s conversation will combine his own `Instructions`, the context of this
-   conversation (or all the conversation if needMemory is true), the `PermanentPrompt` of his `Group` and all its `ParentGroup`, and the content of `TempEvent`.
+   conversation (or all the conversation if needMemory is true), the `PermanentPrompt` of his `Group` and all
+   its `ParentGroup`, and the content of `TempEvent`.
+6. You can define the `Functions` that could be call by the NPC in the conversation.
 
 ## 4. Requirements
 

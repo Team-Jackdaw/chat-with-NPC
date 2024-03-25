@@ -2,6 +2,7 @@ package com.jackdaw.chatwithnpc;
 
 import com.jackdaw.chatwithnpc.conversation.ConversationHandler;
 import com.jackdaw.chatwithnpc.conversation.ConversationManager;
+import com.jackdaw.chatwithnpc.group.GroupManager;
 import com.jackdaw.chatwithnpc.listener.PlayerSendMessageCallback;
 import com.jackdaw.chatwithnpc.npc.NPCEntity;
 import com.jackdaw.chatwithnpc.npc.NPCEntityManager;
@@ -66,9 +67,12 @@ public class ChatWithNPCMod implements ModInitializer {
                 player.sendMessage(Text.of("[chat-with-npc] The API key is not set. Please use `/npchat setKey <Key>` to add your key."), false);
                 return ActionResult.FAIL;
             }
-            NPCEntityManager.registerNPCEntity(entity, player.hasPermissionLevel(4));
+            NPCEntityManager.registerNPCEntity(entity, player.hasPermissionLevel(2));
             NPCEntity npc = NPCEntityManager.getNPCEntity(entity.getUuid());
-            if (npc != null) ConversationManager.startConversation(npc);
+            if (npc != null) {
+                GroupManager.addGroupMember(npc.getGroup(), npc.getName());
+                ConversationManager.startConversation(npc);
+            }
             return ActionResult.FAIL;
         });
         // Register the player chat listener

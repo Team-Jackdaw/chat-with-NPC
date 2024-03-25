@@ -13,25 +13,22 @@ import java.nio.file.Files;
  * <p>
  * Configure the setting if a specific module is enabled or disabled.
  *
- * @author WDRshadow
- * @version v2.5
+ * @author WDRshadow, Lokeyli
+ * @version v2.6
  */
 public class SettingManager {
     private static final Logger logger = ChatWithNPCMod.LOGGER;
     private static final File configFile = ChatWithNPCMod.workingDirectory.resolve("config.json").toFile();
 
-    // use for confirming the setting version is the same with the plugin
-    private static final String lastVersion = "v2.5";
-
     public static boolean enabled = true;
     public static double range = 10.0;
     public static String language = "Chinese";
+    public static int wordLimit = 30;
     public static String apiKey = "";
     public static String model = "gpt-3.5-turbo";
     public static String apiURL = "api.openai.com";
     public static boolean isBubble = true;
     public static boolean isChatBar = false;
-    public static int maxTokens = 512;
     public static TextBackgroundColor bubbleColor = TextBackgroundColor.DEFAULT;
     public static long timeLastingPerChar = 500L;
 
@@ -71,16 +68,15 @@ public class SettingManager {
     }
 
     private static final class Config {
-        private String lastVersion = "v2.5";
         private boolean enabled = true;
         private double range = 10.0;
         private String language = "Chinese";
+        private int wordLimit = 30;
         private String apiKey = "";
         private String model = "gpt-3.5-turbo";
         private String apiURL = "api.openai.com";
         private boolean isBubble = true;
         private boolean isChatBar = false;
-        private int maxTokens = 512;
         private String textBackgroundColor = TextBackgroundColor.DEFAULT.name();
         private long timeLastingPerChar = 500L;
 
@@ -89,12 +85,12 @@ public class SettingManager {
             config.enabled = SettingManager.enabled;
             config.range = SettingManager.range;
             config.language = SettingManager.language;
+            config.wordLimit = SettingManager.wordLimit;
             config.apiKey = SettingManager.apiKey;
             config.model = SettingManager.model;
             config.apiURL = SettingManager.apiURL;
             config.isBubble = SettingManager.isBubble;
             config.isChatBar = SettingManager.isChatBar;
-            config.maxTokens = SettingManager.maxTokens;
             config.textBackgroundColor = SettingManager.bubbleColor.name();
             config.timeLastingPerChar = SettingManager.timeLastingPerChar;
             Gson gson = new Gson();
@@ -102,31 +98,26 @@ public class SettingManager {
         }
 
         private void set() {
-            if (!SettingManager.lastVersion.equals(lastVersion)) {
-                logger.warn("[chat-with-npc] The config file is not the same version with the plugin.");
-                save();
-                return;
-            }
             SettingManager.enabled = enabled;
             SettingManager.range = range;
             SettingManager.language = language;
+            SettingManager.wordLimit = wordLimit;
             SettingManager.apiKey = apiKey;
             SettingManager.model = model;
             SettingManager.apiURL = apiURL;
             SettingManager.isBubble = isBubble;
             SettingManager.isChatBar = isChatBar;
-            SettingManager.maxTokens = maxTokens;
             SettingManager.bubbleColor = TextBackgroundColor.valueOf(textBackgroundColor);
             SettingManager.timeLastingPerChar = timeLastingPerChar;
         }
 
     }
 
-    public static enum TextBackgroundColor{
+    public enum TextBackgroundColor{
 
         /**
          * RGB can be represented by Integer.
-         * ARGB must represented by Long.
+         * ARGB must represent by Long.
          */
         DEFAULT ("69C8FF", "E5160C0E"),
         SAKURANIGHT ("FEACAD", "E51A153D"),

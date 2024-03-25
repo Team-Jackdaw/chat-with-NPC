@@ -3,9 +3,6 @@ package com.jackdaw.chatwithnpc.group;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.TreeSet;
 
 /**
  * <b>Group of NPC</b>
@@ -16,14 +13,15 @@ import java.util.TreeSet;
  * <p>
  * Every group will have parents until the parent is "Global".
  *
- * @version 1.0
+ * @version 1.1
  */
 public class Group {
-    private final String name;
-    private final ArrayList<String> permanentPrompt = new ArrayList<>(Arrays.asList("good weather", "very save"));
-    private final ArrayList<Map<Long, String>> tempEvent = new ArrayList<>();
-    private String parentGroup = "Global";
-    private long lastLoadTime;
+    protected final String name;
+    protected String instruction = "A place with good weather.";
+    protected final ArrayList<String> events = new ArrayList<>();
+    protected String parentGroup = "Global";
+    protected long lastLoadTime;
+    protected final ArrayList<String> memberList = new ArrayList<>();
 
     Group(@NotNull String name) {
         this.name = name;
@@ -53,7 +51,7 @@ public class Group {
      * Set the name of the parent group
      * @param parentGroup the name of the parent group
      */
-    public void setParentGroup(String parentGroup) {
+    protected void setParentGroup(String parentGroup) {
         this.parentGroup = parentGroup;
     }
 
@@ -83,61 +81,49 @@ public class Group {
     }
 
     /**
-     * Add a temporary event to the group
+     * Add an event to the group
      * @param event the event
-     * @param time the period of this event. The unit is millisecond
      */
-    public void addTempEvent(String event, long time) {
-        long now = System.currentTimeMillis();
-        tempEvent.add(Map.of(now + time, event));
+    public void addEvent(String event) {
+        events.add(event);
     }
 
     /**
-     * Remove the last temporary event from the group
+     * Remove the last event from the group
      */
-    public void popTempEvent() {
-        tempEvent.remove(tempEvent.size() - 1);
+    public void popEvent() {
+        if (!events.isEmpty()) {
+            events.remove(events.size() - 1);
+        }
     }
 
     /**
      * Get the temporary event of the group
      * @return the temporary event of the group
      */
-    public ArrayList<Map<Long, String>> getTempEvent() {
-        return new ArrayList<>(tempEvent);
+    public ArrayList<String> getEvent() {
+        return new ArrayList<>(events);
     }
 
-    void setTempEvent(ArrayList<Map<Long, String>> tempEvent) {
-        this.tempEvent.clear();
-        this.tempEvent.addAll(tempEvent);
-    }
-
-    /**
-     * Add a permanent prompt to the group
-     * @param prompt the prompt
-     */
-    public void addPermanentPrompt(String prompt) {
-        permanentPrompt.add(prompt);
+    void setEvent(ArrayList<String> event) {
+        events.clear();
+        events.addAll(event);
     }
 
     /**
-     * Remove the last permanent prompt from the group
+     * Set the instruction of the group
+     * @param instruction the instruction of the group
      */
-    public void popPermanentPrompt() {
-        permanentPrompt.remove(permanentPrompt.size() - 1);
+    public void setInstruction(String instruction) {
+        this.instruction = instruction;
     }
 
     /**
-     * Get the permanent prompt of the group
-     * @return the permanent prompt of the group
+     * Get the instruction of the group
+     * @return the instruction of the group
      */
-    public TreeSet<String> getPermanentPrompt() {
-        return new TreeSet<>(permanentPrompt);
-    }
-
-    void setPermanentPrompt(ArrayList<String> permanentPrompt) {
-        this.permanentPrompt.clear();
-        this.permanentPrompt.addAll(permanentPrompt);
+    public String getInstruction() {
+        return instruction;
     }
 
     /**
@@ -149,10 +135,33 @@ public class Group {
     }
 
     /**
-     * Remove the temporary event that has expired
+     * Add a member to the group
+     * @param member the member to add
      */
-    public void autoDeleteTempEvent() {
-        long now = System.currentTimeMillis();
-        tempEvent.removeIf(map -> map.keySet().iterator().next() < now);
+    protected void addMember(String member) {
+        if (!memberList.contains(member)) {
+            memberList.add(member);
+        }
+    }
+
+    /**
+     * Remove a member from the group
+     * @param member the member to remove
+     */
+    protected void removeMember(String member) {
+        memberList.remove(member);
+    }
+
+    /**
+     * Get the member list of the group
+     * @return the member list of the group
+     */
+    public ArrayList<String> getMemberList() {
+        return new ArrayList<>(memberList);
+    }
+
+    void setMemberList(ArrayList<String> memberList) {
+        this.memberList.clear();
+        this.memberList.addAll(memberList);
     }
 }

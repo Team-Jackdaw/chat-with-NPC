@@ -1,5 +1,7 @@
 package com.jackdaw.chatwithnpc.npc;
 
+import com.jackdaw.chatwithnpc.SettingManager;
+import com.jackdaw.chatwithnpc.SettingManager.TextBackgroundColor;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.decoration.DisplayEntity.TextDisplayEntity;
@@ -7,13 +9,9 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
-
-import java.util.List;
-
 import org.jetbrains.annotations.NotNull;
 
-import com.jackdaw.chatwithnpc.ChatWithNPCMod;
-import com.jackdaw.chatwithnpc.SettingManager.TextBackgroundColor;
+import java.util.List;
 
 
 
@@ -26,7 +24,7 @@ public class TextBubbleEntity extends TextDisplayEntity {
     private long lastUpdateTime = 0L;
     private long timeLastingPerChar; // In milliseconds.
     private long bubbleLastingTime;
-    private TextBackgroundColor textBackgroundColor;
+    private TextBackgroundColor textBackgroundColor = SettingManager.bubbleColor;
 
     private List<String> defaultText = List.of("os: 今天是个上分的好日子", "os: 这个天气，真不戳", "os: 烧鸡翼，我中意食~~~");
 

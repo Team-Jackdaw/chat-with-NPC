@@ -1,4 +1,3 @@
-
 # Register NPC
 
 ## 1. Basic Commands for NPC
@@ -14,29 +13,38 @@
 ## 2. Steps to Register NPC
 
 1. **Create a NPC**: Place a new `LivingEntity` and name it with a `Name Tag`.
-2. **Register the NPC**: If you are an OP, you can shift+clicking on the NPC to register it. Then the NPC will greet with you. Now, the NPC is registered with default settings.
+2. **Register the NPC**: If you are an OP, you can shift+clicking on the NPC to register it. Then the NPC will greet
+   with you. Now, the NPC is registered with default settings.
 
-    > You can use the command `/npchat npc` to check the status of the NPC.
-    ![new NPC](images/initnpc.png)
+   > You can use the command `/npchat npc` to check the status of the NPC.
+   ![new NPC](images/initnpc.png)
 
-3. **Set the Career**: You can use the command `/npchat npc setCareer <career>` to set the `Career` for the NPC. 
-4. **Set the Group**: You can use the command `/npchat npc setGroup <group>` to set the `Group` for the NPC. To register a new group, please read [RegisterGroup](RegisterGroup.md).
-5. **Set the Instructions**: You can use the command `/npchat npc setInstructions <instructions>` to set the `Instructions` for the NPC.
-6. **Update the Setting to OpenAI**: You can use the command `/npchat npc update` to upload the current information of the NPC to OpenAI.
-7. **Clear the Memory**: You can use the command `/npchat npc clearMemory` if you want to clear all the memory of the NPC.
+3. **Set the Career**: You can use the command `/npchat npc setCareer <career>` to set the `Career` for the NPC.
+4. **Set the Group**: You can use the command `/npchat npc setGroup <group>` to set the `Group` for the NPC. To register
+   a new group, please read [RegisterGroup](RegisterGroup.md).
+5. **Set the Instructions**: You can use the command `/npchat npc setInstructions <instructions>` to set
+   the `Instructions` for the NPC.
+6. **Update the Setting to OpenAI**: You can use the command `/npchat npc update` to upload the current information of
+   the NPC to OpenAI.
+7. **Clear the Memory**: You can use the command `/npchat npc clearMemory` if you want to clear all the memory of the
+   NPC.
 
-    > ![set NPC](images/newnpc.png)
+   > ![set NPC](images/newnpc.png)
 
-8. **Reload the Plugin and Save the Data**: You may need to use `/npchat saveAll` to reload the plugin immediately and save the new NPC data (note that this will also unload all other sessions).
+8. **Reload the Plugin and Save the Data**: You may need to use `/npchat saveAll` to reload the plugin immediately and
+   save the new NPC data (note that this will also unload all other sessions).
 
 Now you have completed the registration of an NPC.
 
 ## 3. Rules for NPC Setting
 
-1. **NPC's Name**: The NPC name needs to meet the regular pattern `^[a-zA-Z0-9_-]{1,64}$`, that is, only alphanumeric underscores and horizontal bars are allowed.
+1. **NPC's Name**: The NPC name needs to meet the regular pattern `^[a-zA-Z0-9_-]{1,64}$`, that is, only alphanumeric
+   underscores and horizontal bars are allowed.
 2. **NPC's Career**: No restrictions, but English is recommended.
-3. **NPC's Group**: The group name must conform to the regular pattern `^[a-zA-Z0-9_-]{1,64}$`, that is, only alphanumeric underscores and dashes are allowed. Please see [RegisterGroup](RegisterGroup.md) for details.
-4. **NPC's Instruction**: No restrictions, but English is recommended. Please describe the NPC in the second person. For example:
+3. **NPC's Group**: The group name must conform to the regular pattern `^[a-zA-Z0-9_-]{1,64}$`, that is, only
+   alphanumeric underscores and dashes are allowed. Please see [RegisterGroup](RegisterGroup.md) for details.
+4. **NPC's Instruction**: No restrictions, but English is recommended. Please describe the NPC in the second person. For
+   example:
 
 ## 4. NPC Example
 
@@ -45,11 +53,14 @@ Now you have completed the registration of an NPC.
 3. `group`: `SkeyCity`
 4. `isNeedMemory`: `true`
 5. `instructions`:
-    >Born in a small village, you rose from monk to Archbishop of ScotEmpire through wisdom and compassion. You reformed church practices, making them relatable to the populace, and bridged the gap between religious and secular realms, promoting peace and unity throughout the empire.
+   > Born in a small village, you rose from monk to Archbishop of ScotEmpire through wisdom and compassion. You reformed
+   church practices, making them relatable to the populace, and bridged the gap between religious and secular realms,
+   promoting peace and unity throughout the empire.
 
 ## 5. Configuration File
 
-The configuration file of the NPC is stored in the `npc` folder in this mod directory. The file name is the `<UUID>.json`. The content of the file is as follows:
+The configuration file of the NPC is stored in the `npc` folder in this mod directory. The file name is
+the `<UUID>.json`. The content of the file is as follows:
 
 ```json
 {

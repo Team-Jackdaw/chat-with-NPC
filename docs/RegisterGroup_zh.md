@@ -10,19 +10,18 @@
 - `/npchat group <group> popTempEvent` - 从群组中删除最近一条临时事件。
 - `/npchat addGroup <newGroup>` - 添加一个新的群组
 
-
 ## 2. 注册群组的步骤
 
 1. **创建群组**：使用命令 `/npchat addGroup <newGroup>` 创建一个新的群组。
 
-    > 你可以使用 `/npchat group <group>` 命令查看群组的信息。
-    ![new Group](images/initgroup.png)
+   > 你可以使用 `/npchat group <group>` 命令查看群组的信息。
+   ![new Group](images/initgroup.png)
 
 2. **设置父级群组**：使用命令 `/npchat group <group> setParent <parent>` 为群组设置父级群组（默认为`Global`）。
 3. **添加永久提示**：使用命令 `/npchat group <group> addPermanentPrompt <prompt>` 向群组添加永久提示。
 4. **添加临时事件**：使用命令 `/npchat group <group> addTempEvent <event>` 向群组添加临时事件。
 
-    > ![set Group](images/newgroup.png)
+   > ![set Group](images/newgroup.png)
 
 5. **将群组添加到NPC**：使用命令 `/npchat npc setGroup <group>` 将该群组添加到某个NPC中。然后他们将了解有关该群组的一切。
 6. **重新载入插件并保存数据**: 你也许需要使用 `/npchat saveAll` 立即重新载入插件并保存这个新的NPC数据（注意，这同时也会卸载其他所有会话）。
@@ -86,4 +85,5 @@
   ]
 }
 ```
+
 _请注意_：在加载对话或群组之前，请修改文件。

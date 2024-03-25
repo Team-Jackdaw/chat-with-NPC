@@ -3,9 +3,9 @@ package com.jackdaw.chatwithnpc.openaiapi;
 import com.google.gson.Gson;
 import com.jackdaw.chatwithnpc.ChatWithNPCMod;
 import com.jackdaw.chatwithnpc.SettingManager;
+import com.jackdaw.chatwithnpc.group.GroupManager;
 import com.jackdaw.chatwithnpc.openaiapi.function.FunctionManager;
 import com.jackdaw.chatwithnpc.npc.NPCEntity;
-import com.jackdaw.chatwithnpc.openaiapi.prompt.NPCPrompt;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -41,7 +41,10 @@ public class Assistant {
             assistantRequest = Map.of(
                     "name", npc.getName(),
                     "model", SettingManager.model,
-                    "instructions", NPCPrompt.instructions(npc)
+                    "instructions", npc.instructions() +
+                            GroupManager.getGroupsPrompt(npc.getGroup()) +
+                            "You can only use `" + SettingManager.language + "` language to communicate. " +
+                            "Your word limit is " + SettingManager.wordLimit + " ."
             );
         } else {
             ArrayList<String> functions = npc.getFunctions();
@@ -52,15 +55,18 @@ public class Assistant {
             assistantRequest = Map.of(
                     "name", npc.getName(),
                     "model", SettingManager.model,
-                    "instructions", NPCPrompt.instructions(npc),
+                    "instructions", npc.instructions() +
+                            GroupManager.getGroupsPrompt(npc.getGroup()) +
+                            "You can only use `" + SettingManager.language + "` language to communicate. " +
+                            "Your word limit is " + SettingManager.wordLimit + " .",
                     "tools", functionsJsonList
             );
         }
         String res;
         if (what == Do.CREATE) {
-            res = Request.sendRequest(AssistantClass.toJson(assistantRequest), "assistants", Header.buildBeta(), Request.Action.POST);
+            res = Request.sendRequest(new Gson().toJson(assistantRequest), "assistants", Header.buildBeta(), Request.Action.POST);
         } else {
-            res = Request.sendRequest(AssistantClass.toJson(assistantRequest), "assistants/" + npc.getAssistantId(), Header.buildBeta(), Request.Action.POST);
+            res = Request.sendRequest(new Gson().toJson(assistantRequest), "assistants/" + npc.getAssistantId(), Header.buildBeta(), Request.Action.POST);
         }
         String id = AssistantClass.fromJson(res).id;
         if (id == null) {
@@ -76,10 +82,6 @@ public class Assistant {
         private String instructions;
         private String model;
         private ArrayList<Map> tools;
-
-        private static String toJson(Map map) {
-            return new Gson().toJson(map);
-        }
 
         private static AssistantClass fromJson(String json) {
             return new Gson().fromJson(json, AssistantClass.class);
