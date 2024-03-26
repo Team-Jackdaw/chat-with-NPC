@@ -7,7 +7,6 @@ the `config.json`. The content of the file is as follows:
 
 ```json
 {
-  "lastVersion": "v2.5",
   "enabled": true,
   "range": 10.0,
   "language": "Chinese",
@@ -16,7 +15,7 @@ the `config.json`. The content of the file is as follows:
   "apiURL": "api.openai.com",
   "isBubble": true,
   "isChatBar": true,
-  "maxTokens": 512
+  "wordLimit": 30
 }
 ```
 
@@ -26,9 +25,9 @@ You can set the parameters below:
 - `language`: which language the NPC will use to talk to the player.
 - `model`: the model of OpenAI
 - `apiURL`: you can use the proxy to access the OpenAI API.
-- `maxTokens`: the maximum tokens to use for each conversation.
 - `isBubble`: whether to show the bubble above the NPC.
 - `isChatBar`: whether to show the chat of the NPC in the chat bar of the player.
+- `wordLimit`: the maximum number of words in each reply of the NPC.
 
 ## 2. Manage you Assistant in OpenAI platform
 
@@ -39,8 +38,8 @@ Once you create a new NPC, you will see the Assistant in your OpenAI platform as
 You can access to the OpenAI platform to manage, use and test your NPCs in
 the [OpenAI platform Assistant](https://platform.openai.com/assistants).
 
-**IMPORTANT: You have to also set everything in you NPC configuration file in the mod direction. Or you will lose your
-setting.**
+**Important: The settings in your configuration file will override the settings on the OpenAI platform, so remember to
+modify them in the configuration file after testing.
 
 ## 3. Introduction of the structure of the mod
 
@@ -65,15 +64,10 @@ settings of the Conversation are:
   methods to activate, extract, and delete conversations.
 - `ConversationHandler` contains an `NPCEntity` member, the time `updateTime` of the last conversation, and whether the
   current NPC is talking `isTalking`.
-- When a player activates a `ConversationHandler`, the `ConversationManager` will first activate the NPC
-  through `NPCEntityManager`, assign the `NPCEntity` to the `ConversationHandler`, and request the model to greet the
-  player.
 - When the NPC is asynchronously requesting information from the model, `isTalking` will be set to `true` until the
   model returns the result, and `updateTime` will be updated.
-- When a `ConversationHandler` is unloaded, the manager will firstly end the NPC through `NPCEntityManager`, and then
-  remove the current conversation through `ConversationManager`.
-- That is, the lifecycle of `NPCEntity` is managed by `ConversationManager` and attached to `ConversationHandler` (
-  temporarily).
+- `ConversationHandler` is only activated when the player is talking to the NPC, and unloaded 5 minutes after the player
+    stops talking to the NPC.
 - The lifecycle of `ConversationHandler` is managed by the plugin lifecycle manager.
 
 ## 5. Group manager
@@ -81,17 +75,13 @@ settings of the Conversation are:
 The Group manager is responsible for managing all Groups, and the main settings of the Group are:
 
 - `GroupManager` stores all `Group` and provides methods to activate, extract, and delete Groups.
-- `Group` contains a last load time `lastLoadTime`, and some settings `parentGroup`, `permanentPrompt`, `tempEvent`.
+- `Group` contains a last load time `lastLoadTime`, and some settings `parentGroup`, `instructions`, `event`.
 - `Group` is only activated when the `ConversationHandle` requests information from the model, or when an OP uses a
   command to view and modify a Group.
 - The lifecycle of `Group` is managed by the plugin lifecycle manager.
 
 Other settings:
 
-- The `tempEvent` of `Group` is a temporary event collection. After an OP uses a command to add a temporary event, the
-  event will expire **7 days later**.
-- The `permanentPrompt` of `Group` is a **permanent** event collection. After an OP uses a command to add a permanent
-  event, the event will exist until the OP uses a command to delete the event.
 - The `parentGroup` of `Group` is a parent Group, and in general, all `Group` will eventually point to `Global`.
 
 ## 6. NPCEntity manager
@@ -100,8 +90,8 @@ The NPCEntity manager is responsible for managing all NPCEntity, and the main se
 
 - `NPCEntityManager` stores all `NPCEntity` and provides methods to activate, extract, and delete NPCEntity.
 - `NPCEntity` contains a `TextBubbleEntity`, and some settings `Career`, `instructions`, `Group`, `longTermMemory`.
-- `NPCEntity` is activated when the `ConversationHandler` is activated, and unloaded when the `ConversationHandler` is
-  unloaded, and the lifecycle is managed by `ConversationManager`.
+- `NPCEntity` is only activated when the player is talking to the NPC, or when an OP uses a command to view and modify an
+  NPC.
 
 Other settings:
 
@@ -113,11 +103,11 @@ Other settings:
 
 ## 7. Lifecycle manager
 
-The lifecycle manager is responsible for managing the lifecycle of all `ConversationHandler` and `Group`, and the main
+The lifecycle manager is responsible for managing the lifecycle of all `ConversationHandler`, `NPCEntity` and `Group`, and the main
 settings are:
 
 - `ConversationHandler` and `Group` are managed by the lifecycle manager, and the lifecycle manager provides methods to
-  activate, extract, and delete `ConversationHandler` and `Group`.
-- The lifecycle manager will automatically delete the `ConversationHandler` and `Group` that have not been activated for
-  a long time, and the time is set by the `forgetTime` of `NPCEntity` and `Group`.
-- All `ConversationHandlers` and `Groups` can be unloaded asynchronously with the command `/npc saveAll`.
+  activate, extract, and discard `ConversationHandler`, `NPCEntity` and `Group`.
+- The lifecycle manager will automatically discard the `ConversationHandler`, `NPCEntity` and `Group` that have not been activated for
+  a 5 minutes period every 30 seconds after the plugin is loaded.
+- All `ConversationHandlers`, `NPCEntity` and `Groups` can be unloaded asynchronously with the command `/npc saveAll`.

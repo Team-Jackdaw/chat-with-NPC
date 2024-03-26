@@ -4,10 +4,9 @@
 
 - `/npchat group <group>` - 查看一个群组的信息。
 - `/npchat group <group> setParent <parent>` - 设置群组的父级群组。
-- `/npchat group <group> addPermanentPrompt <prompt>` - 向群组添加一条永久提示（形容词或句）。
-- `/npchat group <group> popPermanentPrompt` - 从群组中删除最近一条永久提示。
-- `/npchat group <group> addTempEvent <event>` - 向群组添加一条临时事件（有效期现实7天）。
-- `/npchat group <group> popTempEvent` - 从群组中删除最近一条临时事件。
+- `/npchat group <group> setInstructions <instructions>` - 设置群组的说明。
+- `/npchat group <group> addEvent <event>` - 添加一个事件到群组。
+- `/npchat group <group> popEvent` - 从群组中删除最近一条事件。
 - `/npchat addGroup <newGroup>` - 添加一个新的群组
 
 ## 2. 注册群组的步骤
@@ -18,8 +17,8 @@
    ![new Group](images/initgroup.png)
 
 2. **设置父级群组**：使用命令 `/npchat group <group> setParent <parent>` 为群组设置父级群组（默认为`Global`）。
-3. **添加永久提示**：使用命令 `/npchat group <group> addPermanentPrompt <prompt>` 向群组添加永久提示。
-4. **添加临时事件**：使用命令 `/npchat group <group> addTempEvent <event>` 向群组添加临时事件。
+3. **添加说明**：使用命令 `/npchat group <group> setInstructions <instructions>` 为群组添加说明。
+4. **添加事件**：使用命令 `/npchat group <group> addEvent <event>` 向群组添加事件。
 
    > ![set Group](images/newgroup.png)
 
@@ -37,10 +36,10 @@
 
 ## 4. 群组示例
 
-- `name`: `imperialPalace`
-- `parent`: `SkeyCity`
-- `permanentPrompt`: `Majestic`, `ancient`, `opulent`, `grandiose`, `fortified`, `sprawling`, `ornate`, `regal`, `awe-inspiring`, `very save`
-- `tempEvent`: `enthronement ceremony`
+- `name`: `imperial_palace`
+- `parent`: `skey_city`
+- `instructions`: `A palace located on a snowy mountain in the center of Skey City, the capital of the Scot Empire.`
+- `Event`: `coronation ceremony`
 
 ## 5. 配置文件
 
@@ -48,42 +47,14 @@
 
 ```json
 {
-  "name": "SkeyCity",
-  "parentGroup": "ScotEmpire",
-  "permanentPrompt": [
-    "Historic",
-    "capital of Scot Empire",
-    "classical",
-    "commercial",
-    "cultural",
-    "culturally-rich",
-    "economically-strong",
-    "expansive",
-    "fortified",
-    "historic",
-    "industrial",
-    "innovative",
-    "inspiring",
-    "large",
-    "majestic",
-    "modern",
-    "opulent",
-    "ornate",
-    "regal",
-    "sprawling",
-    "thriving",
-    "very safe"
-  ],
-  "tempEvent": [
-    "coronation ceremony",
-    "festival",
-    "grand opening",
-    "parade",
-    "reception",
-    "state dinner",
-    "trade fair"
+  "name": "imperial_palace",
+  "parentGroup": "skey_city",
+  "instruction": "A palace located on a snowy mountain in the center of Skey City, the capital of the Scot Empire.",
+  "event": ["coronation ceremony"],
+  "memberList": [
+    "Lokeyli"
   ]
 }
 ```
 
-_请注意_：在加载对话或群组之前，请修改文件。
+_请注意_：在加载对话或群组之前，请修改文件。请不要手动修改memberList的内容，这是NPC的成员列表，由mod自动维护。

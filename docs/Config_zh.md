@@ -6,7 +6,6 @@
 
 ```json
 {
-  "lastVersion": "v2.5",
   "enabled": true,
   "range": 10.0,
   "language": "Chinese",
@@ -15,7 +14,7 @@
   "apiURL": "api.openai.com",
   "isBubble": true,
   "isChatBar": true,
-  "maxTokens": 512
+  "wordLimit": 30
 }
 ```
 
@@ -25,9 +24,9 @@
 - `language`：NPC用来与玩家交谈的语言。
 - `model`：OpenAI的模型。
 - `apiURL`：您可以使用代理访问OpenAI API。（适合在中国大陆地区使用本mod的服务器）
-- `maxTokens`：每次对话使用的最大令牌数。
 - `isBubble`：是否在NPC上方显示气泡。
 - `isChatBar`：是否在玩家的聊天栏中显示NPC的聊天。
+- `wordLimit`：NPC每次回复的最大字数。
 
 ## 2. 在OpenAI平台中管理您的助手
 
@@ -37,7 +36,7 @@
 
 您可以访问OpenAI平台来管理、使用和测试您的NPC，[OpenAI平台助手](https://platform.openai.com/assistants)。
 
-**重要：您还必须在插件目录下的NPC配置文件中设置所有内容。否则你会失去所有设定。**
+**重要：在你配置文件中的设定将会覆盖OpenAI平台上的设定，所以请记得测试完成后也在配置文件中修改。**
 
 ## 3. 介绍
 
@@ -58,11 +57,8 @@ Conversation管理器是插件的核心部分，它负责管理所有的对话�
 
 - `ConversationManager`储存所有的`ConversationHandler`，即一个NPC的当前会话，并且提供激活、提取、删除会话的方法。
 - `ConversationHandler`包含一个`NPCEntity`成员，最近一次对话的时间`updateTime`，当前NPC是否正在讲话`isTalking`。
-- 当玩家激活一个`ConversationHandler`时，`ConversationManager`会先通过`NPCEntityManager`激活该NPC，并将该`NPCEntity`
-  赋予到`ConversationHandler`中，并请求模型向玩家打招呼。
 - 当NPC正在向模型异步请求信息时，`isTalking`会被置为`true`直到模型返回结果，并且`updateTime`会被更新。
-- 当一个`ConversationHandler`被卸载时，会先通过`NPCEntityManager`结束该NPC，然后通过`ConversationManager`将当前会话移除。
-- 也就是说`NPCEntity`的生命周期由`ConversationManager`管理，并依附于`ConversationHandler`（暂时）。
+- `ConversationHandler`仅在玩家与NPC交谈时被激活，当玩家与NPC交谈结束后5分钟被卸载。
 - `ConversationHandler`的生命周期由插件生命周期管理器管理。
 
 ## 5. Group管理器
@@ -70,14 +66,12 @@ Conversation管理器是插件的核心部分，它负责管理所有的对话�
 Group管理器负责管理所有的Group，Group的主要设定有：
 
 - `GroupManager`储存所有的`Group`，并提供激活、提取、删除Group的方法。
-- `Group`包含一个最后加载时间`lastLoadTime`，以及一些设定`parentGroup`, `permanentPrompt`, `tempEvent`。
+- `Group`包含一个最后加载时间`lastLoadTime`，以及一些设定`parentGroup`, `instructions`, `event`。
 - `Group`仅在`ConversationHandle`向模型请求信息前，生成Prompt时被激活，或者当OP使用指令查看和修改一个Group时被激活。
 - `Group`的生命周期由插件生命周期管理器管理。
 
 其他设定：
 
-- `Group`的`tempEvent`是一个临时事件合集，OP使用指令添加一个临时事件后**7天后**该事件将会失效。
-- `Group`的`permanentPrompt`是一个**永久**事件合集，OP使用指令添加一个永久事件后，该事件将会一直存在直到OP使用指令删除该事件。
 - `Group`的`parentGroup`是一个父Group，一般情况下，所有`Group`最终将会指向`Global`。
 
 ## 6. NPCEntity管理器
@@ -86,7 +80,8 @@ NPCEntity管理器负责管理所有的NPCEntity，NPCEntity的主要设定有�
 
 - `NPCEntityManager`储存所有的`NPCEntity`，并提供激活、提取、删除NPCEntity的方法。
 - `NPCEntity`包含一个`TextBubbleEntity`，以及一些设定`Career`, `instructions`, `Group`。
-- `NPCEntity`在`ConversationHandler`被激活时激活，被卸载时卸载，生命周期由`ConversationManager`管理。
+- `NPCEntity`仅在玩家与NPC交谈时、或者OP使用指令查看和修改一个NPC时被激活。
+- `NPCEntity`的生命周期由插件生命周期管理器管理。
 
 其他设定：
 
@@ -95,9 +90,9 @@ NPCEntity管理器负责管理所有的NPCEntity，NPCEntity的主要设定有�
 
 ## 7. 生命周期管理器
 
-生命周期管理器负责管理所有`ConversationHandler`和`Group`的生命周期，它的主要设定有：
+生命周期管理器负责管理所有`ConversationHandler`，`NPCEntity`和`Group`的生命周期，它的主要设定有：
 
-- 自插件被加载后，生命周期管理器将会被异步加载，**每30秒**检查一次所有的`ConversationHandler`和`Group`，并且将会卸载那些*
+- 自插件被加载后，生命周期管理器将会被异步加载，**每30秒**检查一次所有的`ConversationHandler`，`NPCEntity`和`Group`，并且将会卸载那些*
   *超过5分钟**没有被使用的实例。
-- 服务器关闭时，生命周期管理器会关闭所有的`ConversationHandler`和`Group`，并关闭生命周期管理器线程。
-- 通过指令`/npc saveAll`可以异步卸载所有的`ConversationHandler`和`Group`。
+- 服务器关闭时，生命周期管理器会保存并关闭所有的`ConversationHandler`，`NPCEntity`和`Group`，并关闭生命周期管理器线程。
+- 通过指令`/npc saveAll`可以异步保存并卸载所有的`ConversationHandler`，`NPCEntity`和`Group`，并且同步插件设定和函数文件夹。

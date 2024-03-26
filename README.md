@@ -4,11 +4,11 @@
 ![GitHub license](https://img.shields.io/github/license/Team-Jackdaw/chat-with-NPC)
 ![test workflow](https://github.com/Team-Jackdaw/chat-with-NPC/actions/workflows/build.yml/badge.svg)
 
-[Chinese Version](docs/README_zh.md)
-
 > The mod is still under development, and the current version is not stable. If you want to use the latest version,
 > please compile
 > the source code yourself, see [Build](#8-build). If you encounter any problems, please submit an issue.
+
+[Chinese Version](docs/README_zh.md)
 
 ## 1. Introduction
 
@@ -41,13 +41,12 @@ If you are administrator, see the [Installation](#5-installation) for more infor
 
 1. Each `NPC` has his own `Instructions`, and he can belong to a `Group`.
 2. Each `NPC` can will manager their context of the conversation automatically by OpenAI.
-3. Each `Group` has some `PermanentPrompt` to describe them, and can also record some `TempEvent`, which will end after
-   a period of time.
+3. Each `Group` also has its own `Instructions` to describe them, and can also record some `Event` that can be easy to change.
 4. Each `Group` can record a `ParentGroup` until the group's parent group is `Global`, `Global` cannot have a parent
    group.
 5. Each `NPC`'s conversation will combine his own `Instructions`, the context of this
-   conversation (or all the conversation if needMemory is true), the `PermanentPrompt` of his `Group` and all
-   its `ParentGroup`, and the content of `TempEvent`.
+   conversation (or all the conversation if needMemory is true), the `Intructions` of his `Group` and all
+   its `ParentGroup`, and the content of `Event`.
 6. You can define the `Functions` that could be call by the NPC in the conversation.
 
 ## 4. Requirements
@@ -75,13 +74,13 @@ If you are administrator, see the [Installation](#5-installation) for more infor
 - `/npchat setModel <model>` - Set AI model
 - `/npchat setRange <range>` - Set the range of the conversation
 - `/npchat setLanguage <language>` - Set the response language
-- `/npchat setMaxTokens <maxTokens>` - Set the max tokens of a conversation
+- `/npchat setWordLimit <wordLimit>` - Set the word limit of the response
 - `/npchat setURL <url>` - Set the OpenAI API proxy URL
 - `/npchat saveAll` - Save all the data to the disk
 
 ## 7. To do list
 
-- [ ] Improve the chat bubble.
+- [X] Improve the chat bubble.
 - [ ] NPCs chat with each other and communicate their opinion of events.
 - [ ] NPCs have their opinion on every event in their `Group`.
 - [X] NPCs performing actions based on the chat content.
