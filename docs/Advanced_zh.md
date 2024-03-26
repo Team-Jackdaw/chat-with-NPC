@@ -21,11 +21,11 @@ API的一个高级功能，它允许ChatGPT在适当的时候以NPC的身份调�
 
 这种方式需要您在服务器端编写一些mod代码，以实现您定义的函数。这种方式的优点是可以实现非常复杂的功能，缺点是需要您有一定的mod开发经验。
 
-> 我们会在晚些时候开放mod api的文档，以便您可以更好地基于本mod
-> api进行二次开发。目前，您可以克隆本mod的源代码，查看[`src/main/java/com/jackdaw/chatwithnpc/openaiapi/function/CustomFunction`](../src/main/java/com/jackdaw/chatwithnpc/openaiapi/function/CustomFunction.java)
+> 您可以查看[`CustomFunction`](../src/main/java/com/jackdaw/chatwithnpc/openaiapi/function/CustomFunction.java)
 > 类的注释，继承该类并注册函数，在编译本插件来获得该函数功能。
-
-你可以复刻摸板仓库[NPCBasicFunction](https://github.com/Team-Jackdaw/NPCBasicFunction)来查看示例代码。
+> - 开发摸板：[NPCBasicFunction](https://github.com/Team-Jackdaw/NPCBasicFunction)
+> - API文档：[javadoc](https://npchat.doc.ussjackdaw.com)
+> - 依赖配置：[开发者注意事项](README_zh.md/#9-开发者注意事项)
 
 以下是一个简单的示例：
 

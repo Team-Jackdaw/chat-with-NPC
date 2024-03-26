@@ -8,7 +8,8 @@
 - `/npchat npc setInstructions <instructions>` - 为最近的 NPC 设置 `基础设定`。
 - `/npchat npc isNeedMemory <isNeedMemory>` - 设置最近的 NPC 是否记录记忆。
 - `/npchat npc clearMemory` - 清除最近的 NPC 的记忆。
-- `/npchat npc update` - 上传最近的 NPC 的当前信息到 OpenAi。
+- `/npchat npc addFunction <function>` - 为最近的 NPC 添加可调用的函数。
+- `/npchat npc deleteFunction <function>` - 为最近的 NPC 移除可调用的函数。
 
 ## 2. 注册 NPC 的步骤
 
@@ -22,8 +23,8 @@
 4. **设置组**：您可以使用命令 `/npchat npc setGroup <group>` 为 NPC 设置 `组`
    。要注册新组，请阅读 [RegisterGroup](RegisterGroup_zh.md)。
 5. **设置背景**：您可以使用命令 `/npchat npc setInstructions <instructions>` 为 NPC 设置 `基础设定`。
-6. **更新设置到 OpenAI**：您可以使用命令 `/npchat npc update` 将 NPC 的当前信息上传到 OpenAI。
-7. **清除记忆**：您可以使用命令 `/npchat npc clearMemory` 你也许希望清除 NPC 的所有记忆。
+6. **清除记忆**：您可以使用命令 `/npchat npc clearMemory` 你也许希望清除 NPC 的所有记忆。
+7. **立即保存当前数据**：您可以使用命令 `/npchat saveAll` 将 NPC 的当前信息保存到本地。（或者等5分钟后自动保存）
 
    > ![set NPC](images/newnpc.png)
 

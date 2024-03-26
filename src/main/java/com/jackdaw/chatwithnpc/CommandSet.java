@@ -172,6 +172,7 @@ public class CommandSet {
                 .append("\n/npchat setModel <model> - Set AI model")
                 .append("\n/npchat setRange <range> - Set the range of the conversation")
                 .append("\n/npchat setLanguage <language> - Set the response language")
+                .append("\n/npchat setWordLimit <wordLimit> - Set the word limit of the response")
                 .append("\n/npchat setURL <url> - Set the AI Model URL")
                 .append("\n/npchat saveAll - Discard all instances, save all the data and reload the mod.")
                 .append("\n --------------------------------")

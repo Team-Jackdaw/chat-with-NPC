@@ -4,10 +4,9 @@
 
 - `/npchat group <group>` - View the information of a group.
 - `/npchat group <group> setParent <parent>` - Set the parent group for the group.
-- `/npchat group <group> addPermanentPrompt <prompt>` - Add a permanent prompt to the group (adjective or sentence).
-- `/npchat group <group> popPermanentPrompt` - Pop a permanent prompt from the group.
-- `/npchat group <group> addTempEvent <event>` - Add a temporary event to the group (valid for 7 days).
-- `/npchat group <group> popTempEvent` - Pop a temporary event from the group.
+- `/npchat group <group> setInstructions <instructions>` - Set the instructions for the group.
+- `/npchat group <group> addEvent <event>` - Add an event to the group.
+- `/npchat group <group> popEvent` - Remove the most recent event from the group.
 - `/npchat addGroup <newGroup>` - Add a new group
 
 ## 2. Steps to Register Group
@@ -19,10 +18,9 @@
 
 2. **Set the Parent Group**: Use the command `/npchat group <group> setParent <parent>` to set the parent group for the
    group.
-3. **Add Permanent Prompt**: Use the command `/npchat group <group> addPermanentPrompt <prompt>` to add a permanent
-   prompt to the group.
-4. **Add Temporary Event**: Use the command `/npchat group <group> addTempEvent <event>` to add a temporary event to the
-   group.
+3. **Add Instructions**: Use the command `/npchat group <group> setInstructions <instructions>` to add instructions to the
+    group.
+4. **Add Event**: Use the command `/npchat group <group> addEvent <event>` to add an event to the group.
 
    > ![set Group](images/newgroup.png)
 
@@ -41,10 +39,10 @@
 
 ## 4. Group Example
 
-- `name`: `imperialPalace`
-- `parent`: `SkeyCity`
-- `permanentPrompt`: `Majestic`, `ancient`, `opulent`, `grandiose`, `fortified`, `sprawling`, `ornate`, `regal`, `awe-inspiring`, `very save`
-- `tempEvent`: `enthronement ceremony`
+- `name`: `imperial_palace`
+- `parent`: `skey_city`
+- `instructions`: `A palace located on a snowy mountain in the center of Skey City, the capital of the Scot Empire.`
+- `Event`: `coronation ceremony`
 
 ## 5. Configuration File
 
@@ -53,37 +51,17 @@ the `<groupName>.json`. The content of the file is as follows:
 
 ```json
 {
-  "name": "SkeyCity",
-  "parentGroup": "ScotEmpire",
-  "permanentPrompt": [
-    "Historic",
-    "capital of Scot Empire",
-    "classical",
-    "commercial",
-    "cultural",
-    "culturally-rich",
-    "economically-strong",
-    "expansive",
-    "glorious",
-    "innovative",
-    "magnificent",
-    "majestic",
-    "modern",
-    "political",
-    "powerful",
-    "prosperous",
-    "vast",
-    "vibrant"
-  ],
-  "tempEvent": [
-    {
-      "1711027280972": "the old King just dead"
-    },
-    {
-      "1711027308399": "New King Lee Reuben on the throne"
-    }
-  ]
+   "name": "imperial_palace",
+   "parentGroup": "skey_city",
+   "instruction": "A palace located on a snowy mountain in the center of Skey City, the capital of the Scot Empire.",
+   "event": ["coronation ceremony"],
+   "memberList": [
+      "Lokeyli"
+   ]
 }
 ```
 
-_Note_: Please modify the file before you load the conversation or group.
+_Note_: Please modify the file before you load the conversation or group. Please do not manually modify the content of
+memberList, which is the member list of the NPC and is automatically maintained by the mod.
+
+

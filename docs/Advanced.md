@@ -27,11 +27,12 @@ This method requires you to write some mod code on the server side to implement 
 of this method is that it can implement very complex functions, but the disadvantage is that it requires you to have
 some mod development experience.
 
-> We will open the mod API documentation later so that you can better develop based on this mod API. For now, you can
-> clone the source code of this mod and view the comments of
-> the [`src/main/java/com/jackdaw/chatwithnpc/openaiapi/function/CustomFunction`](../src/main/java/com/jackdaw/chatwithnpc/openaiapi/function/CustomFunction.java)
-> class, inherit this class and register the function to compile this plugin to get the function.
-> function.
+> You can view the comments of the [`CustomFunction`](../src/main/java/com/jackdaw/chatwithnpc/openaiapi/function/CustomFunction.java)
+> class to learn more about creating custom functions by extending this class and registering the function. You can
+> compile this plugin to get the function functionality.
+> - Development template: [NPCBasicFunction](https://github.com/Team-Jackdaw/NPCBasicFunction)
+> - API documentation: [javadoc](https://npchat.doc.ussjackdaw.com)
+> - Dependency configuration: [Developer Notes](../README.md/#9-developer-notes)
 
 You can clone the template repository [NPCBasicFunction](https://github.com/Team-Jackdaw/NPCBasicFunction) to view the
 example code.

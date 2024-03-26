@@ -8,7 +8,8 @@
 - `/npchat npc setInstructions <instructions>` - Set the instructions for the closest NPC.
 - `/npchat npc isNeedMemory <isNeedMemory>` - Set if the closest NPC will record the memory.
 - `/npchat npc clearMemory` - Clear the memory for the closest NPC.
-- `/npchat npc update` - Upload the current information of the closest NPC to OpenAi.
+- `/npchat npc addFunction <function>` - Add a callable function for the closest NPC.
+- `/npchat npc deleteFunction <function>` - Remove a callable function for the closest NPC.
 
 ## 2. Steps to Register NPC
 
@@ -24,10 +25,10 @@
    a new group, please read [RegisterGroup](RegisterGroup.md).
 5. **Set the Instructions**: You can use the command `/npchat npc setInstructions <instructions>` to set
    the `Instructions` for the NPC.
-6. **Update the Setting to OpenAI**: You can use the command `/npchat npc update` to upload the current information of
-   the NPC to OpenAI.
-7. **Clear the Memory**: You can use the command `/npchat npc clearMemory` if you want to clear all the memory of the
+6. **Clear the Memory**: You can use the command `/npchat npc clearMemory` if you want to clear all the memory of the
    NPC.
+7. **Save the Current Data Immediately**: You can use the command `/npchat saveAll` to save the current information of
+    the NPC to the local file. (Or it will be saved automatically after 5 minutes)
 
    > ![set NPC](images/newnpc.png)
 
