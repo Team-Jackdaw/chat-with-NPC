@@ -1,5 +1,6 @@
 package com.jackdaw.chatwithnpc.npc;
 
+import com.jackdaw.chatwithnpc.ChatWithNPCMod;
 import com.jackdaw.chatwithnpc.SettingManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -51,6 +52,8 @@ public class NPCEntity {
         this.entity = entity;
         this.uuid = entity.getUuid();
         this.textBubble = new TextBubbleEntity(entity);
+        textBubble.setTextBackgroundColor(SettingManager.bubbleColor);
+        textBubble.setTimeLastingPerChar(SettingManager.timeLastingPerChar);
         this.updateTime = System.currentTimeMillis();
     }
 
@@ -142,7 +145,17 @@ public class NPCEntity {
      * @param range  The range of the NPC
      */
     public void replyMessage(String message, double range) {
-        if (SettingManager.isBubble) textBubble.update(message, SettingManager.bubbleColor, SettingManager.timeLastingPerChar);
+        if (SettingManager.isBubble) {
+            ChatWithNPCMod.LOGGER.info("speaker: " + entity.toString());
+            ChatWithNPCMod.LOGGER.info("message: " + message);
+            ChatWithNPCMod.LOGGER.info("textBubble: " + textBubble.toString());
+            if(this.textBubble.isRemoved()) {
+                this.textBubble = new TextBubbleEntity(entity);
+            }
+            textBubble.setTextBackgroundColor(SettingManager.bubbleColor);
+            textBubble.setTimeLastingPerChar(SettingManager.timeLastingPerChar);
+            textBubble.update(message);
+        }
         if (SettingManager.isChatBar)
             findNearbyPlayers(range).forEach(player -> player.sendMessage(Text.of("<" + name + "> " + message)));
         this.updateTime = System.currentTimeMillis();

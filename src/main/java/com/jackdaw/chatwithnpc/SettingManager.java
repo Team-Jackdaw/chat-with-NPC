@@ -1,6 +1,8 @@
 package com.jackdaw.chatwithnpc;
 
 import com.google.gson.Gson;
+import com.jackdaw.chatwithnpc.npc.TextBubbleEntity.TextBackgroundColor;
+
 import org.slf4j.Logger;
 
 import java.io.File;
@@ -112,32 +114,5 @@ public class SettingManager {
         }
 
     }
-
-    public enum TextBackgroundColor{
-
-        /**
-         * RGB can be represented by Integer.
-         * ARGB must represent by Long.
-         */
-        DEFAULT ("69C8FF", "E5160C0E"),
-        SAKURANIGHT ("FEACAD", "E51A153D"),
-        SAKURADAY ("f9316d", "E5fed9d5");
     
-        private final String textRGB;
-        private final String backgroundARGB;
-    
-        TextBackgroundColor(String textRGB, String backgroundARGB){
-            this.textRGB = textRGB;
-            this.backgroundARGB = backgroundARGB;
-        }
-        
-        public int getTextRGBAsInt(){
-            return Integer.parseInt(textRGB, 16);
-        }
-    
-        public long getBackgroundARGBAsLong(){
-            return Long.parseLong(backgroundARGB, 16);
-        }
-    
-    }
 }
