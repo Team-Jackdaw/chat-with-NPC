@@ -2,6 +2,7 @@ package com.jackdaw.chatwithnpc.npc;
 
 import com.jackdaw.chatwithnpc.ChatWithNPCMod;
 import com.jackdaw.chatwithnpc.SettingManager;
+import com.jackdaw.chatwithnpc.openaiapi.Assistant;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import org.jetbrains.annotations.NotNull;
@@ -89,6 +90,12 @@ public class NPCEntityManager {
         if (!isOP && !npcDataManager.isExist()) return;
         npcDataManager.sync();
         npcMap.put(entity.getUuid(), npcEntity);
+        try {
+            if (!npcEntity.hasAssistant()) Assistant.createAssistant(npcEntity);
+            else Assistant.modifyAssistant(npcEntity);
+        } catch (Exception e) {
+            ChatWithNPCMod.LOGGER.error("[chat-with-npc] Modify assistant failed." + e.getMessage());
+        }
     }
 
     /**

@@ -31,6 +31,10 @@ public class FunctionManager {
     private static final Path folder = ChatWithNPCMod.workingDirectory.resolve("functions");
     private static final Map<String, CustomFunction> functionRegistry = new HashMap<>();
 
+    static {
+        registerFunction("inquiry_group", new QueryGroupFunction());
+    }
+
     public static @NotNull ArrayList<String> getRegistryList() {
         return new ArrayList<>(functionRegistry.keySet());
     }

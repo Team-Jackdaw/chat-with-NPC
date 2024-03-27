@@ -64,8 +64,6 @@ public class ConversationHandler {
         sendWaitMessage();
         AsyncTask.call(() -> {
             try {
-                if (!npc.hasAssistant()) Assistant.createAssistant(npc);
-                else Assistant.modifyAssistant(npc);
                 if(!npc.hasThreadId()) Threads.createThread(this);
                 Threads.addMessage(npc.getThreadId(), message);
                 AsyncTask.TaskResult result = Run.run(this);

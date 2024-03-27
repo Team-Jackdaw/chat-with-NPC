@@ -167,34 +167,28 @@ public class GroupManager {
     }
 
     /**
-     * Get the prompt of the group and all the parent groups.
+     * Get the prompt of the group.
      *
      * @param group the group name
      * @return the prompt of the group
      */
-    public static @NotNull String getGroupsPrompt(String group) {
+    public static @Nullable String getGroupsPrompt(String group) {
+        Group current = getGroup(group);
+        if (current == null) return null;
         StringBuilder groupsPrompt = new StringBuilder();
-        ArrayList<Group> groups = GroupManager.getParentGroups(group);
-        if (groups.isEmpty()) return "";
-        for (Group aGroup : groups) {
-            StringBuilder prompt = new StringBuilder();
-            if (aGroup.getName().equals("Global")) {
-                prompt.append("The overall environment is ");
-            } else {
-                prompt.append("You live in(/belongs to/are member of) `").append(aGroup.getName()).append("` where is ");
-            }
-            prompt.append(aGroup.getInstruction());
-            if (!aGroup.getEvent().isEmpty()) {
-                prompt.append(" and happening ");
-                for (String event : aGroup.getEvent()) {
-                    prompt.append(event);
-                    if (aGroup.getEvent().indexOf(event) != aGroup.getEvent().size() - 1) prompt.append(", ");
-                    else prompt.append(". ");
-                }
-            }
-            groupsPrompt.append(prompt);
+        groupsPrompt.append("The place ").append(group).append(" is ").append(current.getInstruction()).append(". ");
+        if (current.getEvent().isEmpty()) return groupsPrompt.toString();
+        groupsPrompt.append("There are some events happening here: ");
+        for (String event : current.getEvent()) {
+            groupsPrompt.append(event);
+            if (current.getEvent().indexOf(event) != current.getEvent().size() - 1) groupsPrompt.append(", ");
+            else groupsPrompt.append(". ");
         }
         return groupsPrompt.toString();
+    }
+
+    public static @NotNull String getParentGroupListPrompt(String group) {
+        return "Your are living in: " + getParentGroups(group).stream().map(Group::getName).reduce((a, b) -> a + ", " + b).orElse("Global") + ".";
     }
 
     /**

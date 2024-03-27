@@ -36,15 +36,17 @@ public class Assistant {
     }
 
     private static @NotNull String assistantRequest(@NotNull NPCEntity npc, Do what) throws Exception {
+        String instructions = npc.instructions() +
+                GroupManager.getParentGroupListPrompt(npc.getGroup()) +
+                GroupManager.getGroupsPrompt(npc.getGroup()) +
+                "You can only use `" + SettingManager.language + "` language to communicate. " +
+                "Your word limit is " + SettingManager.wordLimit + " .";
         Map assistantRequest;
         if (npc.getFunctions() == null || npc.getFunctions().isEmpty()) {
             assistantRequest = Map.of(
                     "name", npc.getName(),
                     "model", SettingManager.model,
-                    "instructions", npc.instructions() +
-                            GroupManager.getGroupsPrompt(npc.getGroup()) +
-                            "You can only use `" + SettingManager.language + "` language to communicate. " +
-                            "Your word limit is " + SettingManager.wordLimit + " ."
+                    "instructions", instructions
             );
         } else {
             ArrayList<String> functions = npc.getFunctions();
@@ -55,10 +57,7 @@ public class Assistant {
             assistantRequest = Map.of(
                     "name", npc.getName(),
                     "model", SettingManager.model,
-                    "instructions", npc.instructions() +
-                            GroupManager.getGroupsPrompt(npc.getGroup()) +
-                            "You can only use `" + SettingManager.language + "` language to communicate. " +
-                            "Your word limit is " + SettingManager.wordLimit + " .",
+                    "instructions", instructions,
                     "tools", functionsJsonList
             );
         }
