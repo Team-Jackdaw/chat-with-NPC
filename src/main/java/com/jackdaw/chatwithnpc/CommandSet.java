@@ -6,6 +6,7 @@ import com.jackdaw.chatwithnpc.group.Group;
 import com.jackdaw.chatwithnpc.group.GroupManager;
 import com.jackdaw.chatwithnpc.npc.NPCEntity;
 import com.jackdaw.chatwithnpc.npc.NPCEntityManager;
+import com.jackdaw.chatwithnpc.npc.TextBubbleEntity;
 import com.jackdaw.chatwithnpc.openaiapi.Threads;
 import com.jackdaw.chatwithnpc.openaiapi.function.FunctionManager;
 import com.mojang.brigadier.CommandDispatcher;
@@ -36,7 +37,7 @@ public class CommandSet {
     };
 
     private static final SuggestionProvider<ServerCommandSource> bubbleColorProvider = (context, builder) -> {
-        for (SettingManager.TextBackgroundColor color : SettingManager.TextBackgroundColor.values()) {
+        for (TextBubbleEntity.TextBackgroundColor color : TextBubbleEntity.TextBackgroundColor.values()) {
             builder.suggest(color.name());
         }
         return builder.buildFuture();
@@ -352,7 +353,7 @@ public class CommandSet {
     }
 
     private static int setBubbleColor(@NotNull CommandContext<ServerCommandSource> context) {
-        SettingManager.bubbleColor = SettingManager.TextBackgroundColor.valueOf(context.getArgument("color", String.class));
+        SettingManager.bubbleColor = TextBubbleEntity.TextBackgroundColor.valueOf(context.getArgument("color", String.class));
         SettingManager.save();
         context.getSource().sendFeedback(Text.of("[chat-with-npc] Bubble color set"), true);
         return 1;
