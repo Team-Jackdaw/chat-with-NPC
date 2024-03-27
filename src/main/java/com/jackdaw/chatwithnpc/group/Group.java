@@ -23,7 +23,7 @@ public class Group {
     protected long lastLoadTime;
     protected final ArrayList<String> memberList = new ArrayList<>();
 
-    Group(@NotNull String name) {
+    public Group(@NotNull String name) {
         this.name = name;
         if (name.equals("Global")) {
             parentGroup = null;

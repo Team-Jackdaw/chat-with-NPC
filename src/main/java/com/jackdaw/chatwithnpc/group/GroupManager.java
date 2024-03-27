@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class GroupManager {
     public static final ConcurrentHashMap<String, Group> GroupMap = new ConcurrentHashMap<>();
     // The time in milliseconds that a group is considered out of time
-    private static final long outOfTime = ChatWithNPCMod.outOfTime;
+    public static final long outOfTime = ChatWithNPCMod.outOfTime;
 
     public static boolean isLoaded(String name) {
         return GroupMap.containsKey(name);
@@ -214,19 +214,19 @@ public class GroupManager {
         return TreeNode.toString(groupToTree.generateTree(root), 0);
     }
 
-    static class GroupToTree {
-        final Map<String, List<String>> graph = new HashMap<>();
+    protected static class GroupToTree {
+        protected final Map<String, List<String>> graph = new HashMap<>();
 
-        void addEdge(String source, String destination) {
+        protected void addEdge(String source, String destination) {
             graph.computeIfAbsent(source, x -> new ArrayList<>()).add(destination);
             graph.computeIfAbsent(destination, x -> new ArrayList<>()).add(source);
         }
 
-        TreeNode generateTree(String root) {
+        protected TreeNode generateTree(String root) {
             return buildTree(root, new HashSet<>());
         }
 
-        @NotNull TreeNode buildTree(String node, @NotNull Set<String> visited) {
+        protected @NotNull TreeNode buildTree(String node, @NotNull Set<String> visited) {
             visited.add(node);
             TreeNode treeNode = new TreeNode(node);
             List<TreeNode> children = new ArrayList<>();
@@ -242,16 +242,16 @@ public class GroupManager {
         }
     }
 
-    static class TreeNode {
-        String val;
-        List<TreeNode> children;
+    protected static class TreeNode {
+        protected String val;
+        protected List<TreeNode> children;
 
-        TreeNode(String val) {
+        protected TreeNode(String val) {
             this.val = val;
             this.children = new ArrayList<>();
         }
 
-        static @NotNull String toString(TreeNode node, int level) {
+        protected static @NotNull String toString(TreeNode node, int level) {
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < level; i++) {
                 if (i == level - 1)

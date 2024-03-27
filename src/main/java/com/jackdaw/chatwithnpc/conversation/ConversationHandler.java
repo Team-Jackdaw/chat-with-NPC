@@ -28,7 +28,7 @@ public class ConversationHandler {
      * Construct a new Conversation for an NPC. This will start a conversation with the NPC asynchronously.
      * @param npc The NPC to start a conversation with.
      */
-    ConversationHandler(@NotNull NPCEntity npc) {
+    public ConversationHandler(@NotNull NPCEntity npc) {
         this.npc = npc;
         startConversation();
     }
@@ -41,11 +41,17 @@ public class ConversationHandler {
         return npc;
     }
 
-    private void sendWaitMessage() {
+    /**
+     * Send a wait message to the NPC. This will make the NPC reply to the player with a waiting message.
+     */
+    public void sendWaitMessage() {
         npc.replyMessage("...", SettingManager.range);
     }
 
-    private void startConversation() {
+    /**
+     * Say hello to the NPC. This will start a conversation with the NPC asynchronously.
+     */
+    public void startConversation() {
         replyToEntity("Hello!");
     }
 

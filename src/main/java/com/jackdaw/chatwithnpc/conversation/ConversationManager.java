@@ -25,7 +25,7 @@ public class ConversationManager {
 
     public static final ConcurrentHashMap<UUID, ConversationHandler> conversationMap = new ConcurrentHashMap<>();
     // The time in milliseconds that a conversation is considered out of time
-    private static final long outOfTime = ChatWithNPCMod.outOfTime;
+    public static final long outOfTime = ChatWithNPCMod.outOfTime;
 
     /**
      * Start a conversation for an NPC
@@ -96,7 +96,7 @@ public class ConversationManager {
         return conversationMap.keySet().stream().filter(entities::contains).map(conversationMap::get).toList();
     }
 
-    private static List<Entity> getEntitiesInRange(@NotNull PlayerEntity player, double range) {
+    public static List<Entity> getEntitiesInRange(@NotNull PlayerEntity player, double range) {
         return player.world.getEntitiesByClass(Entity.class, player.getBoundingBox().expand(range), entity -> entity.getCustomName() != null);
     }
 
