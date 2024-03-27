@@ -2,6 +2,7 @@
 
 ## 1. Basic Commands for Group
 
+- `/npchat group` - View the information of all groups.
 - `/npchat group <group>` - View the information of a group.
 - `/npchat group <group> setParent <parent>` - Set the parent group for the group.
 - `/npchat group <group> setInstructions <instructions>` - Set the instructions for the group.

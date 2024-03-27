@@ -4,7 +4,8 @@
 ![GitHub license](https://img.shields.io/github/license/Team-Jackdaw/chat-with-NPC)
 ![test workflow](https://github.com/Team-Jackdaw/chat-with-NPC/actions/workflows/build.yml/badge.svg)
 
-> 该mod仍在开发中，当前版本不稳定。如果您想使用mod，请自行编译源代码，参见[构建](#8-构建)。如果遇到任何问题，请提交问题。
+> 该mod目前仍在测试阶段，请您发现任何问题及时提交issue。如果您想使用最新版本，请自行编译源代码，参见[构建](#8-构建)。
+
 
 [English Version](../README.md)
 
@@ -75,7 +76,7 @@ NPC的对话可以被所有人看到（在他们头顶的**聊天气泡**中）�
 ## 7. 待做列表
 
 - [X] 改进聊天气泡。
-- [ ] NPC之间可以相互聊天，并交流观点。
+- [ ] NPC之间可以相互聊天，并交流观点。 （请参阅[高级功能](Advanced_zh.md)）
 - [ ] NPC会对他们所属的`Group`中的事件有自己的看法。
 - [X] NPC会对聊天内容作出动作反应。 (请参阅[高级功能](Advanced_zh.md))
 

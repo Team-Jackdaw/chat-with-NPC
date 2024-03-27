@@ -109,5 +109,5 @@ settings are:
 - `ConversationHandler` and `Group` are managed by the lifecycle manager, and the lifecycle manager provides methods to
   activate, extract, and discard `ConversationHandler`, `NPCEntity` and `Group`.
 - The lifecycle manager will automatically discard the `ConversationHandler`, `NPCEntity` and `Group` that have not been activated for
-  a 5 minutes period every 30 seconds after the plugin is loaded.
+  a **5 minutes** period every **30 seconds** after the plugin is loaded.
 - All `ConversationHandlers`, `NPCEntity` and `Groups` can be unloaded asynchronously with the command `/npc saveAll`.

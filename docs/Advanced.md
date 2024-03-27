@@ -1,6 +1,6 @@
 # Advanced Features
 
-## 1. Function Calls
+## 1. Function Calls (beta)
 
 Function calls are an advanced feature of the OpenAI API that allows ChatGPT to call functions that may affect game
 balance as an NPC at the appropriate time. The functions are defined by the server administrator, and the effects that
@@ -196,3 +196,13 @@ Don't forget to add this function to the NPC.
 
 ![open_door](images/open_door.png)
 ![close_door](images/close_door.png)
+
+## 2. NPC Conversation (dev)
+
+This feature allows NPCs to communicate with each other and convey their opinions on events. This feature can make your
+server more vivid and interesting. This feature is still under development. We plan to put this part in
+[NPConversation](https://github.com/Team-Jackdaw/NPConversation).
+
+**_Effect Picture:_**
+
+![npc_conversation](images/npConversation.jpg)

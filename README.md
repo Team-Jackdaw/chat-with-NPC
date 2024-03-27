@@ -4,9 +4,8 @@
 ![GitHub license](https://img.shields.io/github/license/Team-Jackdaw/chat-with-NPC)
 ![test workflow](https://github.com/Team-Jackdaw/chat-with-NPC/actions/workflows/build.yml/badge.svg)
 
-> The mod is still under development, and the current version is not stable. If you want to use the latest version,
-> please compile
-> the source code yourself, see [Build](#8-build). If you encounter any problems, please submit an issue.
+> The mod is still in beta, please submit an issue if you find any problems. If you want to use the latest version,
+> please compile the source code yourself, see [Build](#8-build).
 
 [Chinese Version](docs/README_zh.md)
 
@@ -79,14 +78,14 @@ If you are administrator, see the [Installation](#5-installation) for more infor
 - `/npchat setURL <url>` - Set the OpenAI API proxy URL
 - `/npchat saveAll` - Save all the data to the disk
 - `/npchat setChatBar <true/false>` - Set to display the conversation at the chat bat at the bottom left or not, `true` to display, `false` to hide.
-- `//npchat setBubble <true/false>` - Set to display the bubble of the conversation above our lovely NPC or not, `true` to display, `false` to hide.
+- `/npchat setBubble <true/false>` - Set to display the bubble of the conversation above our lovely NPC or not, `true` to display, `false` to hide.
 - `/npchat setBubbleStyle Color <color preset>` - Set the preset colors for font and background. 
 - `/npchat setBubbleStyle timeLastingPerChar <time>` - Set the time lasting for a character in unit of second. For example, setting the time to 1.5 seconds means a sentence with 6 characters will have its bubble displayed for a total of 9 seconds.
 
 ## 7. To do list
 
 - [X] Improve the chat bubble.
-- [ ] NPCs chat with each other and communicate their opinion of events.
+- [ ] NPCs chat with each other and communicate their opinion of events. (See [Advanced](docs/Advanced.md))
 - [ ] NPCs have their opinion on every event in their `Group`.
 - [X] NPCs performing actions based on the chat content. (See [Advanced](docs/Advanced.md))
 

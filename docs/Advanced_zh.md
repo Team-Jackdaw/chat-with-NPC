@@ -1,6 +1,6 @@
 # 高级功能
 
-## 1. 函数调用
+## 1. 函数调用（beta）
 
 函数调用是OpenAI
 API的一个高级功能，它允许ChatGPT在适当的时候以NPC的身份调用这些可能影响游戏平衡的函数，函数由服务器管理员定义，它可以达到的效果由您来决定。详细关于该功能的介绍请参见[OpenAI API文档](https://beta.openai.com/docs/api-reference/function-calls/create-function-call)。
@@ -177,3 +177,13 @@ execute run scoreboard players set @s npc_open_door_result 1
 
 ![open_door](images/open_door.png)
 ![close_door](images/close_door.png)
+
+## 2. NPC间的对话（dev）
+
+该功能允许NPC之间交流并传递他们对事件的看法。这个功能可以让您的服务器更加生动有趣。目前这个功能仍在开发中。我们计划将这部分内容放在[NPConversation](https://github.com/Team-Jackdaw/NPConversation)
+中。
+
+**_效果图：_**
+
+![npc_conversation](images/npConversation.jpg)
+

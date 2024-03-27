@@ -2,6 +2,7 @@
 
 ## 1. 群组的基本命令
 
+- `/npchat group` - 查看所有群组的信息。
 - `/npchat group <group>` - 查看一个群组的信息。
 - `/npchat group <group> setParent <parent>` - 设置群组的父级群组。
 - `/npchat group <group> setInstructions <instructions>` - 设置群组的说明。
