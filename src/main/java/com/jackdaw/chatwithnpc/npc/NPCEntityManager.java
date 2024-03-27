@@ -88,6 +88,7 @@ public class NPCEntityManager {
         NPCDataManager npcDataManager = npcEntity.getDataManager();
         if (!isOP && !npcDataManager.isExist()) return;
         npcDataManager.sync();
+        npcEntity.addFunction("inquiry_group");
         npcMap.put(entity.getUuid(), npcEntity);
     }
 

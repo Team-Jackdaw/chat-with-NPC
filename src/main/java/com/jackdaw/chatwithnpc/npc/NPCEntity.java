@@ -2,6 +2,7 @@ package com.jackdaw.chatwithnpc.npc;
 
 import com.jackdaw.chatwithnpc.ChatWithNPCMod;
 import com.jackdaw.chatwithnpc.SettingManager;
+import com.jackdaw.chatwithnpc.openaiapi.function.FunctionManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
@@ -259,7 +260,7 @@ public class NPCEntity {
      * @param function The function to add
      */
     public void addFunction(String function) {
-        functions.add(function);
+        if (!functions.contains(function) && FunctionManager.getRegistryList().contains(function)) functions.add(function);
     }
 
     /**
