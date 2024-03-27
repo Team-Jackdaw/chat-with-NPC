@@ -52,7 +52,24 @@ public class ConversationHandler {
      * Say hello to the NPC. This will start a conversation with the NPC asynchronously.
      */
     public void startConversation() {
-        replyToEntity("Hello!");
+        setTalking(true);
+        sendWaitMessage();
+        AsyncTask.call(() -> {
+            try {
+                if (!npc.hasAssistant()) Assistant.createAssistant(npc);
+                else Assistant.modifyAssistant(npc);
+                if(!npc.hasThreadId()) Threads.createThread(this);
+                Threads.addMessage(npc.getThreadId(), "Hello!");
+                AsyncTask.TaskResult result = Run.run(this);
+                setTalking(false);
+                return result;
+            } catch (Exception e) {
+                ChatWithNPCMod.LOGGER.error(e.getMessage());
+                setTalking(false);
+            }
+            return AsyncTask.nothingToDo();
+        });
+        updateTime = System.currentTimeMillis();
     }
 
     /**
@@ -64,7 +81,6 @@ public class ConversationHandler {
         sendWaitMessage();
         AsyncTask.call(() -> {
             try {
-                if(!npc.hasThreadId()) Threads.createThread(this);
                 Threads.addMessage(npc.getThreadId(), message);
                 AsyncTask.TaskResult result = Run.run(this);
                 setTalking(false);

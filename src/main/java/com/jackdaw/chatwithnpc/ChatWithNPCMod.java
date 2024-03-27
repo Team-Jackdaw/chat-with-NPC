@@ -99,6 +99,14 @@ public class ChatWithNPCMod implements ModInitializer {
                 AsyncTask.TaskResult result = AsyncTask.pollTaskQueue();
                 result.execute();
             }
+            // check if the NPC entity is removed
+            NPCEntityManager.npcMap.forEach((uuid, npc) -> {
+                if (npc.getEntity().isRemoved()) {
+                    if (ConversationManager.isConversing(uuid))
+                        ConversationManager.endConversation(uuid);
+                    NPCEntityManager.removeNPCEntity(uuid);
+                }
+            });
         });
         // Start the live cycle manager
         LiveCycleManager.start(updateInterval);
