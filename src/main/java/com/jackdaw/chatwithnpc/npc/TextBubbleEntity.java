@@ -41,6 +41,7 @@ public class TextBubbleEntity extends TextDisplayEntity {
         this.lastUpdateTime = System.currentTimeMillis();
         this.timeLastingPerChar = this.defaultTimePerChar;
         this.textBackgroundColor = this.defaultColor;
+        this.bubbleLastingTime = 0;
         speaker.world.spawnEntity(this);
         ServerChunkEvents.CHUNK_UNLOAD.register((ServerWorld world, WorldChunk chunk) -> {
             this.onChunkUnload(world, chunk);
@@ -55,17 +56,18 @@ public class TextBubbleEntity extends TextDisplayEntity {
         nbtData.putBoolean("see_through", this.isSeeThroughBlock());
         this.readNbt(nbtData);
         if (System.currentTimeMillis() - lastUpdateTime > bubbleLastingTime) {
-            nbtData.putString("text", Text.Serializer.toJson(
-                textBuilder(defaultText, textBackgroundColor)));
-            this.readNbt(nbtData);
+            updateNbt(defaultText);
             bubbleLastingTime = Long.MAX_VALUE;
             lastUpdateTime = System.currentTimeMillis();
+        }
+        if (this.speaker.isRemoved()) {
+            this.remove(Entity.RemovalReason.DISCARDED);
         }
     }
 
     private void onChunkUnload(ServerWorld world, WorldChunk chunk) {
         if (chunk.getPos().equals(currentChunkPos) && world.equals(currentWorld)) {
-            this.remove(Entity.RemovalReason.UNLOADED_TO_CHUNK);
+            this.remove(Entity.RemovalReason.DISCARDED);
         }
     }
 
@@ -78,6 +80,12 @@ public class TextBubbleEntity extends TextDisplayEntity {
     }
 
     public void update(String message) {
+        updateNbt(message);
+        bubbleLastingTime = bubbleLastingTime(message);
+        lastUpdateTime = System.currentTimeMillis();
+    }
+
+    private void updateNbt(String message) {
         NbtCompound nbtData = this.writeNbt(new NbtCompound());
         nbtData.putByte("text_opacity", (byte) -1);
         nbtData.putString("text", Text.Serializer.toJson(textBuilder(message, textBackgroundColor)));
@@ -85,8 +93,6 @@ public class TextBubbleEntity extends TextDisplayEntity {
         nbtData.putBoolean("see_through", this.isSeeThroughBlock());
         nbtData.putLong("background", textBackgroundColor.getBackgroundARGBAsLong());
         this.readNbt(nbtData);
-        bubbleLastingTime = bubbleLastingTime(message);
-        lastUpdateTime = System.currentTimeMillis();
     }
 
     private Text textBuilder(String message, TextBackgroundColor textBackgroundColor) {
