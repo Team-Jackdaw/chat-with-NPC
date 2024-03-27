@@ -66,9 +66,6 @@ public class GroupManager {
     public static void endOutOfTimeGroup() {
         if (GroupMap.isEmpty()) return;
         GroupMap.forEach((name, environment) -> {
-            if (environment.getName().equals("Global")) {
-                return;
-            }
             if (environment.getLastLoadTime() + outOfTime < System.currentTimeMillis()) {
                 environment.getDataManager().save();
                 discardGroup(name);
@@ -98,12 +95,17 @@ public class GroupManager {
     private static @NotNull ArrayList<Group> getParentGroups(@NotNull String currentGroup, @NotNull ArrayList<String> visited) {
         ArrayList<Group> parentGroups = new ArrayList<>();
         Group current = GroupManager.getGroup(currentGroup);
-        if (current == null) return parentGroups;
+        if (current == null || current.getName().equals("Global")) {
+            parentGroups.add(GroupManager.getGroup("Global"));
+            return parentGroups;
+        }
         parentGroups.add(current);
         String parentGroup = current.getParentGroup();
-        if (parentGroup != null && !visited.contains(parentGroup)) {
+        if (!visited.contains(parentGroup)) {
             visited.add(currentGroup);
             parentGroups.addAll(GroupManager.getParentGroups(parentGroup, visited));
+        } else {
+            parentGroups.add(GroupManager.getGroup("Global"));
         }
         return parentGroups;
     }
