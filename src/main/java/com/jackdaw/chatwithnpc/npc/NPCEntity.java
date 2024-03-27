@@ -147,9 +147,6 @@ public class NPCEntity {
      */
     public void replyMessage(String message, double range) {
         if (SettingManager.isBubble) {
-            ChatWithNPCMod.LOGGER.info("speaker: " + entity.toString());
-            ChatWithNPCMod.LOGGER.info("message: " + message);
-            ChatWithNPCMod.LOGGER.info("textBubble: " + textBubble.toString());
             if(this.textBubble.isRemoved()) {
                 this.textBubble = new TextBubbleEntity(entity);
             }

@@ -52,17 +52,21 @@ public class TextBubbleEntity extends TextDisplayEntity {
     public void tick() {
         super.tick();
         this.setPosition(speaker.getX(), speaker.getY() + speaker.getHeight() + heightOffset, speaker.getZ());
-        NbtCompound nbtData = this.writeNbt(new NbtCompound());
-        nbtData.putBoolean("see_through", this.isSeeThroughBlock());
-        this.readNbt(nbtData);
+        updateNbtSeeThrough();
         if (System.currentTimeMillis() - lastUpdateTime > bubbleLastingTime) {
-            updateNbt(defaultText);
+            updateAllNbt(defaultText);
             bubbleLastingTime = Long.MAX_VALUE;
             lastUpdateTime = System.currentTimeMillis();
         }
         if (this.speaker.isRemoved()) {
             this.remove(Entity.RemovalReason.DISCARDED);
         }
+    }
+
+    private void updateNbtSeeThrough() {
+        NbtCompound nbtData = this.writeNbt(new NbtCompound());
+        nbtData.putBoolean("see_through", this.isSeeThroughBlock());
+        this.readNbt(nbtData);
     }
 
     private void onChunkUnload(ServerWorld world, WorldChunk chunk) {
@@ -80,12 +84,12 @@ public class TextBubbleEntity extends TextDisplayEntity {
     }
 
     public void update(String message) {
-        updateNbt(message);
+        updateAllNbt(message);
         bubbleLastingTime = bubbleLastingTime(message);
         lastUpdateTime = System.currentTimeMillis();
     }
 
-    private void updateNbt(String message) {
+    private void updateAllNbt(String message) {
         NbtCompound nbtData = this.writeNbt(new NbtCompound());
         nbtData.putByte("text_opacity", (byte) -1);
         nbtData.putString("text", Text.Serializer.toJson(textBuilder(message, textBackgroundColor)));
@@ -127,8 +131,17 @@ public class TextBubbleEntity extends TextDisplayEntity {
          * ARGB must represent by Long.
          */
         DEFAULT ("69C8FF", "FF160C0E"),
+        DAY ("000000", "FFe0e0e0"),
+        NIGHT("FFFFFF", "FF202020"),
+        MATRIX("00d643", "FF0a0a0a"),
+        FERN ("784884", "FF201f22"),
+        ABBA ("091972", "FF0ABBA0"),
         SAKURANIGHT ("FEACAD", "FF1A153D"),
-        SAKURADAY ("f9316d", "FFfed9d5");
+        SAKURADAY ("f9316d", "FFfed9d5"),
+        MISTYBLUE ("001532", "FFa0afb7"),
+        UCL ("FF9933", "FF000000"),
+        TUB ("FFFFFF", "FFC61521"),
+        KTH ("FFFFFF", "FF2258A5");
     
         private final String textRGB;
         private final String backgroundARGB;
