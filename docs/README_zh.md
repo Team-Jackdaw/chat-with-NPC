@@ -66,6 +66,11 @@ NPC的对话可以被所有人看到（在他们头顶的**聊天气泡**中）�
 - `/npchat setWordLimit <wordLimit>` - 设置响应的字数限制
 - `/npchat setURL <url>` - 设置OpenAI API代理URL
 - `/npchat saveAll` - 将所有数据保存到磁盘
+- `/npchat setChatBar <true/false>` - 设置是否在屏幕左下角的聊天栏中显示对话。设为true显示，设为false不显示。
+- `/npchat setBubble <true/false>` - 设置是否在NPC头顶显示对话泡泡。设为true显示，设为false不显示。
+- `/npchat setBubbleStyle Color <color preset>` - 设置对话泡泡的预设颜色，包括字体和背景颜色。
+- `/npchat setBubbleStyle timeLastingPerChar <time>` - 设置对话泡泡中每个字符的显示时长，单位为秒。例如，如果每个字符的显示时间设置为1.5秒，那么一句含有6个字符的话语的泡泡将会持续9秒。
+
 
 ## 7. 待做列表
 

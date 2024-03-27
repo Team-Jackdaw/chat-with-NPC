@@ -78,6 +78,10 @@ If you are administrator, see the [Installation](#5-installation) for more infor
 - `/npchat setWordLimit <wordLimit>` - Set the word limit of the response
 - `/npchat setURL <url>` - Set the OpenAI API proxy URL
 - `/npchat saveAll` - Save all the data to the disk
+- `/npchat setChatBar <true/false>` - Set to display the conversation at the chat bat at the bottom left or not, `true` to display, `false` to hide.
+- `//npchat setBubble <true/false>` - Set to display the bubble of the conversation above our lovely NPC or not, `true` to display, `false` to hide.
+- `/npchat setBubbleStyle Color <color preset>` - Set the preset colors for font and background. 
+- `/npchat setBubbleStyle timeLastingPerChar <time>` - Set the time lasting for a character in unit of second. For example, setting the time to 1.5 seconds means a sentence with 6 characters will have its bubble displayed for a total of 9 seconds.
 
 ## 7. To do list
 
