@@ -22,11 +22,11 @@
 
 NPC的对话可以被所有人看到（在他们头顶的**聊天气泡**中），或者在NPC周围的一定范围内的玩家（在**聊天栏**中）。
 
-![image](images/greeting.png)
+任何附近的玩家都可以直接在聊天栏中回复NPC（如果玩家附近有多个NPC，则回复最近的NPC）。（养养猫娘什么的）
 
-任何附近的玩家都可以直接在聊天栏中回复NPC（如果玩家附近有多个NPC，则回复最近的NPC）。
+![image](images/greeting_zh-min.png)
 
-![image](images/reply.png)
+![image](images/matrix-min.png)
 
 如果您是管理员，请参阅[安装](#5-安装)以获取更多信息。
 

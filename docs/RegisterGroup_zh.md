@@ -21,7 +21,7 @@
 3. **添加说明**：使用命令 `/npchat group <group> setInstructions <instructions>` 为群组添加说明。
 4. **添加事件**：使用命令 `/npchat group <group> addEvent <event>` 向群组添加事件。
 
-   > ![set Group](images/newgroup.png)
+   > ![set Group](images/groups.png)
 
 5. **将群组添加到NPC**：使用命令 `/npchat npc setGroup <group>` 将该群组添加到某个NPC中。然后他们将了解有关该群组的一切。
 6. **重新载入插件并保存数据**: 你也许需要使用 `/npchat saveAll` 立即重新载入插件并保存这个新的NPC数据（注意，这同时也会卸载其他所有会话）。

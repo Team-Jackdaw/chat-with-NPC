@@ -94,7 +94,14 @@ public class NPCBasicFunction implements ModInitializer {
 
 **_Effect Picture:_**
 
-![give_diamond](images/give_diamond.png)
+Giving Diamonds:
+![give_diamond](images/diamond-min.png)
+
+Come Here!:
+![come_here](images/come-min.png)
+
+Feeling Happy:
+![feeling_happy](images/love-min.png)
 
 ### 2. Implemented through configuration files
 
@@ -194,8 +201,7 @@ Don't forget to add this function to the NPC.
 
 **_Effect Picture:_**
 
-![open_door](images/open_door.png)
-![close_door](images/close_door.png)
+![open_door](images/open_door-min.png)
 
 ## 2. NPC Conversation (dev)
 

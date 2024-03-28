@@ -27,12 +27,12 @@ greet with players.
 The NPC's speech can be seen by everyone (in the **chat bubble** above their head), or by players within a certain range
 around NPC (in the **Chat bar**).
 
-![image](docs/images/greeting.png)
-
 Any nearby players can **reply to the NPC in the chat bar directly** (or the nearest NPC if there are multiple NPCs near
 the player).
 
-![image](docs/images/reply.png)
+![image](docs/images/bole-min.png)
+
+![image](docs/images/matrix-min.png)
 
 If you are administrator, see the [Installation](#5-installation) for more information.
 

@@ -23,7 +23,7 @@
     group.
 4. **Add Event**: Use the command `/npchat group <group> addEvent <event>` to add an event to the group.
 
-   > ![set Group](images/newgroup.png)
+   > ![set Group](images/groups.png)
 
 5. **Add Group to an NPC**: Use the command `/npchat npc setGroup <group>` to add this group to an NPC. And then they
    will know everything about this group.
