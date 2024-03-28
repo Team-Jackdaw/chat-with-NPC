@@ -82,7 +82,14 @@ public class NPCBasicFunction implements ModInitializer {
 
 **_效果图：_**
 
+NPC给予钻石：
 ![give_diamond](images/diamond-min.png)
+
+叫NPC小狗过来：
+![come_here](images/come-min.png)
+
+NPC感到开心而冒心心：
+![feeling_happy](images/love-min.png)
 
 ### 2. 通过配置文件实现
 
@@ -175,14 +182,7 @@ execute run scoreboard players set @s npc_open_door_result 1
 
 **_效果图：_**
 
-NPC给予钻石：
-![give_diamond](images/diamond-min.png)
-
-叫NPC小狗过来：
-![come_here](images/come-min.png)
-
-NPC感到开心而冒心心：
-![feeling_happy](images/love-min.png)
+![open_door](images/open_door-min.png)
 
 ## 2. NPC间的对话（dev）
 
