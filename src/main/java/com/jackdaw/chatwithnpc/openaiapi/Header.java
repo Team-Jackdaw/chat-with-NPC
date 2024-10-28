@@ -63,7 +63,7 @@ public class Header {
                 header.put(HttpHeaders.CONTENT_TYPE, "application/json");
                 break;
             case OPENAI_BETA:
-                header.put("OpenAI-Beta", "assistants=v1");
+                header.put("OpenAI-Beta", "assistants=v2");
                 break;
         }
         return this;
