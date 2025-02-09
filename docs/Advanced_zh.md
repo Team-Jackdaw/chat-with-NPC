@@ -24,7 +24,7 @@ API的一个高级功能，它允许ChatGPT在适当的时候以NPC的身份调�
 > 您可以查看[`CustomFunction`](../src/main/java/com/jackdaw/chatwithnpc/openaiapi/function/CustomFunction.java)
 > 类的注释，继承该类并注册函数，在编译本插件来获得该函数功能。
 > - 开发摸板：[NPCBasicFunction](https://github.com/Team-Jackdaw/NPCBasicFunction)
-> - API文档：[javadoc](https://npchat.doc.ussjackdaw.com)
+> - API文档：[javadoc](http://npchat.doc.ussjackdaw.com)
 > - 依赖配置：[开发者注意事项](README_zh.md/#9-开发者注意事项)
 
 以下是一个简单的示例：

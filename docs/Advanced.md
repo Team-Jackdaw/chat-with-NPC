@@ -31,7 +31,7 @@ some mod development experience.
 > class to learn more about creating custom functions by extending this class and registering the function. You can
 > compile this plugin to get the function functionality.
 > - Development template: [NPCBasicFunction](https://github.com/Team-Jackdaw/NPCBasicFunction)
-> - API documentation: [javadoc](https://npchat.doc.ussjackdaw.com)
+> - API documentation: [javadoc](http://npchat.doc.ussjackdaw.com)
 > - Dependency configuration: [Developer Notes](../README.md/#9-developer-notes)
 
 You can clone the template repository [NPCBasicFunction](https://github.com/Team-Jackdaw/NPCBasicFunction) to view the

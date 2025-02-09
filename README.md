@@ -101,7 +101,7 @@ Developers can create their own custom functions by extending the `CustomFunctio
 API. For more information on creating custom functions, please refer to
 the [Advanced Function Calling](docs/Advanced.md) documentation. Or, you can extend this mod and buildup your own chat with NPC style. 
 
-- API Document: [javadoc](https://npchat.doc.ussjackdaw.com)
+- API Document: [javadoc](http://npchat.doc.ussjackdaw.com)
 - API dependency configuration:
 ```groovy
 repositories {
@@ -112,7 +112,7 @@ repositories {
 }
 
 dependencies {
-    modImplementation "com.jackdaw:chat-with-NPC:${project.chat_with_npc_version}"
+    modImplementation "com.jackdaw:chat-with-npc:${project.chat_with_npc_version}"
 }
 ```
 

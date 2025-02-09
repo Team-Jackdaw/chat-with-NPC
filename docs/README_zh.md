@@ -91,7 +91,7 @@ NPC的对话可以被所有人看到（在他们头顶的**聊天气泡**中）�
 开发者可以通过扩展`ChatWithNPC`提供的`CustomFunction`类来创建自己的自定义函数。有关创建自定义函数的更多信息，请参阅
 [高级功能调用](Advanced_zh.md)文档。 或者，您可以扩展此mod并构建自己的NPC风格的聊天。
 
-- API文档：[javadoc](https://npchat.doc.ussjackdaw.com)
+- API文档：[javadoc](http://npchat.doc.ussjackdaw.com)
 - API依赖配置：
 ```groovy
 
@@ -103,7 +103,7 @@ repositories {
 }
 
 dependencies {
-    modImplementation "com.jackdaw:chat-with-NPC:${project.chat_with_npc_version}"
+    modImplementation "com.jackdaw:chat-with-npc:${project.chat_with_npc_version}"
 }
 ```
 
