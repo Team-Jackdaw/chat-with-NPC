@@ -87,17 +87,21 @@ jar {
 publishing {
 	publications {
 		mavenJava(MavenPublication) {
+			groupId = 'com.jackdaw'
+			artifactId = 'chat-with-npc'
+			version = '0.1.1-1.19.4'
 			from components.java
 			artifact sourcesJar
 		}
 	}
-
-	// See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
 	repositories {
-		// Add repositories to publish to here.
-		// Notice: This block does NOT have the same function as the block in the top level.
-		// The repositories here will be used for publishing your artifact, not for
-		// retrieving dependencies.
-		mavenLocal()
+		maven {
+			name = "maven-releases"
+			url = uri("https://maven.ussjackdaw.com/repository/maven-releases/")
+			credentials {
+				username = 'admin'
+				password = ''
+			}
+		}
 	}
 }
