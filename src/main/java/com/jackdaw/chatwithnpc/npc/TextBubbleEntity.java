@@ -10,10 +10,8 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
-
 import org.jetbrains.annotations.NotNull;
 
 
@@ -22,11 +20,6 @@ public class TextBubbleEntity extends TextDisplayEntity {
 
     private final Entity speaker;
     private final double heightOffset = 0.55D;
-    private final TextBackgroundColor defaultColor = TextBackgroundColor.DEFAULT;
-    private final long defaultTimePerChar = 500L;
-    private final String defaultText = "...";
-    private World currentWorld;
-    private ChunkPos currentChunkPos;
     private long lastUpdateTime;        // In milliseconds.
     private long timeLastingPerChar;    // In milliseconds.
     private long bubbleLastingTime;     // In milliseconds.
@@ -36,16 +29,12 @@ public class TextBubbleEntity extends TextDisplayEntity {
         super(EntityType.TEXT_DISPLAY, speaker.world);
         this.speaker = speaker;
         this.setPosition(speaker.getX(), speaker.getY() + speaker.getHeight() + heightOffset, speaker.getZ());
-        this.currentWorld = speaker.world;
-        this.currentChunkPos = speaker.getChunkPos();
         this.lastUpdateTime = System.currentTimeMillis();
-        this.timeLastingPerChar = this.defaultTimePerChar;
-        this.textBackgroundColor = this.defaultColor;
+        this.timeLastingPerChar = 500L;
+        this.textBackgroundColor = TextBackgroundColor.DEFAULT;
         this.bubbleLastingTime = 0;
         speaker.world.spawnEntity(this);
-        ServerChunkEvents.CHUNK_UNLOAD.register((ServerWorld world, WorldChunk chunk) -> {
-            this.onChunkUnload(world, chunk);
-        });
+        ServerChunkEvents.CHUNK_UNLOAD.register(this::onChunkUnload);
     }
 
     @Override
@@ -54,6 +43,7 @@ public class TextBubbleEntity extends TextDisplayEntity {
         this.setPosition(speaker.getX(), speaker.getY() + speaker.getHeight() + heightOffset, speaker.getZ());
         updateNbtSeeThrough();
         if (System.currentTimeMillis() - lastUpdateTime > bubbleLastingTime) {
+            String defaultText = "...";
             updateAllNbt(defaultText);
             bubbleLastingTime = Long.MAX_VALUE;
             lastUpdateTime = System.currentTimeMillis();
@@ -70,7 +60,7 @@ public class TextBubbleEntity extends TextDisplayEntity {
     }
 
     private void onChunkUnload(ServerWorld world, WorldChunk chunk) {
-        if (chunk.getPos().equals(currentChunkPos) && world.equals(currentWorld)) {
+        if (chunk.getPos().equals(this.getChunkPos()) && world.equals(this.getWorld())) {
             this.remove(Entity.RemovalReason.DISCARDED);
         }
     }
