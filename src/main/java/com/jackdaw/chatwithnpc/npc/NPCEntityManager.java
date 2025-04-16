@@ -69,7 +69,7 @@ public class NPCEntityManager {
     }
 
     private static List<Entity> getEntitiesInRange(@NotNull PlayerEntity player, double range) {
-        return player.world.getEntitiesByClass(Entity.class, player.getBoundingBox().expand(range), entity -> entity.getCustomName() != null);
+        return player.getWorld().getEntitiesByClass(Entity.class, player.getBoundingBox().expand(range), entity -> entity.getCustomName() != null);
     }
 
     /**
@@ -88,7 +88,6 @@ public class NPCEntityManager {
         NPCDataManager npcDataManager = npcEntity.getDataManager();
         if (!isOP && !npcDataManager.isExist()) return;
         npcDataManager.sync();
-        npcEntity.addFunction("inquiry_group");
         npcMap.put(entity.getUuid(), npcEntity);
     }
 

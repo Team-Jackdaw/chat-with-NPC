@@ -2,6 +2,8 @@ package com.jackdaw.chatwithnpc.npc;
 
 import com.google.gson.Gson;
 import com.jackdaw.chatwithnpc.ChatWithNPCMod;
+import com.jackdaw.chatwithnpc.api.json.Message;
+import com.jackdaw.chatwithnpc.api.json.Role;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
@@ -10,6 +12,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A serializer used to read or write the data from the files.
@@ -89,33 +92,38 @@ public class NPCDataManager {
 
     private static final class NPCData {
         private final String name;
-        private final String assistantID;
-        private final String threadID;
         private final String careers;
         private final String localGroup;
         private final boolean needMemory;
         private final String instructions;
         private final ArrayList<String> functions;
+        private final List<Message> messages;
 
         private NPCData(NPCEntity npc) {
             this.name = npc.getName();
-            this.assistantID = npc.getAssistantId();
-            this.threadID = npc.getThreadId();
             this.careers = npc.getCareer();
             this.localGroup = npc.getGroup();
             this.instructions = npc.getInstructions();
             this.needMemory = npc.isNeedMemory();
             this.functions = npc.getFunctions();
+            this.messages = npc.getMessages();
         }
 
         private void set(NPCEntity npc) {
-            npc.setAssistantId(assistantID);
-            npc.setThreadId(threadID);
             npc.setCareer(careers);
             npc.setGroup(localGroup);
             npc.setInstructions(instructions);
             npc.setNeedMemory(needMemory);
             npc.setFunctions(functions);
+            if (!messages.isEmpty() && needMemory) {
+                Message systemMessage = new Message();
+                systemMessage.role = Role.SYSTEM.name().toLowerCase();
+                systemMessage.content = npc.getFullInstructions();
+                messages.set(0, systemMessage);
+                npc.setMessages(messages);
+            } else {
+                npc.initMessage();
+            }
         }
 
         private String toJson() {

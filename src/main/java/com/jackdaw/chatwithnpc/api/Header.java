@@ -1,15 +1,15 @@
-package com.jackdaw.chatwithnpc.openaiapi;
+package com.jackdaw.chatwithnpc.api;
 
-import com.jackdaw.chatwithnpc.SettingManager;
 import org.apache.http.HttpHeaders;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A class to build headers for the OpenAI API
+ * A class to build headers for the API
  */
 public class Header {
     private final Map<String, String> header = new HashMap<>();
@@ -27,37 +27,38 @@ public class Header {
     }
 
     /**
-     * Build the default headers for the OpenAI API
-     * @return The default headers for the OpenAI API
+     * Build the default headers for the API
+     * @return The default headers for the API
      */
     public static Map<String, String> buildDefault() {
         return Header.builder()
-                .add(Header.Type.CONTENT_TYPE)
-                .add(Header.Type.AUTHORIZATION)
+                .add(Type.CONTENT_TYPE, null)
                 .build();
     }
 
     /**
-     * Build the beta headers for the OpenAI API
-     * @return The beta headers for the OpenAI API
+     * Build the beta headers for the API
+     * @param apiKey The API key to use
+     * @return The beta headers for the API
      */
-    public static Map<String, String> buildBeta() {
+    public static Map<String, String> buildBeta(@NotNull String apiKey) {
         return Header.builder()
-                .add(Header.Type.CONTENT_TYPE)
-                .add(Header.Type.AUTHORIZATION)
-                .add(Header.Type.OPENAI_BETA)
+                .add(Type.CONTENT_TYPE, null)
+                .add(Type.AUTHORIZATION, apiKey)
+                .add(Type.OPENAI_BETA, null)
                 .build();
     }
 
     /**
      * Add a header to the builder
      * @param type The type of header to add
+     * @param value The value of the header (Not needed for some types)
      * @return The header builder
      */
-    public Header add(@NotNull Type type) {
+    public Header add(@NotNull Type type, @Nullable String value) {
         switch (type) {
             case AUTHORIZATION:
-                header.put(HttpHeaders.AUTHORIZATION, "Bearer " + SettingManager.apiKey);
+                header.put(HttpHeaders.AUTHORIZATION, "Bearer " + value);
                 break;
             case CONTENT_TYPE:
                 header.put(HttpHeaders.CONTENT_TYPE, "application/json");
@@ -66,6 +67,17 @@ public class Header {
                 header.put("OpenAI-Beta", "assistants=v2");
                 break;
         }
+        return this;
+    }
+
+    /**
+     * Add a header to the builder
+     * @param key The key of the header
+     * @param value The value of the header
+     * @return The header builder
+     */
+    public Header add(@NotNull String key, @NotNull String value) {
+        header.put(key, value);
         return this;
     }
 

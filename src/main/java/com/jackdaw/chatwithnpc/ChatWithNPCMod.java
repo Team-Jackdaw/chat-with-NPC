@@ -2,11 +2,13 @@ package com.jackdaw.chatwithnpc;
 
 import com.jackdaw.chatwithnpc.conversation.ConversationHandler;
 import com.jackdaw.chatwithnpc.conversation.ConversationManager;
+import com.jackdaw.chatwithnpc.function.FunctionManager;
+import com.jackdaw.chatwithnpc.function.QueryGroupFunction;
 import com.jackdaw.chatwithnpc.group.GroupManager;
 import com.jackdaw.chatwithnpc.listener.PlayerSendMessageCallback;
 import com.jackdaw.chatwithnpc.npc.NPCEntity;
 import com.jackdaw.chatwithnpc.npc.NPCEntityManager;
-import com.jackdaw.chatwithnpc.openaiapi.function.FunctionManager;
+import com.jackdaw.chatwithnpc.function.MinecraftFunction;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -34,8 +36,6 @@ public class ChatWithNPCMod implements ModInitializer {
     // The time in milliseconds that check for out of time static data
     public static final long updateInterval = 30000L;
 
-    public static final boolean debug = false;
-
     @Override
     public void onInitialize() {
         // Create the working directory if it does not exist
@@ -51,7 +51,8 @@ public class ChatWithNPCMod implements ModInitializer {
         // Load the configuration
         SettingManager.sync();
         // Load the functions
-        FunctionManager.sync();
+        MinecraftFunction.sync();
+        FunctionManager.getInstance().register("query_group", new QueryGroupFunction());
         // Register the command
         CommandRegistrationCallback.EVENT.register(CommandSet::setupCommand);
         // Register the conversation
@@ -63,10 +64,6 @@ public class ChatWithNPCMod implements ModInitializer {
             // The entity must have a custom name to be an NPC
             if (entity.getCustomName() == null) return ActionResult.PASS;
             // register the NPC entity and start a conversation
-            if (SettingManager.apiKey.isEmpty()) {
-                player.sendMessage(Text.of("[chat-with-npc] The API key is not set. Please use `/npchat setKey <Key>` to add your key."), false);
-                return ActionResult.FAIL;
-            }
             NPCEntityManager.registerNPCEntity(entity, player.hasPermissionLevel(2));
             NPCEntity npc = NPCEntityManager.getNPCEntity(entity.getUuid());
             if (npc != null) {
@@ -82,10 +79,6 @@ public class ChatWithNPCMod implements ModInitializer {
             // The player must be in a conversation
             ConversationHandler conversationHandler = ConversationManager.getConversation(player);
             if (conversationHandler == null) return ActionResult.PASS;
-            if (SettingManager.apiKey.isEmpty()) {
-                player.sendMessage(Text.of("[chat-with-npc] The API key is not set. Please use `/npchat setKey <Key>` to add your key."), false);
-                return ActionResult.FAIL;
-            }
             if (conversationHandler.isTalking()) {
                 player.sendMessage(Text.of("[chat-with-npc] The NPC is talking, please wait"), false);
                 return ActionResult.PASS;

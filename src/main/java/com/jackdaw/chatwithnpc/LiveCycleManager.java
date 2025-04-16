@@ -3,7 +3,7 @@ package com.jackdaw.chatwithnpc;
 import com.jackdaw.chatwithnpc.conversation.ConversationManager;
 import com.jackdaw.chatwithnpc.group.GroupManager;
 import com.jackdaw.chatwithnpc.npc.NPCEntityManager;
-import com.jackdaw.chatwithnpc.openaiapi.function.FunctionManager;
+import com.jackdaw.chatwithnpc.function.MinecraftFunction;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -39,7 +39,7 @@ public class LiveCycleManager {
         AsyncTask.call(() -> {
             saveAll();
             SettingManager.sync();
-            FunctionManager.sync();
+            MinecraftFunction.sync();
             return AsyncTask.nothingToDo();
         });
     }
@@ -48,9 +48,6 @@ public class LiveCycleManager {
      * Save all conversations, NPC entities, and environments
      */
     public static void saveAll() {
-        if (ChatWithNPCMod.debug) {
-            ChatWithNPCMod.LOGGER.info("[chat-with-npc] Saving all conversations, NPC entities, and environments.");
-        }
         ConversationManager.endAllConversations();
         NPCEntityManager.endAllNPCEntity();
         GroupManager.endAllGroup();

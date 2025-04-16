@@ -26,14 +26,14 @@ public class TextBubbleEntity extends TextDisplayEntity {
     private TextBackgroundColor textBackgroundColor;
 
     public TextBubbleEntity(@NotNull Entity speaker) {
-        super(EntityType.TEXT_DISPLAY, speaker.world);
+        super(EntityType.TEXT_DISPLAY, speaker.getWorld());
         this.speaker = speaker;
         this.setPosition(speaker.getX(), speaker.getY() + speaker.getHeight() + heightOffset, speaker.getZ());
         this.lastUpdateTime = System.currentTimeMillis();
         this.timeLastingPerChar = 500L;
         this.textBackgroundColor = TextBackgroundColor.DEFAULT;
         this.bubbleLastingTime = 0;
-        speaker.world.spawnEntity(this);
+        speaker.getWorld().spawnEntity(this);
         ServerChunkEvents.CHUNK_UNLOAD.register(this::onChunkUnload);
     }
 
@@ -82,7 +82,8 @@ public class TextBubbleEntity extends TextDisplayEntity {
     private void updateAllNbt(String message) {
         NbtCompound nbtData = this.writeNbt(new NbtCompound());
         nbtData.putByte("text_opacity", (byte) -1);
-        nbtData.putString("text", Text.Serializer.toJson(textBuilder(message, textBackgroundColor)));
+        nbtData.putString("text", textBuilder(message, textBackgroundColor).getString());
+
         nbtData.putString("billboard", "center");
         nbtData.putBoolean("see_through", this.isSeeThroughBlock());
         nbtData.putLong("background", textBackgroundColor.getBackgroundARGBAsLong());

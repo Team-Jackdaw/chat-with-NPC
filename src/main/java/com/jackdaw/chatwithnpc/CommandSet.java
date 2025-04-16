@@ -1,5 +1,7 @@
 package com.jackdaw.chatwithnpc;
 
+import com.jackdaw.chatwithnpc.api.Ollama;
+import com.jackdaw.chatwithnpc.api.json.Role;
 import com.jackdaw.chatwithnpc.conversation.ConversationHandler;
 import com.jackdaw.chatwithnpc.conversation.ConversationManager;
 import com.jackdaw.chatwithnpc.group.Group;
@@ -7,8 +9,7 @@ import com.jackdaw.chatwithnpc.group.GroupManager;
 import com.jackdaw.chatwithnpc.npc.NPCEntity;
 import com.jackdaw.chatwithnpc.npc.NPCEntityManager;
 import com.jackdaw.chatwithnpc.npc.TextBubbleEntity;
-import com.jackdaw.chatwithnpc.openaiapi.Threads;
-import com.jackdaw.chatwithnpc.openaiapi.function.FunctionManager;
+import com.jackdaw.chatwithnpc.function.FunctionManager;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.FloatArgumentType;
@@ -23,6 +24,8 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.function.Supplier;
 
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
@@ -43,7 +46,7 @@ public class CommandSet {
         return builder.buildFuture();
     };
     private static final SuggestionProvider<ServerCommandSource> functionsSuggestionProvider = (context, builder) -> {
-        for (String function : FunctionManager.getRegistryList()) {
+        for (String function : FunctionManager.getInstance().getRegistryList()) {
             builder.suggest(function);
         }
         return builder.buildFuture();
@@ -59,14 +62,6 @@ public class CommandSet {
                 .then(literal("help")
                         .requires(CommandSet::hasOPPermission)
                         .executes(CommandSet::help))
-                .then(literal("setKey")
-                        .requires(CommandSet::hasOPPermission)
-                        .then(argument("key", StringArgumentType.string())
-                                .executes(CommandSet::setAPIKey)))
-                .then(literal("setModel")
-                        .requires(CommandSet::hasOPPermission)
-                        .then(argument("model", StringArgumentType.string())
-                                .executes(CommandSet::setModel)))
                 .then(literal("enable")
                         .requires(CommandSet::hasOPPermission)
                         .executes(context -> setEnabled(context, true)))
@@ -85,10 +80,6 @@ public class CommandSet {
                         .requires(CommandSet::hasOPPermission)
                         .then(argument("wordLimit", IntegerArgumentType.integer(10))
                                 .executes(CommandSet::setWordLimit)))
-                .then(literal("setURL")
-                        .requires(CommandSet::hasOPPermission)
-                        .then(argument("url", StringArgumentType.string())
-                                .executes(CommandSet::setURL)))
                 .then(literal("setBubble")
                         .requires(CommandSet::hasOPPermission)
                         .then(argument("isBubble", BoolArgumentType.bool())
@@ -163,7 +154,7 @@ public class CommandSet {
     }
 
     public static int help(@NotNull CommandContext<ServerCommandSource> context) {
-        Text helpText = Text.literal("")
+        Supplier<Text> helpText = () -> Text.literal("")
                 .append("[chat-with-npc] ChatWithNPC Commands").formatted(Formatting.UNDERLINE)
                 .append("").formatted(Formatting.RESET)
                 .append("\n/npchat - View configuration status")
@@ -209,28 +200,26 @@ public class CommandSet {
         Text yes = Text.literal("Yes").formatted(Formatting.GREEN);
         Text no = Text.literal("No").formatted(Formatting.RED);
         if (!context.getSource().hasPermissionLevel(2)) {
-            Text helpText = Text.literal("")
+            Supplier<Text> helpText = () -> Text.literal("")
                     .append(Text.literal("[chat-with-npc] ChatWithNPC").formatted(Formatting.UNDERLINE))
                     .append("").formatted(Formatting.RESET)
                     .append("\nEnabled: ").append(SettingManager.enabled ? yes : no)
                     .append("\nChat Bubble: ").append(SettingManager.isBubble ? yes : no)
                     .append("\nChat Bar: ").append(SettingManager.isChatBar ? yes : no)
-                    .append("\nModel: ").append(SettingManager.model)
+                    .append("\nModel: ").append(SettingManager.chat_model)
                     .append("\nLanguage: ").append(SettingManager.language)
                     .append(Text.literal("\nYou can start a conversation to mobs by shift-clicking on them! " +
                                     "\nOnce you are in a conversation, you can reply to the NPC by typing in the chat.")
                             .formatted(Formatting.UNDERLINE));
             context.getSource().sendFeedback(helpText, false);
         } else {
-            boolean hasKey = !SettingManager.apiKey.isEmpty();
-            Text helpText = Text.literal("")
+            Supplier<Text> helpText = () -> Text.literal("")
                     .append(Text.literal("[chat-with-npc] ChatWithNPC").formatted(Formatting.UNDERLINE))
                     .append("").formatted(Formatting.RESET)
                     .append("\nEnabled: ").append(SettingManager.enabled ? yes : no)
-                    .append("\nAPI Key: ").append(hasKey ? yes : no)
                     .append("\nChat Bubble: ").append(SettingManager.isBubble ? yes : no)
                     .append("\nChat Bar: ").append(SettingManager.isChatBar ? yes : no)
-                    .append("\nModel: ").append(SettingManager.model)
+                    .append("\nModel: ").append(SettingManager.chat_model)
                     .append("\nRange: ").append(String.valueOf(SettingManager.range))
                     .append("\nLanguage: ").append(SettingManager.language)
                     .append("\nAPI URL: ").append(SettingManager.apiURL)
@@ -241,7 +230,7 @@ public class CommandSet {
     }
 
     private static int allGroupStatus(@NotNull CommandContext<ServerCommandSource> context) {
-        Text statusText = Text.literal("")
+        Supplier<Text> statusText = () -> Text.literal("")
                 .append(Text.literal("[chat-with-npc] Group List:").formatted(Formatting.UNDERLINE))
                 .append("").formatted(Formatting.RESET)
                 .append("\n").append(Text.literal(String.join(", ", GroupManager.getGroupList())).formatted(Formatting.GOLD))
@@ -265,7 +254,7 @@ public class CommandSet {
         // show all the properties of the npc
         Text yes = Text.literal("Yes").formatted(Formatting.GREEN);
         Text no = Text.literal("No").formatted(Formatting.RED);
-        Text statusText = Text.literal("")
+        Supplier<Text> statusText = () -> Text.literal("")
                 .append(Text.literal("[chat-with-npc] NPC Status:").formatted(Formatting.UNDERLINE))
                 .append("").formatted(Formatting.RESET)
                 .append("\nName: ").append(Text.literal(npc.getName()).formatted(Formatting.GOLD))
@@ -287,7 +276,7 @@ public class CommandSet {
         String group = context.getArgument("group", String.class);
         Group g = GroupManager.getGroup(group);
         if (g == null) {
-            context.getSource().sendFeedback(Text.of("[chat-with-npc] Group not found."), false);
+            context.getSource().sendFeedback(() -> Text.of("[chat-with-npc] Group not found."), false);
             return 0;
         }
         Text statusText = Text.literal("")
@@ -304,63 +293,41 @@ public class CommandSet {
                 .append("\n Member: ").append(Text.literal(String.join(", ", g.getMemberList())).formatted(Formatting.DARK_PURPLE))
                 .append("\nLast Load Time: ").append(Text.literal(String.valueOf(g.getLastLoadTimeString())).formatted(Formatting.GRAY))
                 .append("\nUse ").append(Text.literal("/npchat help").formatted(Formatting.GRAY)).append(" for help");
-        context.getSource().sendFeedback(statusText, false);
+        context.getSource().sendFeedback(() -> statusText, false);
         return 1;
     }
 
     private static int saveAll(@NotNull CommandContext<ServerCommandSource> context) {
         LiveCycleManager.asyncSaveAll();
-        context.getSource().sendFeedback(Text.of("[chat-with-npc] Reloaded"), true);
+        context.getSource().sendFeedback(() -> Text.of("[chat-with-npc] Reloaded"), true);
         return 1;
     }
 
     public static int setEnabled(@NotNull CommandContext<ServerCommandSource> context, boolean enabled) {
         SettingManager.enabled = enabled;
         SettingManager.save();
-        context.getSource().sendFeedback(Text.of("[chat-with-npc] ChatWithNPC " + (enabled ? "enabled" : "disabled")), true);
+        context.getSource().sendFeedback(() -> Text.of("[chat-with-npc] ChatWithNPC " + (enabled ? "enabled" : "disabled")), true);
         return 1;
-    }
-
-    public static int setAPIKey(@NotNull CommandContext<ServerCommandSource> context) {
-        String apiKey = context.getArgument("key", String.class);
-        if (!apiKey.isEmpty()) {
-            SettingManager.apiKey = apiKey;
-            SettingManager.save();
-            context.getSource().sendFeedback(Text.of("[chat-with-npc] API key set"), true);
-            return 1;
-        }
-        return 0;
-    }
-
-    public static int setModel(@NotNull CommandContext<ServerCommandSource> context) {
-        String model = context.getArgument("model", String.class);
-        if (!model.isEmpty()) {
-            SettingManager.model = model;
-            SettingManager.save();
-            context.getSource().sendFeedback(Text.of("[chat-with-npc] Model set"), true);
-            return 1;
-        }
-        return 0;
     }
 
     private static int setChatBar(@NotNull CommandContext<ServerCommandSource> context) {
         SettingManager.isChatBar = context.getArgument("isChatBar", Boolean.class);
         SettingManager.save();
-        context.getSource().sendFeedback(Text.of("[chat-with-npc] Chat bar set"), true);
+        context.getSource().sendFeedback(() -> Text.of("[chat-with-npc] Chat bar set"), true);
         return 1;
     }
 
     private static int setBubble(@NotNull CommandContext<ServerCommandSource> context) {
         SettingManager.isBubble = context.getArgument("isBubble", Boolean.class);
         SettingManager.save();
-        context.getSource().sendFeedback(Text.of("[chat-with-npc] Bubble set"), true);
+        context.getSource().sendFeedback(() -> Text.of("[chat-with-npc] Bubble set"), true);
         return 1;
     }
 
     private static int setBubbleColor(@NotNull CommandContext<ServerCommandSource> context) {
         SettingManager.bubbleColor = TextBubbleEntity.TextBackgroundColor.valueOf(context.getArgument("color", String.class));
         SettingManager.save();
-        context.getSource().sendFeedback(Text.of("[chat-with-npc] Bubble color set"), true);
+        context.getSource().sendFeedback(() -> Text.of("[chat-with-npc] Bubble color set"), true);
         return 1;
     }
 
@@ -368,42 +335,35 @@ public class CommandSet {
         // unit in seconds to user side, while in milliseconds for inside implementation.
         SettingManager.timeLastingPerChar = (long) (1000L * context.getArgument("time lasting per character in second", Float.class));
         SettingManager.save();
-        context.getSource().sendFeedback(Text.of("[chat-with-npc] Bubble time lasting per character set"), true);
-        return 1;
-    }
-
-    private static int setURL(@NotNull CommandContext<ServerCommandSource> context) {
-        SettingManager.apiURL = context.getArgument("url", String.class);
-        SettingManager.save();
-        context.getSource().sendFeedback(Text.of("[chat-with-npc] URL set"), true);
+        context.getSource().sendFeedback(() -> Text.of("[chat-with-npc] Bubble time lasting per character set"), true);
         return 1;
     }
 
     private static int setLanguage(@NotNull CommandContext<ServerCommandSource> context) {
         SettingManager.language = context.getArgument("language", String.class);
         SettingManager.save();
-        context.getSource().sendFeedback(Text.of("[chat-with-npc] Language set"), true);
+        context.getSource().sendFeedback(() -> Text.of("[chat-with-npc] Language set"), true);
         return 1;
     }
 
     private static int setWordLimit(@NotNull CommandContext<ServerCommandSource> context) {
         SettingManager.wordLimit = context.getArgument("wordLimit", Integer.class);
         SettingManager.save();
-        context.getSource().sendFeedback(Text.of("[chat-with-npc] Word limit set"), true);
+        context.getSource().sendFeedback(() -> Text.of("[chat-with-npc] Word limit set"), true);
         return 1;
     }
 
     private static int setRange(@NotNull CommandContext<ServerCommandSource> context) {
         SettingManager.range = Double.parseDouble(context.getArgument("range", String.class));
         SettingManager.save();
-        context.getSource().sendFeedback(Text.of("[chat-with-npc] Range set"), true);
+        context.getSource().sendFeedback(() -> Text.of("[chat-with-npc] Range set"), true);
         return 1;
     }
 
     private static int addGroup(@NotNull CommandContext<ServerCommandSource> context) {
         String group = context.getArgument("newGroup", String.class);
         GroupManager.loadGroup(group, true);
-        context.getSource().sendFeedback(Text.of("[chat-with-npc] Group added"), true);
+        context.getSource().sendFeedback(() -> Text.of("[chat-with-npc] Group added"), true);
         return 1;
     }
 
@@ -411,12 +371,12 @@ public class CommandSet {
         String group = context.getArgument("group", String.class);
         Group g = GroupManager.getGroup(group);
         if (g == null) {
-            context.getSource().sendFeedback(Text.of("[chat-with-npc] Group not found."), false);
+            context.getSource().sendFeedback(() -> Text.of("[chat-with-npc] Group not found."), false);
             return 0;
         }
         String event = context.getArgument("event", String.class);
         g.addEvent(event);
-        context.getSource().sendFeedback(Text.of("[chat-with-npc] Event added"), true);
+        context.getSource().sendFeedback(() -> Text.of("[chat-with-npc] Event added"), true);
         return 1;
     }
 
@@ -424,11 +384,11 @@ public class CommandSet {
         String group = context.getArgument("group", String.class);
         Group g = GroupManager.getGroup(group);
         if (g == null) {
-            context.getSource().sendFeedback(Text.of("[chat-with-npc] Group not found."), false);
+            context.getSource().sendFeedback(() -> Text.of("[chat-with-npc] Group not found."), false);
             return 0;
         }
         g.popEvent();
-        context.getSource().sendFeedback(Text.of("[chat-with-npc] Event popped"), true);
+        context.getSource().sendFeedback(() -> Text.of("[chat-with-npc] Event popped"), true);
         return 1;
     }
 
@@ -436,12 +396,12 @@ public class CommandSet {
         String group = context.getArgument("group", String.class);
         Group g = GroupManager.getGroup(group);
         if (g == null) {
-            context.getSource().sendFeedback(Text.of("[chat-with-npc] Group not found."), false);
+            context.getSource().sendFeedback(() -> Text.of("[chat-with-npc] Group not found."), false);
             return 0;
         }
         String instruction = context.getArgument("instruction", String.class);
         g.setInstruction(instruction);
-        context.getSource().sendFeedback(Text.of("[chat-with-npc] Group Instruction set."), true);
+        context.getSource().sendFeedback(() -> Text.of("[chat-with-npc] Group Instruction set."), true);
         return 1;
     }
 
@@ -449,7 +409,7 @@ public class CommandSet {
         String group = context.getArgument("group", String.class);
         String parent = context.getArgument("parent", String.class);
         GroupManager.setGroupParent(group, parent);
-        context.getSource().sendFeedback(Text.of("[chat-with-npc] Group parent set"), true);
+        context.getSource().sendFeedback(() -> Text.of("[chat-with-npc] Group parent set"), true);
         return 1;
     }
 
@@ -472,17 +432,7 @@ public class CommandSet {
         ServerPlayerEntity player = context.getSource().getPlayer();
         NPCEntity npc = NPCEntityManager.getNPCEntity(player);
         if (player != null && npc != null) {
-            if (npc.getThreadId() != null) {
-                AsyncTask.call(() -> {
-                    try {
-                        Threads.discardThread(npc.getThreadId());
-                        npc.setThreadId(null);
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                    return AsyncTask.nothingToDo();
-                });
-            }
+            npc.initMessage();
             player.sendMessage(Text.of("[chat-with-npc] Memory clear."), true);
             return 1;
         }

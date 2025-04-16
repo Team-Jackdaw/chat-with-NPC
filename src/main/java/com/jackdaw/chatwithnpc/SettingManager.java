@@ -16,19 +16,18 @@ import java.nio.file.Files;
  * Configure the setting if a specific module is enabled or disabled.
  *
  * @author WDRshadow, Lokeyli
- * @version v2.6
+ * @version v3.0
  */
 public class SettingManager {
     private static final Logger logger = ChatWithNPCMod.LOGGER;
     private static final File configFile = ChatWithNPCMod.workingDirectory.resolve("config.json").toFile();
-
     public static boolean enabled = true;
     public static double range = 10.0;
     public static String language = "Chinese";
     public static int wordLimit = 30;
-    public static String apiKey = "";
-    public static String model = "gpt-3.5-turbo";
-    public static String apiURL = "api.openai.com";
+    public static String apiURL = "http://localhost:11434";
+    public static String chat_model = "qwen2.5:7b";
+    public static String embedding_model = "nomic-embed-text";
     public static boolean isBubble = true;
     public static boolean isChatBar = false;
     public static TextBackgroundColor bubbleColor = TextBackgroundColor.DEFAULT;
@@ -74,9 +73,8 @@ public class SettingManager {
         private double range = 10.0;
         private String language = "Chinese";
         private int wordLimit = 30;
-        private String apiKey = "";
-        private String model = "gpt-3.5-turbo";
-        private String apiURL = "api.openai.com";
+        private String apiURL = "http://localhost:11434";
+        private String chat_model = "qwen2.5:7b";
         private boolean isBubble = true;
         private boolean isChatBar = false;
         private String textBackgroundColor = TextBackgroundColor.DEFAULT.name();
@@ -88,9 +86,8 @@ public class SettingManager {
             config.range = SettingManager.range;
             config.language = SettingManager.language;
             config.wordLimit = SettingManager.wordLimit;
-            config.apiKey = SettingManager.apiKey;
-            config.model = SettingManager.model;
             config.apiURL = SettingManager.apiURL;
+            config.chat_model = SettingManager.chat_model;
             config.isBubble = SettingManager.isBubble;
             config.isChatBar = SettingManager.isChatBar;
             config.textBackgroundColor = SettingManager.bubbleColor.name();
@@ -104,9 +101,8 @@ public class SettingManager {
             SettingManager.range = range;
             SettingManager.language = language;
             SettingManager.wordLimit = wordLimit;
-            SettingManager.apiKey = apiKey;
-            SettingManager.model = model;
             SettingManager.apiURL = apiURL;
+            SettingManager.chat_model = chat_model;
             SettingManager.isBubble = isBubble;
             SettingManager.isChatBar = isChatBar;
             SettingManager.bubbleColor = TextBackgroundColor.valueOf(textBackgroundColor);

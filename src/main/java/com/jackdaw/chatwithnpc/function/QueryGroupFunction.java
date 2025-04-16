@@ -1,4 +1,4 @@
-package com.jackdaw.chatwithnpc.openaiapi.function;
+package com.jackdaw.chatwithnpc.function;
 
 import com.jackdaw.chatwithnpc.conversation.ConversationHandler;
 import com.jackdaw.chatwithnpc.group.Group;
@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.Map;
 
-public class QueryGroupFunction extends CustomFunction{
+public class QueryGroupFunction extends CustomFunction {
     public QueryGroupFunction() {
         description = "Get the information of a place or a group.";
         properties = Map.of(

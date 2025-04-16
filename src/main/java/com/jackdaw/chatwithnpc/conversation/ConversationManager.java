@@ -97,7 +97,7 @@ public class ConversationManager {
     }
 
     public static List<Entity> getEntitiesInRange(@NotNull Entity theEntity, double range) {
-        return theEntity.world.getEntitiesByClass(Entity.class, theEntity.getBoundingBox().expand(range), entity -> entity.getCustomName() != null);
+        return theEntity.getWorld().getEntitiesByClass(Entity.class, theEntity.getBoundingBox().expand(range), entity -> entity.getCustomName() != null);
     }
 
     /**

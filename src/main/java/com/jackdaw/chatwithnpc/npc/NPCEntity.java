@@ -1,8 +1,11 @@
 package com.jackdaw.chatwithnpc.npc;
 
-import com.jackdaw.chatwithnpc.ChatWithNPCMod;
 import com.jackdaw.chatwithnpc.SettingManager;
-import com.jackdaw.chatwithnpc.openaiapi.function.FunctionManager;
+import com.jackdaw.chatwithnpc.api.Ollama;
+import com.jackdaw.chatwithnpc.api.json.Message;
+import com.jackdaw.chatwithnpc.api.json.Role;
+import com.jackdaw.chatwithnpc.function.FunctionManager;
+import com.jackdaw.chatwithnpc.group.GroupManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
@@ -30,15 +33,15 @@ public class NPCEntity {
     protected final String name;
     protected final Entity entity;
     protected final UUID uuid;
-    protected String assistantId;
-    protected String ThreadId;
     protected String career = "unemployed";
     protected String instructions = "You are an NPC.";
     protected String group = "Global";
-    protected boolean needMemory = true;
+    protected boolean needMemory = false;
     protected long updateTime;
     protected ArrayList<String> functions = new ArrayList<>();
     protected TextBubbleEntity textBubble;
+    protected int permissionLevel = 1;
+    protected List<Message> messages;
 
     /**
      * This is a constructor used to initialize the NPC with the entity.
@@ -52,10 +55,15 @@ public class NPCEntity {
         this.name = entity.getCustomName().getString();
         this.entity = entity;
         this.uuid = entity.getUuid();
-        this.textBubble = new TextBubbleEntity(entity);
-        textBubble.setTextBackgroundColor(SettingManager.bubbleColor);
-        textBubble.setTimeLastingPerChar(SettingManager.timeLastingPerChar);
         this.updateTime = System.currentTimeMillis();
+        addFunction("query_group");
+        initMessage();
+    }
+
+    public void initMessage() {
+        this.messages = Ollama.messageBuilder()
+                .addMessage(Role.SYSTEM, getFullInstructions())
+                .build();
     }
 
     /**
@@ -147,7 +155,7 @@ public class NPCEntity {
      */
     public void replyMessage(String message, double range) {
         if (SettingManager.isBubble) {
-            if(this.textBubble.isRemoved()) {
+            if(this.textBubble == null || this.textBubble.isRemoved()) {
                 this.textBubble = new TextBubbleEntity(entity);
             }
             textBubble.setTextBackgroundColor(SettingManager.bubbleColor);
@@ -155,7 +163,7 @@ public class NPCEntity {
             textBubble.update(message);
         }
         if (SettingManager.isChatBar)
-            findNearbyPlayers(range).forEach(player -> player.sendMessage(Text.of("<" + name + "> " + message)));
+            findNearbyPlayers(range).forEach(player -> player.sendMessage(Text.of("<" + name + "> " + message), false));
         this.updateTime = System.currentTimeMillis();
     }
 
@@ -166,7 +174,7 @@ public class NPCEntity {
      * @return The nearby players
      */
     public List<PlayerEntity> findNearbyPlayers(double range) {
-        World world = entity.world;
+        World world = entity.getWorld();
         return world.getEntitiesByClass(PlayerEntity.class, entity.getBoundingBox().expand(range), player -> true);
     }
 
@@ -205,59 +213,11 @@ public class NPCEntity {
     }
 
     /**
-     * Check if the NPC has an assistant.
-     * @return If the NPC has an assistant
-     */
-    public boolean hasAssistant() {
-        return this.assistantId != null;
-    }
-
-    /**
-     * Get the NPC's assistant ID.
-     * @return The NPC's assistant ID
-     */
-    public String getAssistantId() {
-        return this.assistantId;
-    }
-
-    /**
-     * Set the NPC's assistant ID.
-     * @param id The NPC's assistant ID
-     */
-    public void setAssistantId(String id) {
-        this.assistantId = id;
-    }
-
-    /**
-     * Get the NPC's thread ID.
-     * @return The NPC's thread ID
-     */
-    public String getThreadId() {
-        return ThreadId;
-    }
-
-    /**
-     * Set the NPC's thread ID.
-     * @param threadId The NPC's thread ID
-     */
-    public void setThreadId(String threadId) {
-        ThreadId = threadId;
-    }
-
-    /**
-     * Check if the NPC has a thread ID.
-     * @return If the NPC has a thread ID
-     */
-    public boolean hasThreadId() {
-        return ThreadId != null;
-    }
-
-    /**
      * Add a function to the NPC.
      * @param function The function to add
      */
     public void addFunction(String function) {
-        if (!functions.contains(function) && FunctionManager.getRegistryList().contains(function)) functions.add(function);
+        if (!functions.contains(function) && FunctionManager.getInstance().isRegistered(function)) functions.add(function);
     }
 
     /**
@@ -288,8 +248,13 @@ public class NPCEntity {
      * Discard the NPC. If the NPC is not needed to remember the conversation, all the messages in this conversation will be deleted.
      */
     public void discard() {
+        if (!needMemory) {
+            messages.clear();
+        }
         this.getDataManager().save();
-        this.textBubble.discard();
+        if (this.textBubble != null && !this.textBubble.isRemoved()) {
+            this.textBubble.discard();
+        }
     }
 
     /**
@@ -323,6 +288,27 @@ public class NPCEntity {
     public @NotNull String instructions() {
         return "You are an NPC with type `" + getType() + "` and named `" + getName() + "`. " +
                 "You career is `" + getCareer() + "`. " + getInstructions();
+    }
+
+    public String getFullInstructions() {
+        return instructions() +
+                GroupManager.getParentGroupListPrompt(getGroup()) +
+                GroupManager.getGroupsPrompt(getGroup()) +
+                "You can only use `" + SettingManager.language + "` language to communicate. " +
+                "Your word limit is " + SettingManager.wordLimit + ". " +
+                "You are now chatting with players.";
+    }
+
+    public int getPermissionLevel() {
+        return permissionLevel;
+    }
+
+    public List<Message> getMessages() {
+        return messages;
+    }
+
+    public void setMessages(List<Message> messages) {
+        this.messages = messages;
     }
 
 }
