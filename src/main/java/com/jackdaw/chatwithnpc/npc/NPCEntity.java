@@ -154,16 +154,17 @@ public class NPCEntity {
      * @param range  The range of the NPC
      */
     public void replyMessage(String message, double range) {
+        String noTagsMessage = message.replaceAll("(?s)<([^>]+)>.*?</\\1>", "").trim();
         if (SettingManager.isBubble) {
             if(this.textBubble == null || this.textBubble.isRemoved()) {
                 this.textBubble = new TextBubbleEntity(entity);
             }
             textBubble.setTextBackgroundColor(SettingManager.bubbleColor);
             textBubble.setTimeLastingPerChar(SettingManager.timeLastingPerChar);
-            textBubble.update(message);
+            textBubble.update(noTagsMessage);
         }
         if (SettingManager.isChatBar)
-            findNearbyPlayers(range).forEach(player -> player.sendMessage(Text.of("<" + name + "> " + message), false));
+            findNearbyPlayers(range).forEach(player -> player.sendMessage(Text.of("<" + name + "> " + noTagsMessage), false));
         this.updateTime = System.currentTimeMillis();
     }
 
@@ -286,7 +287,7 @@ public class NPCEntity {
      * @return the prompt
      */
     public @NotNull String instructions() {
-        return "You are an NPC with type `" + getType() + "` and named `" + getName() + "`. " +
+        return "You are a Minecraft NPC with type `" + getType() + "` and named `" + getName() + "`. " +
                 "You career is `" + getCareer() + "`. " + getInstructions();
     }
 
@@ -296,6 +297,7 @@ public class NPCEntity {
                 GroupManager.getGroupsPrompt(getGroup()) +
                 "You can only use `" + SettingManager.language + "` language to communicate. " +
                 "Your word limit is " + SettingManager.wordLimit + ". " +
+                "No emojis or special characters are allowed. " +
                 "You are now chatting with players.";
     }
 

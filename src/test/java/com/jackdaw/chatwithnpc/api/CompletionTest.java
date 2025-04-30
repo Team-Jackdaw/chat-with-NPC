@@ -16,6 +16,26 @@ static {
 }
 
     @Test
+    public void testRun() {
+        try {
+            CompletionResponse res = Ollama.runModel();
+            System.out.println(res.response);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    public void testStop() {
+        try {
+            CompletionResponse res = Ollama.stopModel();
+            System.out.println(res.response);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
     public void testCompletionRequest() {
         try {
             CompletionResponse res = Ollama.completion("Hello");

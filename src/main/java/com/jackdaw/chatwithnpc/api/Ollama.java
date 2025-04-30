@@ -27,6 +27,32 @@ public interface Ollama {
     }
 
     /**
+     * Permanently run the model. Please update the API_URL, CHAT_MODEL before you use the API.
+     * @return CompletionResponse
+     * @throws Exception If the request fails.
+     */
+    static CompletionResponse runModel() throws Exception {
+        CompletionRequest completionRequest = new CompletionRequest();
+        completionRequest.model = SettingManager.chat_model;
+        completionRequest.prompt = "";
+        completionRequest.keep_alive = -1;
+        return completion(completionRequest);
+    }
+
+    /**
+     * Shutdown the model. Please update the API_URL, CHAT_MODEL before you use the API.
+     * @return CompletionResponse
+     * @throws Exception If the request fails.
+     */
+    static CompletionResponse stopModel() throws Exception {
+        CompletionRequest completionRequest = new CompletionRequest();
+        completionRequest.model = SettingManager.chat_model;
+        completionRequest.prompt = "";
+        completionRequest.keep_alive = 0;
+        return completion(completionRequest);
+    }
+
+    /**
      * Request completion from the Ollama API. Please update the API_URL, CHAT_MODEL before you use the API.
      * @param messages The messages to be sent to the chat model. (use the messageBuilder to create messages)
      * @param tools The tools (functions) that can be used in the chat model.

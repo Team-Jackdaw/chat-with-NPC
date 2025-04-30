@@ -43,10 +43,7 @@ public class TextBubbleEntity extends TextDisplayEntity {
         this.setPosition(speaker.getX(), speaker.getY() + speaker.getHeight() + heightOffset, speaker.getZ());
         updateNbtSeeThrough();
         if (System.currentTimeMillis() - lastUpdateTime > bubbleLastingTime) {
-            String defaultText = "...";
-            updateAllNbt(defaultText);
-            bubbleLastingTime = Long.MAX_VALUE;
-            lastUpdateTime = System.currentTimeMillis();
+            this.remove(Entity.RemovalReason.DISCARDED);
         }
         if (this.speaker.isRemoved()) {
             this.remove(Entity.RemovalReason.DISCARDED);

@@ -1,15 +1,14 @@
 package com.jackdaw.chatwithnpc;
 
 import com.jackdaw.chatwithnpc.api.Ollama;
-import com.jackdaw.chatwithnpc.api.json.Role;
 import com.jackdaw.chatwithnpc.conversation.ConversationHandler;
 import com.jackdaw.chatwithnpc.conversation.ConversationManager;
+import com.jackdaw.chatwithnpc.function.FunctionManager;
 import com.jackdaw.chatwithnpc.group.Group;
 import com.jackdaw.chatwithnpc.group.GroupManager;
 import com.jackdaw.chatwithnpc.npc.NPCEntity;
 import com.jackdaw.chatwithnpc.npc.NPCEntityManager;
 import com.jackdaw.chatwithnpc.npc.TextBubbleEntity;
-import com.jackdaw.chatwithnpc.function.FunctionManager;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.FloatArgumentType;
@@ -147,6 +146,12 @@ public class CommandSet {
                         .requires(CommandSet::hasOPPermission)
                         .then(argument("newGroup", StringArgumentType.word())
                                 .executes(CommandSet::addGroup)))
+                .then(literal("model")
+                        .requires(CommandSet::hasOPPermission)
+                        .then(literal("run")
+                                .executes(CommandSet::runModel))
+                        .then(literal("stop")
+                                .executes(CommandSet::stopModel)))
                 .then(literal("saveAll")
                         .requires(CommandSet::hasOPPermission)
                         .executes(CommandSet::saveAll))
@@ -517,5 +522,33 @@ public class CommandSet {
             player.sendMessage(Text.of("[chat-with-npc] No NPC near you."), true);
         }
         return 0;
+    }
+
+    private static int runModel(CommandContext<ServerCommandSource> context) {
+        AsyncTask.call(() -> {
+            try {
+                Ollama.runModel();
+                context.getSource().sendFeedback(() -> Text.of("[chat-with-npc] Model up!"), true);
+            } catch (Exception e) {
+                ChatWithNPCMod.LOGGER.error("Failed to run model", e);
+                context.getSource().sendFeedback(() -> Text.of("[chat-with-npc] Model run failed"), true);
+            }
+            return AsyncTask.nothingToDo();
+        });
+        return 1;
+    }
+
+    private static int stopModel(CommandContext<ServerCommandSource> context) {
+        AsyncTask.call(() -> {
+            try {
+                Ollama.stopModel();
+                context.getSource().sendFeedback(() -> Text.of("[chat-with-npc] Model down!"), true);
+            } catch (Exception e) {
+                ChatWithNPCMod.LOGGER.error("Failed to run model", e);
+                context.getSource().sendFeedback(() -> Text.of("[chat-with-npc] Model stop failed"), true);
+            }
+            return AsyncTask.nothingToDo();
+        });
+        return 1;
     }
 }

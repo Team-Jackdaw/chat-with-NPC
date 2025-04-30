@@ -1,6 +1,7 @@
 package com.jackdaw.chatwithnpc.conversation;
 
 import com.jackdaw.chatwithnpc.AsyncTask;
+import com.jackdaw.chatwithnpc.ChatWithNPCMod;
 import com.jackdaw.chatwithnpc.SettingManager;
 import com.jackdaw.chatwithnpc.api.Ollama;
 import com.jackdaw.chatwithnpc.api.json.*;
@@ -123,6 +124,7 @@ public class ConversationHandler {
                     .addMessage(Role.ASSISTANT, response.message.content)
                     .build();
         } catch (Exception e) {
+            ChatWithNPCMod.LOGGER.error("[chat-with-npc] Error while chatting with NPC: " + e.getMessage());
             messages = Ollama.messageBuilder(messages)
                     .addMessage(Role.ASSISTANT, "I'm sorry, I can't do that.")
                     .build();
@@ -149,6 +151,7 @@ public class ConversationHandler {
                     .addMessage(Role.ASSISTANT, response.message.content)
                     .build();
         } catch (Exception e) {
+            ChatWithNPCMod.LOGGER.error("[chat-with-npc] Error while chatting with NPC: " + e.getMessage());
             messages = Ollama.messageBuilder(messages)
                     .addMessage(Role.ASSISTANT, "I'm sorry, I can't do that.")
                     .build();
