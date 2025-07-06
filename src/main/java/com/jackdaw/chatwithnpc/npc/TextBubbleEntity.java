@@ -6,9 +6,14 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.decoration.DisplayEntity.TextDisplayEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.storage.NbtReadView;
+import net.minecraft.storage.NbtWriteView;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
+import net.minecraft.util.ErrorReporter;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
@@ -43,22 +48,23 @@ public class TextBubbleEntity extends TextDisplayEntity {
         this.setPosition(speaker.getX(), speaker.getY() + speaker.getHeight() + heightOffset, speaker.getZ());
         updateNbtSeeThrough();
         if (System.currentTimeMillis() - lastUpdateTime > bubbleLastingTime) {
-            this.remove(Entity.RemovalReason.DISCARDED);
+            this.remove(RemovalReason.DISCARDED);
         }
         if (this.speaker.isRemoved()) {
-            this.remove(Entity.RemovalReason.DISCARDED);
+            this.remove(RemovalReason.DISCARDED);
         }
     }
 
     private void updateNbtSeeThrough() {
-        NbtCompound nbtData = this.writeNbt(new NbtCompound());
-        nbtData.putBoolean("see_through", this.isSeeThroughBlock());
-        this.readNbt(nbtData);
+        NbtWriteView writeView = NbtWriteView.create(ErrorReporter.EMPTY);
+        this.writeData(writeView);
+        writeView.putBoolean("see_through", this.isSeeThroughBlock());
+        this.readData((ReadView) writeView);
     }
 
     private void onChunkUnload(ServerWorld world, WorldChunk chunk) {
         if (chunk.getPos().equals(this.getChunkPos()) && world.equals(this.getWorld())) {
-            this.remove(Entity.RemovalReason.DISCARDED);
+            this.remove(RemovalReason.DISCARDED);
         }
     }
 
@@ -77,14 +83,15 @@ public class TextBubbleEntity extends TextDisplayEntity {
     }
 
     private void updateAllNbt(String message) {
-        NbtCompound nbtData = this.writeNbt(new NbtCompound());
-        nbtData.putByte("text_opacity", (byte) -1);
-        nbtData.putString("text", textBuilder(message, textBackgroundColor).getString());
+        NbtWriteView writeView = NbtWriteView.create(ErrorReporter.EMPTY);
+        this.writeData(writeView);
+        writeView.putByte("text_opacity", (byte) -1);
+        writeView.putString("text", textBuilder(message, textBackgroundColor).getString());
 
-        nbtData.putString("billboard", "center");
-        nbtData.putBoolean("see_through", this.isSeeThroughBlock());
-        nbtData.putLong("background", textBackgroundColor.getBackgroundARGBAsLong());
-        this.readNbt(nbtData);
+        writeView.putString("billboard", "center");
+        writeView.putBoolean("see_through", this.isSeeThroughBlock());
+        writeView.putLong("background", textBackgroundColor.getBackgroundARGBAsLong());
+        this.readData((ReadView) writeView);
     }
 
     private Text textBuilder(String message, TextBackgroundColor textBackgroundColor) {

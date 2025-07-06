@@ -10,7 +10,7 @@ public class CompletionRequest {
     public String system;
     public boolean stream;
     public Map format;
-    public int keep_alive;
+    public int keep_alive = 300;
 
     public String toJson() {
         return new Gson().toJson(this);
