@@ -13,7 +13,7 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
+import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import org.slf4j.Logger;
@@ -56,7 +56,7 @@ public class ChatWithNPCMod implements ModInitializer {
         // Register the command
         CommandRegistrationCallback.EVENT.register(CommandSet::setupCommand);
         // Register the conversation
-        AttackEntityCallback.EVENT.register((player, world, hand, entity, hitResult) -> {
+        UseEntityCallback.EVENT.register((player, world, hand, entity, hitResult) -> {
             // The mod must be enabled
             if (!SettingManager.enabled) return ActionResult.PASS;
             // The player must be sneaking to start a conversation

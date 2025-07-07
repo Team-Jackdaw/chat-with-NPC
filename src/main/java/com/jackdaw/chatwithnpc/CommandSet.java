@@ -148,6 +148,9 @@ public class CommandSet {
                                 .executes(CommandSet::addGroup)))
                 .then(literal("model")
                         .requires(CommandSet::hasOPPermission)
+                        .then(literal("set")
+                                .then(argument("model", StringArgumentType.word())
+                                        .executes(CommandSet::setModel)))
                         .then(literal("run")
                                 .executes(CommandSet::runModel))
                         .then(literal("stop")
@@ -312,6 +315,14 @@ public class CommandSet {
         SettingManager.enabled = enabled;
         SettingManager.save();
         context.getSource().sendFeedback(() -> Text.of("[chat-with-npc] ChatWithNPC " + (enabled ? "enabled" : "disabled")), true);
+        return 1;
+    }
+
+    public static int setModel(@NotNull CommandContext<ServerCommandSource> context) {
+        String model = context.getArgument("model", String.class);
+        SettingManager.chat_model = model;
+        SettingManager.save();
+        context.getSource().sendFeedback(() -> Text.of("[chat-with-npc] ChatWithNPC Chat model changed to: " + model), true);
         return 1;
     }
 
